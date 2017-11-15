@@ -1,24 +1,25 @@
-!/bin/sh
+#!/bin/bash
 
-DATE=`date +%Y_%m%d_%H%M`
-SAVE_DIR="/home/pi/hdd1/sun-mba/radio/“
-RECORDING_TIME=5
+DATE=`date "+%Y%m%d"`
+SAVE_DIR="/home/pi/hdd1/sun-mba/radio/"
+RECTIME=`expr $1 \* 60`
 
-RTMP_r='--rtmp "rtmpe://fms1.uniqueradio.jp/"'
-RTMP_a='-a ?rtmp://fms-base2.mitene.ad.jp/agqr/'
-RTMP_f='-f "WIN 16,0,0,257"'
-RTMP_W='-W http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf'
-RTMP_p='-p http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php'
-RTMP_C='-C B:0'
-RTMP_y='-y aandg22'
-RTMP_B="--stop ${RECORDING_TIME}"
+RTMP_r='"rtmpe://fms1.uniqueradio.jp/"'
+RTMP_a='?rtmp://fms-base2.mitene.ad.jp/agqr/'
+RTMP_f='"WIN 16,0,0,257"'
+RTMP_W='http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf'
+RTMP_p='http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php'
+RTMP_C='B:0'
+RTMP_y='aandg22'
 
-#$1 > file name
-RTMP_o="-o ${SAVE_DIR}agqr-${DATE}.flv"
-RTMP_PARAM="${RTMP_r} ${RTMP_a} ${RTMP_f} ${RTMP_W} ${RTMP_p} ${RTMP_C} ${RTMP_y} ${RTMP_B} --live ${RTMP_o}"
+RTMP_o="${SAVE_DIR}$2_${DATE}"
 
-#echo agqr-${DATE}.flv
-#echo "rtmpdump ${RTMP_PARAM}"
+RTMP_PARAM="--rtmp ${RTMP_r} -a ${RTMP_a} -f ${RTMP_f} -W ${RTMP_W} -p ${RTMP_p} -C ${RTMP_C} -y ${RTMP_y} --stop ${RECTIME} --live -o ${RTMP_o}.flv"
 
-#recoding start
+#echo ${RTMP_PARAM}
+
 rtmpdump ${RTMP_PARAM}
+
+avconv -loglevel quiet -i ${RTMP_o}.flv -acodec libmp3lame -ab 64k ${RTMP_o}.mp3
+
+rm ${RTMP_o}.flv
