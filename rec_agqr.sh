@@ -5,7 +5,7 @@ SAVE_DIR="/home/pi/hdd1/sun-mba/radio/"
 RECTIME=`expr $1 \* 60`
 
 RTMP_r='"rtmpe://fms1.uniqueradio.jp/"'
-RTMP_a='?rtmp://fms-base2.mitene.ad.jp/agqr/'
+RTMP_a='?rtmp://fms-base1.mitene.ad.jp/agqr/'
 RTMP_f='"WIN 16,0,0,257"'
 RTMP_W='http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf'
 RTMP_p='http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php'
