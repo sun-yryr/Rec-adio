@@ -10,7 +10,7 @@ RTMP_f='"WIN 16,0,0,257"'
 RTMP_W='http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf'
 RTMP_p='http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php'
 RTMP_C='B:0'
-RTMP_y='aandg2'
+RTMP_y='aandg22'
 
 RTMP_o="${SAVE_DIR}$2_${DATE}"
 
