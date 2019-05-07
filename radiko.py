@@ -15,12 +15,14 @@ class yradio:
         res = requests.get(self.RADIKO_URL)
         res.encoding = "utf-8"
         self.isKeyword = False
+        self.reload_date = DT.date.today()
         self.program_radiko = ET.fromstring(res.text)
 
     def reload_program(self):
         res = requests.get(self.RADIKO_URL)
         res.encoding = "utf-8"
         self.program_radiko = ET.fromstring(res.text)
+        self.reload_date = DT.date.today()
     
     def change_keywords(self, keywords):
         if bool(keywords):

@@ -7,7 +7,7 @@
         ]
     },
     "AnG": [
-        {"start_ts": YYYYMMddHHmmss,  "rec_time": 録音時間(sec), "title": タイトル},
-        {"start_ts": YYYYMMddHHmmss,  "rec_time": 録音時間(sec), "title": タイトル}
+        {"start_ts": YYYYMMddHHmmss,  "dur": 録音時間(sec), "title": タイトル, "isRepeat": False},
+        {"start_ts": HHmmss, "weekday":0~6,  "dur": 録音時間(sec), "title": タイトル, "isRepeat": True}
     ]
 }
