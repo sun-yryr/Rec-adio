@@ -25,7 +25,7 @@ class yradio:
     def change_keywords(self, keywords):
         if bool(keywords):
             word = "("
-            for keyword in keywords
+            for keyword in keywords:
                 word += keyword
                 word += "|"
             word = word.rstrip("|")

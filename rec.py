@@ -23,14 +23,14 @@ def main():
                 res.remove(data)
             elif (tmp_time < com):
                 print(data["ftl"])
-                p = Process(target=rec, args=([data, tmp_time.total_seconds(), AuthToken],))
+                p = Process(target=rec_radiko, args=([data, tmp_time.total_seconds(), AuthToken],))
                 p.start()
                 res.remove(data)
         time.sleep(10)
 
 
 
-def rec(data):
+def rec_radiko(data):
     program_data = data[0]
     AuthToken = data[2]
     print(program_data["title"])
@@ -39,6 +39,24 @@ def rec(data):
     time.sleep(program_data["dur"]+data[1]-5)
     #time.sleep(30)
     p1.send_signal(SIGINT)
+
+def rec_agqr(data):
+    program_data = data[0]
+    filepath = program_data["title"] + "_" + program_data["ft"][:12]
+    cwd = ('rtmpdump --rtmp "rtmpe://fms1.uniqueradio.jp/" ')
+    cwd += ('-a ?rtmp://fms-base1.mitene.ad.jp/agqr/ ')
+    cwd += ('-f "WIN 16,0,0,257" ')
+    cwd += ('-W http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf ')
+    cwd += ('-p http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php ')
+    cwd += ('-C B:0 ')
+    cwd += ('-y aandg22 ')
+    cwd += ('--stop %s ' % program_data["dur"])
+    cwd += ('--live -o %s.flv' % (filepath))
+    subprocess.run(cwd, shell=True)
+    
+    cwd2 = ('avconv -loglevel quiet -i %s.flv -acodec libmp3lame -ab 64k %s.mp3' % (filepath, filepath))
+    subprocess.run(cwd2, shell=True)
+
 
 if __name__ == "__main__":
     main()
