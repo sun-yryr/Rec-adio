@@ -1,0 +1,13 @@
+{
+    "radio": {
+        "savedir": 保存先path,
+        "keywords": [
+            "キーワード1",
+            "キーワード2"
+        ]
+    },
+    "AnG": [
+        {"start_ts": YYYYMMddHHmmss,  "rec_time": 録音時間(sec), "title": タイトル},
+        {"start_ts": YYYYMMddHHmmss,  "rec_time": 録音時間(sec), "title": タイトル}
+    ]
+}

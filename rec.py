@@ -17,7 +17,7 @@ def main():
     while(True):
         now = DT.datetime.now()
         print(res)
-        for i, data in enumerate(res):
+        for data in res:
             tmp_time = data["DT_ft"] - now
             if (tmp_time < zero):
                 res.remove(data)
