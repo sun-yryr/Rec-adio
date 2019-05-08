@@ -42,7 +42,7 @@ class yradio:
         self.change_keywords([])
         
     def search(self):
-        if (self.isKeyword is False): return None
+        if (self.isKeyword is False): return []
         res = []
         for station in self.program_radiko.findall("stations/station"):
             for prog in station.findall("./progs/prog"):
@@ -70,7 +70,7 @@ class yradio:
                         "dur": int(prog.get("dur"))
                     })
         if bool(res): return res
-        else: return None
+        else: return []
 
     def authorization(self):
         auth1_url = "https://radiko.jp/v2/api/auth1"

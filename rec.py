@@ -7,6 +7,10 @@ import time
 import datetime as DT
 import json
 
+with open("./settings.json") as f:
+    aa = json.load(f)
+    SAVEDIR = aa["radio"]["savedir"]
+
 
 def main():
     radio = radiko.yradio()
@@ -19,13 +23,13 @@ def main():
     zero = DT.timedelta()
     while(True):
         now = DT.datetime.now()
-        #print(radiko_data)
+        print(radiko_data)
         if (bool(radiko_data)):
             for data in radiko_data:
                 tmp_time = data["DT_ft"] - now
-                if (tmp_time < zero):
-                    radiko_data.remove(data)
-                elif (tmp_time < com):
+                #if (tmp_time < zero):
+                    #radiko_data.remove(data)
+                if (tmp_time < com):
                     #print(data["ftl"])
                     p = Process(target=rec_radiko, args=([data, tmp_time.total_seconds(), AuthToken],))
                     p.start()
@@ -33,6 +37,7 @@ def main():
         if (now.hour == 6 and now.minute <= 2 and radio.reload_date != DT.date.today()):
             radio.reload_program()
         time.sleep(10)
+
 
 def agqr_main():
     agqr_data = create_agqr_data()
@@ -67,8 +72,9 @@ def create_agqr_data():
 def rec_radiko(data):
     program_data = data[0]
     AuthToken = data[2]
+    filepath = program_data["title"]+"_"+program_data["ft"][:12]
     print(program_data["title"])
-    cwd = ('ffmpeg -headers "X-Radiko-AuthToken: %s" -i "https://rpaa.smartstream.ne.jp/so/playlist.m3u8?station_id=%s&l=15&lsid=85605612400545823313125539756301319021&type=b" -acodec copy ./%s.m4a' % (AuthToken, program_data["station"], program_data["title"]+ "/" +program_data["title"]+"_"+program_data["ft"][:12]))
+    cwd = ('ffmpeg -headers "X-Radiko-AuthToken: %s" -i "https://rpaa.smartstream.ne.jp/so/playlist.m3u8?station_id=%s&l=15&lsid=85605612400545823313125539756301319021&type=b" -acodec copy "./%s.m4a"' % (AuthToken, program_data["station"], filepath))
     p1 = subprocess.Popen(cwd, stdout=subprocess.DEVNULL, shell=True)
     time.sleep(program_data["dur"]+data[1]-5)
     #time.sleep(30)
