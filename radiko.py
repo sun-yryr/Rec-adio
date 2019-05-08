@@ -86,6 +86,7 @@ class yradio:
         if (res.status_code != 200):
             print("Authorization1 Failed")
             return None
+        print(res.headers)
         AuthToken = res.headers["X-RADIKO-AUTHTOKEN"]
         KeyLength = int(res.headers["X-Radiko-KeyLength"])
         KeyOffset = int(res.headers["X-Radiko-KeyOffset"])
@@ -100,6 +101,8 @@ class yradio:
         }
         res = requests.get(auth2_url, headers=headers)
         if (res.status_code == 200):
+            print("----------")
+            print(res.headers)
             return AuthToken
         else:
             print("Authorization2 Failed")

@@ -27,9 +27,9 @@ def main():
         if (bool(radiko_data)):
             for data in radiko_data:
                 tmp_time = data["DT_ft"] - now
-                #if (tmp_time < zero):
-                    #radiko_data.remove(data)
-                if (tmp_time < com):
+                if (tmp_time < zero):
+                    radiko_data.remove(data)
+                elif (tmp_time < com):
                     #print(data["ftl"])
                     p = Process(target=rec_radiko, args=([data, tmp_time.total_seconds(), AuthToken],))
                     p.start()
