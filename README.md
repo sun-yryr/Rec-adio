@@ -10,7 +10,7 @@
 - 録音完了を何らかの方法で通知する（line）
 
 # 設定方法 centOS7の場合
-参考ページ : 
+参考ページ : https://qiita.com/taittide/items/7219cc9ff6788423ab50
 ```
 git clone https://github.com/sun-yryr/Rec-adio.git
 cd Rec-adio
