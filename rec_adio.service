@@ -1,0 +1,12 @@
+[Unit]
+Description = Net Radio Recording
+After = network.target
+
+[Service]
+User = yryr
+ExecStart = /home/yryr/radio/run.py
+Restart = no
+Type = simple
+
+[Install]
+WantedBy = multi-user.target

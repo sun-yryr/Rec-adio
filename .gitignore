@@ -1,4 +1,5 @@
 __pycache__
 .vscode
-savefile
+savefile/*
 .DS_Store
+conf/config.json

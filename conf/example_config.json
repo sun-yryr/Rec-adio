@@ -1,0 +1,34 @@
+{
+    "all": {
+        "savedir": "保存先のpath",
+        "dbx_token": "dropboxのアクセストークン",
+        "line_token": "line notifyのアクセストークン"
+    },
+    "radiko": {
+        "keywords": [
+            "夏川椎菜",
+            "水瀬いのり",
+            "伊藤美来",
+            "阿澄佳奈"
+        ]
+    },
+    "AnG": [
+        {"start_ts": "20190511172800",  "dur": 60, "title": "test", "isRepeat": false},
+        {"start_ts": "210000", "weekday": 1,  "dur": 1800, "title": "TrySailのTRYangle harmony", "isRepeat": true},
+        {"start_ts": "233000", "weekday": 1,  "dur": 1800, "title": "佐倉としたい大西", "isRepeat": true},
+        {"start_ts": "193000", "weekday": 2,  "dur": 1800, "title": "竹達彩奈「秘密のラジオ」", "isRepeat": true},
+        {"start_ts": "190000", "weekday": 3,  "dur": 1800, "title": "Pyxisの夜空の下_de_Meeting", "isRepeat": true},
+        {"start_ts": "020000", "weekday": 4,  "dur": 1800, "title": "阿澄佳奈 星空ひなたぼっこ", "isRepeat": true},
+        {"start_ts": "140000", "weekday": 5,  "dur": 1800, "title": "ラムネムララララムラムララジオ", "isRepeat": true}
+    ],
+    "Onsen": {
+        "keywords": [
+            "夏川椎菜",
+            "水瀬いのり",
+            "ひとりぼっち"
+        ]
+    },
+    "Hibiki": {
+        "keywords": []
+    }
+}
