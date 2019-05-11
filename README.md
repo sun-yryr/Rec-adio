@@ -1,26 +1,27 @@
 # radio
-trysailのラジオを聞き逃さないように録音したい！ってことで作るradio録音
+オタク！ラジオを聞き逃すな！ってことで作るradio録音
 
-## やりたいこと
+## できること
 - 設定ファイルの作成と読み込み
 - 番組表の取得，キーワード録音
 - 複数番組の同時録音
 - systemctlでの自動起動，再起動
-- 出来たらクラウドストレージに保存（id, passは設定ファイル）
-- 録音完了を何らかの方法で通知する（lineかなぁ）
+- 出来たらdropに保存（アクセストークンは設定ファイル）
+- 録音完了を何らかの方法で通知する（line）
 
----
+# 設定方法 centOS7の場合
+参考ページ : https://qiita.com/taittide/items/7219cc9ff6788423ab50
+```
+git clone https://github.com/sun-yryr/Rec-adio.git
+cd Rec-adio
+chmod +x ./run.py
+cp ./conf/example_config.json ./conf/config.json
+nano ./conf/config.json
 
-・rec_radiko.sh
-  $1=チャンネルコード
-  $2=録音時間
-  $3=保存先パス
-  $4=ファイル名
+# 設定なので適当にいじってください
 
-・rec_agqr.sh
-  $1=録音時間
-  $2=ファイル名
-
-保存先がSAVE_DIRに記述してあるのでそこを直せば使えます。
-
-**start.shは関係ないです**
+sudo mv ./rec_adio.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable rec_adio.service
+sudo systemctl start rec_adio.service
+```
