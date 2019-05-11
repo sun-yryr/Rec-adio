@@ -14,6 +14,7 @@
 ```
 git clone https://github.com/sun-yryr/Rec-adio.git
 cd Rec-adio
+chmod +x ./run.py
 cp ./conf/example_config.json ./conf/config.json
 nano ./conf/config.json
 
