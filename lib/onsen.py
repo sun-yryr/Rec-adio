@@ -11,6 +11,7 @@ class onsen:
         self.change_keywords(keywords)
         self.SAVEROOT = SAVEROOT
         self.dbx = dbx
+        self.reload_date = DT.date.today()
 
     def change_keywords(self, keywords):
         if bool(keywords):

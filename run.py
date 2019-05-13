@@ -19,25 +19,24 @@ T_ZERO = DT.timedelta()
 
 def main_radiko():
     Radiko = radiko.radiko()
-    AuthToken = Radiko.authorization()
     Radiko.change_keywords(config["radiko"]["keywords"])
     radiko_data = Radiko.search()
     while(True):
         now = DT.datetime.now()
-        print(radiko_data)
+        #print(radiko_data)
         if (bool(radiko_data)):
             for data in radiko_data:
                 tmp_time = data["DT_ft"] - now
                 if (tmp_time < T_ZERO):
                     radiko_data.remove(data)
                 elif (tmp_time < T_BASELINE):
+                    AuthToken = Radiko.authorization()
                     p = Process(target=radiko.rec, args=([data, tmp_time.total_seconds(), AuthToken, SAVEROOT, dbx],))
                     p.start()
                     radiko_data.remove(data)
         if (now.hour == 6 and now.minute <= 2 and Radiko.reload_date != DT.date.today()):
             Radiko.reload_program()
             radiko_data = Radiko.search()
-            AuthToken = Radiko.authorization()
         time.sleep(50)
 
 def main_agqr():
@@ -67,17 +66,17 @@ def main_agqr():
         time.sleep(50)
 
 def main_onsen_hibiki():
+    Onsen = onsen.onsen(config["Onsen"]["keywords"], SAVEROOT, dbx)
+    Hibiki = hibiki.hibiki(config["Hibiki"]["keywords"], SAVEROOT, dbx)
     while(True):
         now = DT.datetime.now()
         if (now.hour == 6 and now.minute <= 10 and Onsen.reload_date != DT.date.today()):
-            Onsen = onsen.onsen(config["Onsen"]["keywords"], SAVEROOT, dbx)
-            Hibiki = hibiki.hibiki(config["Hibiki"]["keywords"], SAVEROOT, dbx)
             titles = Onsen.rec()
             titles.extend(Hibiki.rec())
             if (bool(titles)):
                 f.recording_successful_toline("、".join(titles))
             else:
-                f.recording_failure_toline("音泉, 響")
+                print("in onsen, hibiki. there aren't new title.")
         time.sleep(300)
 
 if __name__ == "__main__":
