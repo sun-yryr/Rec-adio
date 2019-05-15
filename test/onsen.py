@@ -3,8 +3,16 @@ import requests
 import json
 import re
 
-path = "/Users/sun-mba/develop/radio/"
-c = re.compile("(高野麻里佳)")
+path = "./conf/config.json"
+fs = open(path, "r")
+js = json.load(fs)
+word = "("
+for keyword in js["Onsen"]["keywords"]:
+    word += keyword
+    word += "|"
+word = word.rstrip("|")
+word += ")"
+c = re.compile(word)
 
 res = requests.get("http://www.onsen.ag/api/shownMovie/shownMovie.json")
 res.encoding = "utf-8"
@@ -19,9 +27,9 @@ for program in programs["result"]:
     count = prog.get("count")
     if (title is not None and personality is not None and update_DT !=""):
         if (c.search(personality)):
-            print(prog["update"], prog["title"], prog["personality"])
-            movie_url = prog["moviePath"]["pc"]
+            print(update_DT, title, personality)
+            """movie_url = prog["moviePath"]["pc"]
             res3 = requests.get(movie_url)
             f = open(path+title+".mp3", "wb")
             f.write(res3.content)
-            f.close()
+            f.close()"""

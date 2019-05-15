@@ -34,7 +34,7 @@ def main_radiko():
                     p = Process(target=radiko.rec, args=([data, tmp_time.total_seconds(), AuthToken, SAVEROOT, dbx],))
                     p.start()
                     radiko_data.remove(data)
-        if (now.hour == 6 and now.minute <= 2 and Radiko.reload_date != DT.date.today()):
+        if (now.hour == 6 and now.minute <= 5 and Radiko.reload_date != DT.date.today()):
             Radiko.reload_program()
             radiko_data = Radiko.search()
         time.sleep(50)
@@ -70,7 +70,7 @@ def main_onsen_hibiki():
     Hibiki = hibiki.hibiki(config["Hibiki"]["keywords"], SAVEROOT, dbx)
     while(True):
         now = DT.datetime.now()
-        if (now.hour == 6 and now.minute <= 10 and Onsen.reload_date != DT.date.today()):
+        if (now.hour == 10 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
             titles = Onsen.rec()
             titles.extend(Hibiki.rec())
             if (bool(titles)):
