@@ -70,7 +70,7 @@ def main_onsen_hibiki():
     Hibiki = hibiki.hibiki(config["Hibiki"]["keywords"], SAVEROOT, dbx)
     while(True):
         now = DT.datetime.now()
-        if (now.hour == 10 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
+        if (now.hour == 7 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
             titles = Onsen.rec()
             titles.extend(Hibiki.rec())
             if (bool(titles)):

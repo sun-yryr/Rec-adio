@@ -41,8 +41,9 @@ class hibiki:
             title = program.get("name")
             personality = program.get("cast")
             if (self.keyword.search(title) or self.keyword.search(personality)):
+                title = title.replace(" ", "_")
                 # フォルダの作成
-                dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
+                dir_path = self.SAVEROOT + "/" + title
                 f.createSaveDir(dir_path)
                 # ファイル重複チェック
                 update_date = DT.datetime.strptime(episode["updated_at"].split(" ")[0], "%Y/%m/%d")
@@ -69,7 +70,7 @@ class hibiki:
                 db_list = [d.name for d in res.entries]
                 if not title in db_list:
                     self.dbx.files_create_folder(dbx_path)
-                dbx_path += "/" +title+ ".m4a"
+                dbx_path += "/" + file_name
                 fs = open(file_path, "rb")
                 self.dbx.files_upload(fs.read(), dbx_path)
                 fs.close()

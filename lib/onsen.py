@@ -43,6 +43,10 @@ class onsen:
             count = prog.get("count")
             if (title is not None and personality is not None and update_DT !=""):
                 if (self.keyword.search(title) or self.keyword.search(personality)):
+                    movie_url = prog["moviePath"]["pc"]
+                    if (movie_url == ""):
+                        continue
+                    title = title.replace(" ", "_")
                     # フォルダの作成
                     dir_path = self.SAVEROOT + "/" + title
                     f.createSaveDir(dir_path)
@@ -52,7 +56,6 @@ class onsen:
                     if not file_name in os.listdir(dir_path):
                         print(prog["update"], prog["title"], prog["personality"])
                         returnData.append(title)
-                        movie_url = prog["moviePath"]["pc"]
                         res3 = requests.get(movie_url)
                         fs = open(file_path, "wb")
                         fs.write(res3.content)
@@ -65,3 +68,10 @@ class onsen:
                         dbx_path += "/" +title+"#"+count+ ".mp3"
                         self.dbx.files_upload(res3.content, dbx_path)
         return returnData
+
+import dropbox
+if __name__ == "__main__":
+    config = f.load_configurations("./conf/config.json")
+    dbx = dropbox.Dropbox(config["all"]["dbx_token"])
+    Onsen = onsen(config["Onsen"]["keywords"], "./savefile", dbx)
+    a = Onsen.rec()
