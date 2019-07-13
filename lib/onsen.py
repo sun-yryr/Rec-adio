@@ -46,12 +46,11 @@ class onsen:
                     movie_url = prog["moviePath"]["pc"]
                     if (movie_url == ""):
                         continue
-                    title = title.replace(" ", "_")
                     # フォルダの作成
-                    dir_path = self.SAVEROOT + "/" + title
+                    dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
                     f.createSaveDir(dir_path)
                     # ファイル重複チェック
-                    file_name = title +"#"+ count + ".mp3"
+                    file_name = title.replace(" ", "_") +"#"+ count + ".mp3"
                     file_path = dir_path +"/"+ file_name
                     if not file_name in os.listdir(dir_path):
                         print(prog["update"], prog["title"], prog["personality"])

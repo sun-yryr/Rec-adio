@@ -116,7 +116,7 @@ def rec(data):
     SAVEROOT = data[3]
     dbx = data[4]
     #ディレクトリの作成
-    dir_path = SAVEROOT + "/" + program_data["title"]
+    dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
     f.createSaveDir(dir_path)
     dbx_path = "/radio/" + program_data["title"]
     res = dbx.files_list_folder('/radio')
@@ -125,6 +125,7 @@ def rec(data):
         dbx.files_create_folder(dbx_path)
     #保存先パスの作成
     file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
+    file_path = file_path.replace(" ", "_")
     dbx_path += "/" +program_data["title"]+"_"+program_data["ft"][:12]+ ".m4a"
     #print(program_data["title"])
     #stream urlの取得
