@@ -10,7 +10,7 @@ def rec(data):
     program_ft = data[2]
     SAVEROOT = data[3]
     dbx = data[4]
-    dir_path = SAVEROOT + "/" + program_data["title"]
+    dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
     f.createSaveDir(dir_path)
     dbx_path = "/radio/" + program_data["title"]
     res = dbx.files_list_folder('/radio')
@@ -19,7 +19,7 @@ def rec(data):
         dbx.files_create_folder(dbx_path)
     dbx_path += "/" +program_data["title"] + "_" + program_ft[:12]+ ".m4a"
 
-    file_path = dir_path + "/" + program_data["title"] + "_" + program_ft[:12]
+    file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_ft[:12]
     cwd  = ('rtmpdump --rtmp "rtmpe://fms1.uniqueradio.jp/" ')
     cwd += ('-a ?rtmp://fms-base1.mitene.ad.jp/agqr/ ')
     cwd += ('-f "WIN 16,0,0,257" ')

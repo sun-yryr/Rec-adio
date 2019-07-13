@@ -43,13 +43,12 @@ class hibiki:
             if (self.keyword.search(title) or self.keyword.search(personality)):
                 title = title.replace(" ", "_")
                 # フォルダの作成
-                dir_path = self.SAVEROOT + "/" + title
+                dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
                 f.createSaveDir(dir_path)
                 # ファイル重複チェック
                 update_date = DT.datetime.strptime(episode["updated_at"].split(" ")[0], "%Y/%m/%d")
-                file_name = title + "_" + update_date.strftime("%Y%m%d") + ".m4a"
+                file_name = title.replace(" ", "_") + "_" + update_date.strftime("%Y%m%d") + ".m4a"
                 file_path = dir_path +"/"+ file_name
-                file_path = file_path.replace(" ", "_")
                 if file_name in os.listdir(dir_path):
                     continue
                 url2 = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + program.get("access_id")
@@ -58,7 +57,6 @@ class hibiki:
                 video_url = api_base + "videos/play_check?video_id=" + str(tmpjson["episode"]["video"]["id"])
                 res2 = requests.get(video_url, headers=headers)
                 tmpjson = json.loads(res2.text)
-                print(tmpjson)
                 print(title)
                 if (tmpjson.get("playlist_url") is None):
                     continue
@@ -70,7 +68,7 @@ class hibiki:
                 db_list = [d.name for d in res.entries]
                 if not title in db_list:
                     self.dbx.files_create_folder(dbx_path)
-                dbx_path += "/" + file_name
+                dbx_path += "/" + title + "_" + update_date.strftime("%Y%m%d") + ".m4a"
                 fs = open(file_path, "rb")
                 self.dbx.files_upload(fs.read(), dbx_path)
                 fs.close()
