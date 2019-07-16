@@ -41,7 +41,6 @@ class hibiki:
             title = program.get("name")
             personality = program.get("cast")
             if (self.keyword.search(title) or self.keyword.search(personality)):
-                title = title.replace(" ", "_")
                 # フォルダの作成
                 dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
                 f.createSaveDir(dir_path)
