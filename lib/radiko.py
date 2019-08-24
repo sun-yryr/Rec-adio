@@ -133,7 +133,7 @@ def rec(data):
     m3u8 = gen_temp_chunk_m3u8_url(url, AuthToken)
     #コマンドの実行
     time.sleep(wait_start_time)
-    cwd = ('ffmpeg -headers "X-Radiko-AuthToken: %s" -i "%s" -acodec copy "%s.m4a"' % (AuthToken, m3u8, file_path))
+    cwd = ('ffmpeg -loglevel error -headers "X-Radiko-AuthToken: %s" -i "%s" -acodec copy  "%s.m4a"' % (AuthToken, m3u8, file_path))
     p1 = subprocess.Popen(cwd, stdout=subprocess.DEVNULL, shell=True)
     time.sleep(program_data["dur"]-10)
     p1.send_signal(SIGINT)

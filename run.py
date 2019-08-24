@@ -1,4 +1,4 @@
-#!/bin/python3.6
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 from lib import radiko, agqr, onsen, hibiki, functions as f
 import subprocess
@@ -37,7 +37,7 @@ def main_radiko():
         if (now.hour == 6 and now.minute <= 5 and Radiko.reload_date != DT.date.today()):
             Radiko.reload_program()
             radiko_data = Radiko.search()
-        time.sleep(50)
+        time.sleep(60)
 
 def main_agqr():
     agqr_data = config["AnG"]
@@ -63,7 +63,7 @@ def main_agqr():
                 if (tmp_time > T_ZERO and tmp_time < T_BASELINE):
                     p = Process(target=agqr.rec, args=([data, tmp_time.total_seconds(), tmp.strftime("%Y%m%d%H%M%S"), SAVEROOT, dbx],))
                     p.start()
-        time.sleep(50)
+        time.sleep(60)
 
 def main_onsen_hibiki():
     Onsen = onsen.onsen(config["Onsen"]["keywords"], SAVEROOT, dbx)
@@ -88,8 +88,9 @@ if __name__ == "__main__":
         exit(code=-1)
     f.line_token = config["all"]["line_token"]
     SAVEROOT = config.get("all").get("savedir")
-    if (os.path.isfile(SAVEROOT) is None):
+    if (os.path.isfile(SAVEROOT) is None) or (SAVEROOT == ""):
         SAVEROOT = ROOT + "/savefile"
+    print("SAVEROOT : " + SAVEROOT)
     dbx = dropbox.Dropbox(config["all"]["dbx_token"])
     dbx.users_get_current_account()
     res = dbx.files_list_folder('')

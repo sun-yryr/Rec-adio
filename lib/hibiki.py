@@ -60,7 +60,7 @@ class hibiki:
                 if (tmpjson.get("playlist_url") is None):
                     continue
                 returnData.append(title)
-                cwd = 'ffmpeg -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
+                cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
                 p1 = subprocess.run(cwd, stdout=subprocess.DEVNULL, shell=True)
                 dbx_path = "/radio/" + title
                 res = self.dbx.files_list_folder('/radio')
