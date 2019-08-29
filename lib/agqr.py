@@ -20,13 +20,13 @@ def rec(data):
     dbx_path += "/" +program_data["title"] + "_" + program_ft[:12]+ ".m4a"
 
     file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_ft[:12]
-    cwd  = ('rtmpdump --rtmp "rtmpe://fms1.uniqueradio.jp/" ')
+    cwd  = ('rtmpdump --rtmp "rtmp://fms1.uniqueradio.jp/" ')
     cwd += ('-a ?rtmp://fms-base1.mitene.ad.jp/agqr/ ')
     cwd += ('-f "WIN 16,0,0,257" ')
     cwd += ('-W http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf ')
     cwd += ('-p http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php ')
     cwd += ('-C B:0 ')
-    cwd += ('-y aandg22 ')
+    cwd += ('-y aandg1 ')
     cwd += ('--stop %s ' % str(program_data["dur"]))
     cwd += ('--live -o "%s.flv"' % (file_path))
     time.sleep(wait_start_time)
