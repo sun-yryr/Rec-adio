@@ -61,7 +61,7 @@ class hibiki:
                     continue
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
-                p1 = subprocess.run(cwd, stdout=subprocess.DEVNULL, shell=True)
+                subprocess.run(cwd, shell=True)
                 dbx_path = "/radio/" + title
                 res = self.dbx.files_list_folder('/radio')
                 db_list = [d.name for d in res.entries]

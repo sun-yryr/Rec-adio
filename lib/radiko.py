@@ -134,10 +134,12 @@ def rec(data):
     #コマンドの実行
     time.sleep(wait_start_time)
     cwd = ('ffmpeg -loglevel error -headers "X-Radiko-AuthToken: %s" -i "%s" -acodec copy  "%s.m4a"' % (AuthToken, m3u8, file_path))
-    p1 = subprocess.Popen(cwd, stdout=subprocess.DEVNULL, shell=True)
+    p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
+    print("sleep for " + str(program_data["dur"]-10))
     time.sleep(program_data["dur"]-10)
-    p1.send_signal(SIGINT)
-    time.sleep(5)
+    print("STOP SIGNAL......")
+    p1.communicate(b'q')
+    time.sleep(10)
     if (f.is_recording_succeeded(file_path+ ".m4a")):
         f.recording_successful_toline(program_data["title"])
         fs = open(file_path+".m4a", "rb")

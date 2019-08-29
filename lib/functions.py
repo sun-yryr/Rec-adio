@@ -19,6 +19,7 @@ def createSaveDir(Path):
 
 def is_recording_succeeded(Path):
     size = os.path.getsize(Path)
+    print("rec size = " + str(size))
     if (size >= 1024) and (62914560 > size):
         return True
     else:
