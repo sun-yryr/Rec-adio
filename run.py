@@ -19,7 +19,7 @@ T_ZERO = DT.timedelta()
 
 def main_radiko():
     Radiko = radiko.radiko()
-    Radiko.change_keywords(config["radiko"]["keywords"])
+    Radiko.change_keywords(keywords)
     radiko_data = Radiko.search()
     while(True):
         now = DT.datetime.now()
@@ -40,34 +40,29 @@ def main_radiko():
         time.sleep(60)
 
 def main_agqr():
-    agqr_data = config["AnG"]
+    Agqr = agqr.agqr()
+    Agqr.change_keywords(keywords)
+    agqr_data = Agqr.search()
     while(True):
         now = DT.datetime.now()
-        #print(agqr_data)
-        for data in agqr_data:
-            if (data["isRepeat"]):
-                # 毎週録音
-                # 録音は今日?
-                if (now.weekday() == data["weekday"]):
-                    # 録音開始時間の生成
-                    tmp = DT.datetime.strptime(now.strftime("%Y%m%d")+data["start_ts"], "%Y%m%d%H%M%S")
-                    # 現在時刻との差分
-                    tmp_time = tmp - now
-                    # 過去でなく、数分前か
-                    if (tmp_time > T_ZERO and tmp_time < T_BASELINE):
-                        p = Process(target=agqr.rec, args=([data, tmp_time.total_seconds(), tmp.strftime("%Y%m%d%H%M%S"), SAVEROOT, dbx],))
-                        p.start()
-            else:
-                tmp = DT.datetime.strptime(data["start_ts"], "%Y%m%d%H%M%S")
-                tmp_time = tmp - now
-                if (tmp_time > T_ZERO and tmp_time < T_BASELINE):
-                    p = Process(target=agqr.rec, args=([data, tmp_time.total_seconds(), tmp.strftime("%Y%m%d%H%M%S"), SAVEROOT, dbx],))
+        if (bool(agqr_data)):
+            for data in agqr_data:
+                tmp_time = data["DT_ft"] - now
+                if (tmp_time < T_ZERO):
+                    agqr_data.remove(data)
+                elif (tmp_time < T_BASELINE):
+                    p = Process(target=agqr.rec, args=([data, tmp_time.total_seconds(), SAVEROOT, dbx],))
                     p.start()
+                    agqr_data.remove(data)
+        if (now.hour == 6 and now.minute <= 5 and Agqr.reload_date != DT.date.today()):
+            Agqr.reload_program()
+            agqr_data = Agqr.search()
         time.sleep(60)
 
+
 def main_onsen_hibiki():
-    Onsen = onsen.onsen(config["Onsen"]["keywords"], SAVEROOT, dbx)
-    Hibiki = hibiki.hibiki(config["Hibiki"]["keywords"], SAVEROOT, dbx)
+    Onsen = onsen.onsen(keywords, SAVEROOT, dbx)
+    Hibiki = hibiki.hibiki(keywords, SAVEROOT, dbx)
     while(True):
         now = DT.datetime.now()
         if (now.hour == 7 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
@@ -91,6 +86,7 @@ if __name__ == "__main__":
     if (os.path.isfile(SAVEROOT) is None) or (SAVEROOT == ""):
         SAVEROOT = ROOT + "/savefile"
     print("SAVEROOT : " + SAVEROOT)
+    keywords = config["all"]["keywords"]
     dbx = dropbox.Dropbox(config["all"]["dbx_token"])
     dbx.users_get_current_account()
     res = dbx.files_list_folder('')

@@ -62,7 +62,7 @@ class radiko:
                 if (ck):
                     res.append({
                         "station": station.get("id"),
-                        "title": prog.find("title").text.replace(" ", "_"),
+                        "title": title.replace(" ", "_"),
                         "ft": prog.get("ft"),
                         "DT_ft": DT.datetime.strptime(prog.get("ft"), "%Y%m%d%H%M%S"),
                         "to": prog.get("to"),

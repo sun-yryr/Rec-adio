@@ -2,7 +2,13 @@
     "all": {
         "savedir": "保存先のpath",
         "dbx_token": "dropboxのアクセストークン",
-        "line_token": "line notifyのアクセストークン"
+        "line_token": "line notifyのアクセストークン",
+        "keywords": [
+            "夏川椎菜",
+            "TrySail",
+            "水瀬いのり",
+            "伊藤美来"
+        ]
     },
     "radiko": {
         "keywords": [
