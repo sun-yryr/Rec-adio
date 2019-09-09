@@ -43,6 +43,7 @@ def main_agqr():
     Agqr = agqr.agqr()
     Agqr.change_keywords(keywords)
     agqr_data = Agqr.search()
+    #print(agqr_data)
     while(True):
         now = DT.datetime.now()
         if (bool(agqr_data)):
@@ -51,7 +52,7 @@ def main_agqr():
                 if (tmp_time < T_ZERO):
                     agqr_data.remove(data)
                 elif (tmp_time < T_BASELINE):
-                    p = Process(target=agqr.rec, args=([data, tmp_time.total_seconds(), SAVEROOT, dbx],))
+                    p = Process(target=Agqr.rec, args=([data, tmp_time.total_seconds(), SAVEROOT, dbx],))
                     p.start()
                     agqr_data.remove(data)
         if (now.hour == 0 and now.minute <= 5 and Agqr.reload_date != DT.date.today()):

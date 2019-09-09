@@ -64,6 +64,7 @@ class agqr:
 
     def rec(self, data):
         program_data = data[0]
+        #print(program_data)
         wait_start_time = data[1]
         SAVEROOT = data[2]
         dbx = data[3]
@@ -84,7 +85,7 @@ class agqr:
         cwd += ('-p http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php ')
         cwd += ('-C B:0 ')
         cwd += ('-y aandg1 ')
-        cwd += ('--stop %s ' % str(program_data["dur"]))
+        cwd += ('--stop %s ' % str(program_data["dur"]*60))
         cwd += ('--live -o "%s.flv"' % (file_path))
         time.sleep(wait_start_time)
         #rtmpdumpは時間指定の終了ができるので以下を同期処理にする
