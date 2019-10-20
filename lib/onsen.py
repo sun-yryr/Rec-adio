@@ -46,6 +46,8 @@ class onsen:
                     movie_url = prog["moviePath"]["pc"]
                     if (movie_url == ""):
                         continue
+                    # title の長さ
+                    title = title[:30]
                     # フォルダの作成
                     dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
                     f.createSaveDir(dir_path)
