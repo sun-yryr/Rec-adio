@@ -26,7 +26,7 @@ def is_recording_succeeded(Path):
             return True
         else:
             return False
-     else:
+    else:
         return False
 
 def recording_successful_toline(title):
