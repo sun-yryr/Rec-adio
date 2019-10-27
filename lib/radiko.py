@@ -140,7 +140,7 @@ def rec(data):
     print("STOP SIGNAL......")
     p1.communicate(b'q')
     time.sleep(10)
-    if (f.is_recording_succeeded(file_path+ ".m4a")):
+    if (f.is_recording_succeeded(file_path)):
         f.recording_successful_toline(program_data["title"])
         fs = open(file_path+".m4a", "rb")
         dbx.files_upload(fs.read(), dbx_path)

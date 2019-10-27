@@ -78,13 +78,7 @@ class agqr:
         dbx_path += "/" +program_data["title"] + "_" + program_data["ft"][:12]+ ".m4a"
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
-        cwd  = ('rtmpdump --rtmp "rtmp://fms1.uniqueradio.jp/" ')
-        cwd += ('-a ?rtmp://fms-base1.mitene.ad.jp/agqr/ ')
-        cwd += ('-f "WIN 16,0,0,257" ')
-        cwd += ('-W http://www.uniqueradio.jp/agplayerf/LIVEPlayer-HD0318.swf ')
-        cwd += ('-p http://www.uniqueradio.jp/agplayerf/newplayerf2-win.php ')
-        cwd += ('-C B:0 ')
-        cwd += ('-y aandg1 ')
+        cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1b ')
         cwd += ('--stop %s ' % str(program_data["dur"]*60))
         cwd += ('--live -o "%s.flv"' % (file_path))
         time.sleep(wait_start_time)
@@ -94,7 +88,7 @@ class agqr:
         cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -acodec copy "%s.m4a"' % (file_path, file_path))
         subprocess.run(cwd2, shell=True)
         print("agqr finish!")
-        if (f.is_recording_succeeded(file_path+ ".m4a")):
+        if (f.is_recording_succeeded(file_path)):
             f.recording_successful_toline(program_data["title"])
             fs = open(file_path+".m4a", "rb")
             dbx.files_upload(fs.read(), dbx_path)

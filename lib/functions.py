@@ -18,11 +18,15 @@ def createSaveDir(Path):
         os.makedirs(Path)
 
 def is_recording_succeeded(Path):
-    size = os.path.getsize(Path)
-    print("rec size = " + str(size))
-    if (size >= 1024) and (62914560 > size):
-        return True
-    else:
+    m4a_path = Path + ".m4a"
+    if (os.path.isfile(m4a_path)):
+        size = os.path.getsize(m4a_path)
+        print("rec size = " + str(size))
+        if (size >= 1024) and (62914560 > size):
+            return True
+        else:
+            return False
+     else:
         return False
 
 def recording_successful_toline(title):
