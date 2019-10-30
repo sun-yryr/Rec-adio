@@ -22,7 +22,7 @@ def is_recording_succeeded(Path):
     if (os.path.isfile(m4a_path)):
         size = os.path.getsize(m4a_path)
         print("rec size = " + str(size))
-        if (size >= 1024) and (62914560 > size):
+        if (size >= 1024):
             return True
         else:
             return False
