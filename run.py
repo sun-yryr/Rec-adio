@@ -31,7 +31,7 @@ def main_radiko():
                     radiko_data.remove(data)
                 elif (tmp_time < T_BASELINE):
                     AuthToken = Radiko.authorization()
-                    p = Process(target=radiko.rec, args=([data, tmp_time.total_seconds(), AuthToken, SAVEROOT, dbx],))
+                    p = Process(target=radiko.rec, args=([data, tmp_time.total_seconds(), AuthToken, SAVEROOT],))
                     p.start()
                     radiko_data.remove(data)
         if (now.hour == 6 and now.minute <= 5 and Radiko.reload_date != DT.date.today()):
@@ -52,7 +52,7 @@ def main_agqr():
                 if (tmp_time < T_ZERO):
                     agqr_data.remove(data)
                 elif (tmp_time < T_BASELINE):
-                    p = Process(target=Agqr.rec, args=([data, tmp_time.total_seconds(), SAVEROOT, dbx],))
+                    p = Process(target=Agqr.rec, args=([data, tmp_time.total_seconds(), SAVEROOT],))
                     p.start()
                     agqr_data.remove(data)
         if (now.hour == 0 and now.minute <= 5 and Agqr.reload_date != DT.date.today()):
@@ -62,8 +62,8 @@ def main_agqr():
 
 
 def main_onsen_hibiki():
-    Onsen = onsen.onsen(keywords, SAVEROOT, dbx)
-    Hibiki = hibiki.hibiki(keywords, SAVEROOT, dbx)
+    Onsen = onsen.onsen(keywords, SAVEROOT)
+    Hibiki = hibiki.hibiki(keywords, SAVEROOT)
     while(True):
         now = DT.datetime.now()
         if (now.hour == 7 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
@@ -76,24 +76,13 @@ def main_onsen_hibiki():
         time.sleep(300)
 
 if __name__ == "__main__":
-    ROOT = (__file__.replace("/run.py", ""))
-    if (ROOT == __file__):
-        ROOT = ROOT.replace("run.py", ".")
-    config = f.load_configurations(ROOT + "/conf/config.json")
+    config = f.load_configurations()
     if (config is None):
         exit(code=-1)
     f.line_token = config["all"]["line_token"]
-    SAVEROOT = config.get("all").get("savedir")
-    if (os.path.isfile(SAVEROOT) is None) or (SAVEROOT == ""):
-        SAVEROOT = ROOT + "/savefile"
+    SAVEROOT = f.createSaveDirPath()
     print("SAVEROOT : " + SAVEROOT)
     keywords = config["all"]["keywords"]
-    dbx = dropbox.Dropbox(config["all"]["dbx_token"])
-    dbx.users_get_current_account()
-    res = dbx.files_list_folder('')
-    db_list = [d.name for d in res.entries]
-    if not "radio" in db_list:
-        dbx.files_create_folder("radio")
     ps = [
         Process(target=main_radiko),
         Process(target=main_agqr),

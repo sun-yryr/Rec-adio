@@ -8,10 +8,9 @@ import datetime as DT
 import subprocess
 
 class hibiki:
-    def __init__(self, keywords, SAVEROOT, dbx):
+    def __init__(self, keywords, SAVEROOT):
         self.change_keywords(keywords)
         self.SAVEROOT = SAVEROOT
-        self.dbx = dbx
 
     def change_keywords(self, keywords):
         if bool(keywords):
@@ -62,14 +61,9 @@ class hibiki:
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
                 subprocess.run(cwd, shell=True)
-                dbx_path = "/radio/" + title
-                res = self.dbx.files_list_folder('/radio')
-                db_list = [d.name for d in res.entries]
-                if not title in db_list:
-                    self.dbx.files_create_folder(dbx_path)
-                dbx_path += "/" + title + "_" + update_date.strftime("%Y%m%d") + ".m4a"
+
                 fs = open(file_path, "rb")
-                self.dbx.files_upload(fs.read(), dbx_path)
+                f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
                 fs.close()
         print("finish")
         return returnData

@@ -31,3 +31,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable rec_adio.service
 sudo systemctl start rec_adio.service
 ```
+
+### 設定ファイル
+- saveRoot 保存先フォルダ
+- line token
+- dbx token

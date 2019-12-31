@@ -7,10 +7,9 @@ import lib.functions as f
 import datetime as DT
 
 class onsen:
-    def __init__(self, keywords, SAVEROOT, dbx):
+    def __init__(self, keywords, SAVEROOT):
         self.change_keywords(keywords)
         self.SAVEROOT = SAVEROOT
-        self.dbx = dbx
         self.reload_date = DT.date.today()
 
     def change_keywords(self, keywords):
@@ -61,18 +60,5 @@ class onsen:
                         fs = open(file_path, "wb")
                         fs.write(res3.content)
                         fs.close()
-                        dbx_path = "/radio/" + title
-                        res = self.dbx.files_list_folder('/radio')
-                        db_list = [d.name for d in res.entries]
-                        if not title in db_list:
-                            self.dbx.files_create_folder(dbx_path)
-                        dbx_path += "/" +title+"#"+count+ ".mp3"
-                        self.dbx.files_upload(res3.content, dbx_path)
+                        f.DropBox.upload_onsen(title, count, res3.content)
         return returnData
-
-import dropbox
-if __name__ == "__main__":
-    config = f.load_configurations("./conf/config.json")
-    dbx = dropbox.Dropbox(config["all"]["dbx_token"])
-    Onsen = onsen(config["Onsen"]["keywords"], "./savefile", dbx)
-    a = Onsen.rec()
