@@ -16,5 +16,12 @@
             "高尾花音",
             "鹿乃"
         ]
+    },
+    "swift": {
+        "tenantid": "",
+        "username": "",
+        "password": "",
+        "identityUrl": "",
+        "objectStrageUrl": ""
     }
 }

@@ -7,7 +7,7 @@ import dropbox
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
     if (ROOT == __file__):
-        ROOT = ROOT.replace("functions.py", ".")
+        ROOT = ROOT.replace("functions.py", "..")
     Path = ROOT + "/conf/config.json"
     if (os.path.isfile(Path) is False):
         print("config file is not found")
@@ -55,6 +55,8 @@ def recording_failure_toline(title):
     requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
 
 class DBXController():
+    hadInit = True
+
     def __init__(self):
         tmpconf = load_configurations()
         if (tmpconf is None) or (tmpconf["all"]["dbx_token"] == ""):
@@ -92,3 +94,79 @@ class DBXController():
         self.dbx.files_upload(fileData, dbx_path)
 
 DropBox = DBXController()
+
+class SwiftController():
+    hadInit = True
+    containerName = "test-container"
+
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf.get("swift") is None):
+            self.hadInit = False
+            return
+        self.username = tmpconf["swift"]["username"]
+        self.password = tmpconf["swift"]["password"]
+        self.tenantid = tmpconf["swift"]["tenantid"]
+        self.identityUrl = tmpconf["swift"]["identityUrl"]
+        self.objectStrageUrl = tmpconf["swift"]["objectStrageUrl"]
+        # エラーがあったら初期化中止
+        if not self.renewal_token():
+            print("login error")
+            return
+        self.create_container(self.containerName)
+    
+    def renewal_token(self):
+        if not self.hadInit:
+            return False
+        data = {
+            "auth": {
+                "passwordCredentials": {
+                    "username": self.username,
+                    "password": self.password
+                },
+                "tenantId": self.tenantid
+            }
+        }
+        res = requests.post(self.identityUrl + "/tokens",
+                            headers={"Content-Type" : "application/json"},
+                            data=json.dumps(data))
+        resData = json.loads(res.text)
+        if "error" in resData.keys():
+            return False
+        self.token = resData["access"]["token"]["id"]
+        return True
+
+    def create_container(self, containerName, isRenewToken = False):
+        if not self.hadInit:
+            return False
+        if isRenewToken:
+            self.renewal_token()
+        res = requests.put(self.objectStrageUrl + "/" + containerName,
+                            headers={
+                                "Content-Type" : "application/json",
+                                "X-Auth-Token": self.token,
+                                "X-Container-Read": ".r:*"
+                            })
+        if res.status_code in [200, 201, 204]:
+            return True
+        else:
+            return False
+    
+    def upload_file(self, filePath, objectName):
+        if not self.hadInit:
+            return False
+        self.renewal_token()
+        f = open(filePath, "rb")
+        res = requests.put(self.objectStrageUrl + "/" + self.containerName + "/" + objectName,
+                            headers={
+                                "Content-Type" : "application/json",
+                                "X-Auth-Token": self.token
+                            },
+                            data=f.read())
+        print(res.status_code)
+        
+        
+
+if __name__ == "__main__":
+    test = SwiftController()
+    test.upload_file("/Users/sun-mba/Desktop/mea.mp4", "1.mp4")
