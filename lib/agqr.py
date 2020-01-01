@@ -57,7 +57,8 @@ class agqr:
                     "ft": prog.get("ft"),
                     "DT_ft": DT.datetime.strptime(prog.get("ft"), "%Y%m%d%H%M"),
                     "to": prog.get("to"),
-                    "dur": int(prog.get("dur"))
+                    "dur": int(prog.get("dur")),
+                    "pfm": pfm
                 })
         if bool(res): return res
         else: return []
@@ -67,15 +68,9 @@ class agqr:
         #print(program_data)
         wait_start_time = data[1]
         SAVEROOT = data[2]
-        dbx = data[3]
+
         dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
         f.createSaveDir(dir_path)
-        dbx_path = "/radio/" + program_data["title"]
-        res = dbx.files_list_folder('/radio')
-        db_list = [d.name for d in res.entries]
-        if not program_data["title"] in db_list:
-            dbx.files_create_folder(dbx_path)
-        dbx_path += "/" +program_data["title"] + "_" + program_data["ft"][:12]+ ".m4a"
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
         cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1b ')
@@ -91,7 +86,7 @@ class agqr:
         if (f.is_recording_succeeded(file_path)):
             f.recording_successful_toline(program_data["title"])
             fs = open(file_path+".m4a", "rb")
-            dbx.files_upload(fs.read(), dbx_path)
+            f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
             fs.close()
         else:
             f.recording_failure_toline(program_data["title"])
