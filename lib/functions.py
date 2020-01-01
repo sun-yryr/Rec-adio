@@ -159,7 +159,7 @@ class SwiftController():
         f = open(filePath, "rb")
         res = requests.put(self.objectStrageUrl + "/" + self.containerName + "/" + objectName,
                             headers={
-                                "Content-Type" : "application/json",
+                                "Content-Type" : "video/mp4",  # ここで送信するデータ形式を決める
                                 "X-Auth-Token": self.token
                             },
                             data=f.read())
@@ -169,4 +169,4 @@ class SwiftController():
 
 if __name__ == "__main__":
     test = SwiftController()
-    test.upload_file("/Users/sun-mba/Desktop/mea.mp4", "1.mp4")
+    test.upload_file("/Users/sun-mm/Desktop/nagarekawa.mp4", "1")
