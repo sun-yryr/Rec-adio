@@ -23,5 +23,12 @@
         "password": "",
         "identityUrl": "",
         "objectStrageUrl": ""
+    },
+    "mysql": {
+        "hostname": "",
+        "port": "",
+        "username": "",
+        "password": "",
+        "database": ""
     }
 }

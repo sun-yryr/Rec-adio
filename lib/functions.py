@@ -3,6 +3,7 @@ import os
 import json
 import requests
 import dropbox
+import mysql.connector as sql
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -95,6 +96,8 @@ class DBXController():
 
 DropBox = DBXController()
 
+
+
 class SwiftController():
     hadInit = True
     containerName = "radio"
@@ -164,9 +167,35 @@ class SwiftController():
                             },
                             data=f.read())
         print(res.status_code)
-        
-        
+
+Swift = SwiftController()
+
+
+class DBController:
+    hadInit = False
+
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf.get("mysql") is None):
+            return
+        self.conn = sql.connect(
+            host = tmpconf["mysql"]["hostname"] or 'localhost',
+            port = tmpconf["mysql"]["port"] or '3306',
+            user = tmpconf["mysql"]["username"],
+            password = tmpconf["mysql"]["password"],
+            database = tmpconf["mysql"]["database"]
+        )
+        self.hadInit = True
+    
+    def insert(self):
+        self.conn.ping(reconnect=True)
+        cur = self.conn.cursor()
+        s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`) VALUES ( '%s', '%s', %s, '%s', '%s')"
+        cur.execute(s, ("a", "b", 1, "c", "d"))
+        cur.close()
 
 if __name__ == "__main__":
-    test = SwiftController()
-    test.upload_file("/Users/sun-mm/Desktop/nagarekawa.mp4", "1")
+    # test = SwiftController()
+    # test.upload_file("/Users/sun-mm/Desktop/nagarekawa.mp4", "1")
+    test = DBController()
+    test.insert()
