@@ -192,6 +192,7 @@ class DBController:
         cur = self.conn.cursor()
         s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`) VALUES ( %s, %s, %s, %s, %s)"
         cur.execute(s, ("a", "b", 1, "c", "d"))
+        self.conn.commit()
         cur.close()
 
 if __name__ == "__main__":
