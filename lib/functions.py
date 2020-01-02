@@ -3,11 +3,13 @@ import os
 import json
 import requests
 import dropbox
+import mysql.connector as sql
+import hashlib
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
     if (ROOT == __file__):
-        ROOT = ROOT.replace("functions.py", ".")
+        ROOT = ROOT.replace("functions.py", "..")
     Path = ROOT + "/conf/config.json"
     if (os.path.isfile(Path) is False):
         print("config file is not found")
@@ -93,3 +95,114 @@ class DBXController():
         self.dbx.files_upload(fileData, dbx_path)
 
 DropBox = DBXController()
+
+
+
+class SwiftController():
+    hadInit = False
+    containerName = "radio"
+
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf.get("swift") is None):
+            return
+        self.username = tmpconf["swift"]["username"]
+        self.password = tmpconf["swift"]["password"]
+        self.tenantid = tmpconf["swift"]["tenantid"]
+        self.identityUrl = tmpconf["swift"]["identityUrl"]
+        self.objectStrageUrl = tmpconf["swift"]["objectStrageUrl"]
+        self.hadInit = True
+        # エラーがあったら初期化中止
+        if not self.renewal_token():
+            print("login error")
+            return
+        self.create_container(self.containerName)
+    
+    def renewal_token(self):
+        if not self.hadInit:
+            return False
+        data = {
+            "auth": {
+                "passwordCredentials": {
+                    "username": self.username,
+                    "password": self.password
+                },
+                "tenantId": self.tenantid
+            }
+        }
+        res = requests.post(self.identityUrl + "/tokens",
+                            headers={"Content-Type" : "application/json"},
+                            data=json.dumps(data))
+        resData = json.loads(res.text)
+        if "error" in resData.keys():
+            return False
+        self.token = resData["access"]["token"]["id"]
+        return True
+
+    def create_container(self, containerName, isRenewToken = False):
+        if not self.hadInit:
+            return False
+        if isRenewToken:
+            self.renewal_token()
+        res = requests.put(self.objectStrageUrl + "/" + containerName,
+                            headers={
+                                "Content-Type" : "audio/mp4a-latm",
+                                "X-Auth-Token": self.token,
+                                "X-Container-Read": ".r:*"
+                            })
+        if res.status_code in [200, 201, 204]:
+            return True
+        else:
+            return False
+    
+    def upload_file(self, filePath):
+        if not self.hadInit:
+            return False
+        self.renewal_token()
+        # stationとdatetimeでObjectNameを生成する。md5
+        hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
+        Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
+        f = open(filePath, "rb")
+        res = requests.put(Path,
+                            headers={
+                                "Content-Type" : "video/mp4",  # ここで送信するデータ形式を決める
+                                "X-Auth-Token": self.token
+                            },
+                            data=f.read())
+        print(res.status_code)
+        return Path
+
+Swift = SwiftController()
+
+
+class DBController:
+    hadInit = False
+
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf.get("mysql") is None):
+            return
+        self.conn = sql.connect(
+            host = tmpconf["mysql"]["hostname"] or 'localhost',
+            port = tmpconf["mysql"]["port"] or '3306',
+            user = tmpconf["mysql"]["username"],
+            password = tmpconf["mysql"]["password"],
+            database = tmpconf["mysql"]["database"]
+        )
+        self.hadInit = True
+    
+    def insert(self, title, pfm, timestamp, station, uri, info = ""):
+        self.conn.ping(reconnect=True)
+        cur = self.conn.cursor()
+        s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`, `info`) VALUES ( %s, %s, %s, %s, %s, %s)"
+        cur.execute(s, (title, pfm, timestamp, station, uri, info))
+        self.conn.commit()
+        cur.close()
+
+Mysql = DBController()
+
+if __name__ == "__main__":
+    # test = SwiftController()
+    # test.upload_file("/Users/sun-mm/Desktop/nagarekawa.mp4", "1")
+    test = DBController()
+    test.insert()

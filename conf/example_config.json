@@ -16,5 +16,19 @@
             "高尾花音",
             "鹿乃"
         ]
+    },
+    "swift": {
+        "tenantid": "",
+        "username": "",
+        "password": "",
+        "identityUrl": "",
+        "objectStrageUrl": ""
+    },
+    "mysql": {
+        "hostname": "",
+        "port": "",
+        "username": "",
+        "password": "",
+        "database": ""
     }
 }
