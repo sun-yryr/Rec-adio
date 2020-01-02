@@ -55,10 +55,10 @@ def recording_failure_toline(title):
     requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
 
 class DBXController():
+    hadInit = False
     def __init__(self):
         tmpconf = load_configurations()
         if (tmpconf is None) or (tmpconf["all"]["dbx_token"] == ""):
-            self.hadInit = False
             return
         self.dbx = dropbox.Dropbox(tmpconf["all"]["dbx_token"])
         self.dbx.users_get_current_account()
@@ -66,6 +66,7 @@ class DBXController():
         db_list = [d.name for d in res.entries]
         if not "radio" in db_list:
             self.dbx.files_create_folder("radio")
+        self.hadInit = True
 
     def upload(self, title, ft, fileData):
         if not self.hadInit:
