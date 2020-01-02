@@ -97,7 +97,7 @@ DropBox = DBXController()
 
 class SwiftController():
     hadInit = True
-    containerName = "test-container"
+    containerName = "radio"
 
     def __init__(self):
         tmpconf = load_configurations()
@@ -143,7 +143,7 @@ class SwiftController():
             self.renewal_token()
         res = requests.put(self.objectStrageUrl + "/" + containerName,
                             headers={
-                                "Content-Type" : "application/json",
+                                "Content-Type" : "audio/mp4a-latm",
                                 "X-Auth-Token": self.token,
                                 "X-Container-Read": ".r:*"
                             })
