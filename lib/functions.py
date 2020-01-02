@@ -190,7 +190,7 @@ class DBController:
     def insert(self):
         self.conn.ping(reconnect=True)
         cur = self.conn.cursor()
-        s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`) VALUES ( '%s', '%s', %s, '%s', '%s')"
+        s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`) VALUES ( %s, %s, %s, %s, %s)"
         cur.execute(s, ("a", "b", 1, "c", "d"))
         cur.close()
 
