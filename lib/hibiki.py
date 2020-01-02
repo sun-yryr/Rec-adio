@@ -71,7 +71,7 @@ class hibiki:
                 f.Mysql.insert(
                     title= title,
                     pfm= personality,
-                    timestamp= update_date.strftime("%Y%m%d%H%M"),
+                    timestamp= update_date.strftime("%Y%m%d"),
                     station= "hibiki",
                     uri= url,
                 )
