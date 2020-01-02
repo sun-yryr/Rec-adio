@@ -62,8 +62,16 @@ class hibiki:
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
                 subprocess.run(cwd, shell=True)
 
-                fs = open(file_path, "rb")
-                f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
-                fs.close()
+                # fs = open(file_path, "rb")
+                # f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
+                # fs.close()
+                url = f.Swift.upload_file(filePath=file_path)
+                f.Mysql.insert(
+                    title= title,
+                    pfm= personality,
+                    timestamp= update_date.strftime("%Y%m%d%H%M"),
+                    station= "hibiki",
+                    uri= url,
+                )
         print("finish")
         return returnData

@@ -4,6 +4,7 @@ import json
 import requests
 import dropbox
 import mysql.connector as sql
+import hashlib
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -155,18 +156,22 @@ class SwiftController():
         else:
             return False
     
-    def upload_file(self, filePath, objectName):
+    def upload_file(self, filePath):
         if not self.hadInit:
             return False
         self.renewal_token()
+        # stationとdatetimeでObjectNameを生成する。md5
+        hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
+        Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
         f = open(filePath, "rb")
-        res = requests.put(self.objectStrageUrl + "/" + self.containerName + "/" + objectName,
+        res = requests.put(Path,
                             headers={
                                 "Content-Type" : "video/mp4",  # ここで送信するデータ形式を決める
                                 "X-Auth-Token": self.token
                             },
                             data=f.read())
         print(res.status_code)
+        return Path
 
 Swift = SwiftController()
 
@@ -187,13 +192,15 @@ class DBController:
         )
         self.hadInit = True
     
-    def insert(self):
+    def insert(self, title, pfm, timestamp, station, uri, info = ""):
         self.conn.ping(reconnect=True)
         cur = self.conn.cursor()
-        s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`) VALUES ( %s, %s, %s, %s, %s)"
-        cur.execute(s, ("a", "b", 1, "c", "d"))
+        s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`, `info`) VALUES ( %s, %s, %s, %s, %s, %s)"
+        cur.execute(s, (title, pfm, timestamp, station, uri, info))
         self.conn.commit()
         cur.close()
+
+Mysql = DBController()
 
 if __name__ == "__main__":
     # test = SwiftController()

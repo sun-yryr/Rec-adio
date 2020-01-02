@@ -136,9 +136,18 @@ def rec(data):
     time.sleep(10)
     if (f.is_recording_succeeded(file_path)):
         f.recording_successful_toline(program_data["title"])
-        fs = open(file_path+".m4a", "rb")
-        f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
-        fs.close()
+        # fs = open(file_path+".m4a", "rb")
+        # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
+        url = f.Swift.upload_file(filePath=file_path + ".m4a")
+        f.Mysql.insert(
+            title= program_data["title"].replace(" ", "_"),
+            pfm= program_data["pfm"],
+            timestamp= program_data["ft"],
+            station= program_data["station"],
+            uri= url,
+            info= program_data["info"]
+        )
+        # fs.close()
     else:
         f.recording_failure_toline(program_data["title"])
 

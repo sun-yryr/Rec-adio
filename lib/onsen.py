@@ -64,5 +64,13 @@ class onsen:
                         # mp3 -> m4a 変換
                         cwd = 'ffmpeg -loglevel error "%s" -c:a aac -b:a 256k "%s"' % (file_path, file_path.replace(".mp3", ".m4a"))
                         subprocess.run(cwd, shell=True)
-                        f.DropBox.upload_onsen(title, count, res3.content)
+                        # f.DropBox.upload_onsen(title, count, res3.content)
+                        url = f.Swift.upload_file(filePath=file_path.replace(".mp3", ".m4a"))
+                        f.Mysql.insert(
+                            title= title,
+                            pfm= personality,
+                            timestamp= update_DT,
+                            station= "onsen",
+                            uri= url
+                        )
         return returnData
