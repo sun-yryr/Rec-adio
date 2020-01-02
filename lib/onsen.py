@@ -5,6 +5,7 @@ import re
 import os
 import lib.functions as f
 import datetime as DT
+import subprocess
 
 class onsen:
     def __init__(self, keywords, SAVEROOT):
@@ -60,5 +61,8 @@ class onsen:
                         fs = open(file_path, "wb")
                         fs.write(res3.content)
                         fs.close()
+                        # mp3 -> m4a 変換
+                        cwd = 'ffmpeg -loglevel error "%s" -c:a aac -b:a 256k "%s"' % (file_path, file_path.replace(".mp3", ".m4a"))
+                        subprocess.run(cwd, shell=True)
                         f.DropBox.upload_onsen(title, count, res3.content)
         return returnData
