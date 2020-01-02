@@ -52,6 +52,8 @@ class hibiki:
                 url2 = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + program.get("access_id")
                 res2 = requests.get(url2, headers=headers)
                 tmpjson = json.loads(res2.text)
+                if (tmpjson.get("episode") is None) or (tmpjson["episode"].get("video") is None):
+                    continue
                 video_url = api_base + "videos/play_check?video_id=" + str(tmpjson["episode"]["video"]["id"])
                 res2 = requests.get(video_url, headers=headers)
                 tmpjson = json.loads(res2.text)

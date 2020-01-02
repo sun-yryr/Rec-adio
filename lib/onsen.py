@@ -62,7 +62,7 @@ class onsen:
                         fs.write(res3.content)
                         fs.close()
                         # mp3 -> m4a 変換
-                        cwd = 'ffmpeg -loglevel error "%s" -c:a aac -b:a 256k "%s"' % (file_path, file_path.replace(".mp3", ".m4a"))
+                        cwd = 'ffmpeg -loglevel error -i "%s" -c:a aac -b:a 256k "%s"' % (file_path, file_path.replace(".mp3", ".m4a"))
                         subprocess.run(cwd, shell=True)
                         # f.DropBox.upload_onsen(title, count, res3.content)
                         url = f.Swift.upload_file(filePath=file_path.replace(".mp3", ".m4a"))
