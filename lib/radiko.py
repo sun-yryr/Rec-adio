@@ -69,7 +69,8 @@ class radiko:
                         "ftl": prog.get("ftl"),
                         "tol": prog.get("tol"),
                         "dur": int(prog.get("dur")),
-                        "pfm": pfm.replace("，", ",")
+                        "pfm": pfm.replace("，", ","),
+                        "info": info
                     })
         if bool(res): return res
         else: return []
