@@ -91,7 +91,7 @@ class agqr:
             f.Mysql.insert(
                 title= program_data["title"].replace(" ", "_"),
                 pfm= program_data["pfm"],
-                datetime= program_data["ft"],
+                timestamp= program_data["ft"],
                 station= "AGQR",
                 uri= url
             )
