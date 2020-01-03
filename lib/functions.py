@@ -165,7 +165,7 @@ class SwiftController():
         f = open(filePath, "rb")
         res = requests.put(Path,
                             headers={
-                                "Content-Type" : "audio/mp4a-latm",  # ここで送信するデータ形式を決める
+                                "Content-Type" : "audio/m4a-latm",  # ここで送信するデータ形式を決める
                                 "X-Auth-Token": self.token
                             },
                             data=f.read())
@@ -202,7 +202,7 @@ class DBController:
 Mysql = DBController()
 
 if __name__ == "__main__":
-    # test = SwiftController()
-    # test.upload_file("/Users/sun-mm/Desktop/nagarekawa.mp4", "1")
-    test = DBController()
-    test.insert()
+    test = SwiftController()
+    print(test.upload_file("/Users/sun-mm/Downloads/box.m4a"))
+    # test = DBController()
+    # test.insert()
