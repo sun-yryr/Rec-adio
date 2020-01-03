@@ -146,7 +146,7 @@ class SwiftController():
             self.renewal_token()
         res = requests.put(self.objectStrageUrl + "/" + containerName,
                             headers={
-                                "Content-Type" : "audio/mp4a-latm",
+                                "Content-Type" : "application/json",
                                 "X-Auth-Token": self.token,
                                 "X-Container-Read": ".r:*"
                             })
@@ -165,7 +165,7 @@ class SwiftController():
         f = open(filePath, "rb")
         res = requests.put(Path,
                             headers={
-                                "Content-Type" : "video/mp4",  # ここで送信するデータ形式を決める
+                                "Content-Type" : "audio/mp4a-latm",  # ここで送信するデータ形式を決める
                                 "X-Auth-Token": self.token
                             },
                             data=f.read())
