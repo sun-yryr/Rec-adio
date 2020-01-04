@@ -1,19 +1,16 @@
 import React from 'react';
+import { BrowserRouter, Route } from 'react-router-dom';
+import Top from './components/Top';
+import Search from './components/Search';
 
-import logo from './logo.svg';
-import './App.css';
-import AudioProvider from './conponents/AudioProvider';
-
-const client = new ApolloClient({
-    uri: 'https://48p1r2roz4.sse.codesandbox.io',
-});
+const A = () => <p>router home</p>;
+const B = () => <p>router memo</p>;
 
 const App: React.FC = () => (
-    <ApolloProvider client={client}>
-        <div>
-            <h2>Apollo app</h2>
-        </div>
-    </ApolloProvider>
+    <BrowserRouter>
+        <Route exact path="/" component={Top} />
+        <Route path="/search" component={Search} />
+    </BrowserRouter>
 );
 
 export default App;

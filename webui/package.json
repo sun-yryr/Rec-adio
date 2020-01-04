@@ -3,18 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@material-ui/core": "^4.8.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^7.2.1",
     "@types/jest": "^24.0.25",
+    "@types/material-ui": "^0.21.7",
     "@types/node": "^12.12.22",
     "@types/react": "^16.9.17",
     "@types/react-dom": "^16.9.4",
+    "@types/react-router-dom": "^5.1.3",
+    "@types/styled-components": "^4.4.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-redux": "^7.1.3",
+    "react-router": "^5.1.2",
+    "react-router-dom": "^5.1.2",
     "react-scripts": "3.3.0",
     "redux": "^4.0.5",
+    "styled-components": "^4.4.1",
     "typescript": "^3.7.4"
   },
   "scripts": {
@@ -40,6 +47,7 @@
   },
   "devDependencies": {
     "@types/react-redux": "^7.1.5",
+    "@types/react-router": "^5.1.3",
     "@typescript-eslint/eslint-plugin": "^2.14.0",
     "@typescript-eslint/parser": "^2.14.0",
     "eslint": "^6.8.0",
