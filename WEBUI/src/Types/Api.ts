@@ -1,4 +1,4 @@
-import { Action } from 'redux';
+import { Action } from '../../node_modules/redux';
 import { Program } from './Main';
 
 export interface ApiState {

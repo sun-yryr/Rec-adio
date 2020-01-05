@@ -3,7 +3,7 @@ import {
     createStore,
     Store,
     applyMiddleware,
-} from 'redux';
+} from '../node_modules/redux';
 
 export interface IRootState {
     loading: boolean,

@@ -1,4 +1,4 @@
-import { Action } from 'redux';
+import { Action } from '../../node_modules/redux';
 
 export enum ActionType {
     ADD_PLAY = 'ADD_PLAY',

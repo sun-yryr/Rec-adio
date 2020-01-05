@@ -1,7 +1,7 @@
-import React, { ChangeEvent } from 'react';
-import styled from 'styled-components';
-import { RouteComponentProps, withRouter } from 'react-router';
-import { TextField, Button } from '@material-ui/core';
+import React, { ChangeEvent } from '../../node_modules/@types/react';
+import styled from '../../node_modules/@types/styled-components/ts3.7';
+import { RouteComponentProps, withRouter } from '../../node_modules/@types/react-router';
+import { TextField, Button } from '../../node_modules/@material-ui/core';
 
 interface State {
     keyword: string
