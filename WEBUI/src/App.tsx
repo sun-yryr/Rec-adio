@@ -1,13 +1,26 @@
-import React from '../node_modules/@types/react';
-import { BrowserRouter, Route } from '../node_modules/@types/react-router-dom';
+import React from 'react';
+import { BrowserRouter, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import Top from './components/Top';
 import Search from './components/Search';
+import ResultTable from './components/ResultTable';
+import { rootReducer } from './reducers';
+
+const store = createStore(
+    rootReducer,
+    applyMiddleware(thunk),
+);
 
 const App: React.FC = () => (
-    <BrowserRouter>
-        <Route exact path="/" component={Top} />
-        <Route path="/search" component={Search} />
-    </BrowserRouter>
+    <Provider store={store}>
+        <BrowserRouter>
+            <Route exact path="/" component={Top} />
+            <Route exact path="/search" component={Search} />
+            <Route exact path="/result" component={ResultTable} />
+        </BrowserRouter>
+    </Provider>
 );
 
 export default App;

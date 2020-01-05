@@ -1,4 +1,4 @@
-import { Action } from '../../node_modules/redux';
+import { Action } from 'redux';
 import { Program } from './Main';
 
 export interface ApiState {
@@ -7,11 +7,24 @@ export interface ApiState {
     data: Array<Program>
 }
 
+export enum API_ACTIONS {
+    START = 'START_FETCH',
+    FAILURE = 'FAILURE_FETCH',
+    SUCCESS = 'SUCCESS_FETCH',
+}
+
 export interface StartFetchAction extends Action {
-    type: 'START_FETCH'
+    type: API_ACTIONS.START
 }
 
 export interface FailureFetchAction extends Action {
-    type: 'FAILURE_FETCH';
+    type: API_ACTIONS.FAILURE;
     payload: { message: string };
 }
+
+export interface SuccessFetchAction extends Action {
+    type: API_ACTIONS.SUCCESS;
+    payload: Array<Program>;
+}
+
+export type ApiActions = StartFetchAction & FailureFetchAction & SuccessFetchAction;

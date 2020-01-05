@@ -1,22 +1,39 @@
-import React, { ChangeEvent } from '../../node_modules/@types/react';
-import styled from '../../node_modules/@types/styled-components/ts3.7';
-import { RouteComponentProps, withRouter } from '../../node_modules/@types/react-router';
-import { TextField, Button } from '../../node_modules/@material-ui/core';
+import React from 'react';
+import styled from 'styled-components';
+import { RouteComponentProps, withRouter } from 'react-router';
+import { TextField, Button } from '@material-ui/core';
+import { connect } from 'react-redux';
+import { ThunkDispatch } from 'redux-thunk';
+import { RootState, RootActions } from '../Types';
+import { apiActionCreator } from '../Actions/Api';
 
 interface State {
     keyword: string
 }
 
-class Search extends React.Component<RouteComponentProps, State> {
-    constructor(props: RouteComponentProps) {
+interface DispatchToProps {
+    search: (query: string) => void,
+}
+type IProps = DispatchToProps & RouteComponentProps;
+
+class Search extends React.Component<IProps, State> {
+    constructor(props: IProps) {
         super(props);
         this.state = { keyword: '' };
         this.input = this.input.bind(this);
+        this.search = this.search.bind(this);
     }
 
     input(e: any) {
         const keyword: string = e.target.value;
         this.setState({ keyword });
+    }
+
+    search() {
+        const { search, history } = this.props;
+        const { keyword } = this.state;
+        search(keyword);
+        history.push('/result');
     }
 
     render() {
@@ -38,13 +55,21 @@ class Search extends React.Component<RouteComponentProps, State> {
                     value={keyword}
                     onChange={this.input}
                 />
-                <Button variant="contained">検索</Button>
+                <Button variant="contained" onClick={this.search}>検索</Button>
             </Root>
         );
     }
 }
 
-export default withRouter(Search);
+const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, undefined, RootActions>): DispatchToProps => ({
+    search: (query: string) => {
+        dispatch(apiActionCreator.getData(query));
+    },
+});
+
+export default connect(
+    mapDispatchToProps,
+)(withRouter(Search));
 
 const Root = styled.div`
     text-align: center;
