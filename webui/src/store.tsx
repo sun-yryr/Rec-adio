@@ -8,5 +8,5 @@ import {
 export interface IRootState {
     loading: boolean,
     nowplaying?: HTMLAudioElement,
-    audioQueue: Array<HTMLAudioElement>
+    audioQueue: Array<HTMLAudioElement>,
 }
