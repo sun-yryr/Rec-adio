@@ -50,7 +50,7 @@ router.get('/api/search', async function (req, res, next) {
     let rows;
     try {
         conn = await pool.getConnection();
-        rows = await conn.query("SELECT * FROM Programs");
+        rows = await conn.query("SELECT * FROM Programs WHERE `title` LIKE ? OR `pfm` LIKE ?", [q, q]);
         res.status = 200
         res.json(rows);
     } catch (err) {
