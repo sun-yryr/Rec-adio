@@ -68,7 +68,9 @@ class radiko:
                         "to": prog.get("to"),
                         "ftl": prog.get("ftl"),
                         "tol": prog.get("tol"),
-                        "dur": int(prog.get("dur"))
+                        "dur": int(prog.get("dur")),
+                        "pfm": pfm.replace("，", ","),
+                        "info": info
                     })
         if bool(res): return res
         else: return []
@@ -114,20 +116,12 @@ def rec(data):
     wait_start_time = data[1]
     AuthToken = data[2]
     SAVEROOT = data[3]
-    dbx = data[4]
     #ディレクトリの作成
     dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
     f.createSaveDir(dir_path)
-    dbx_path = "/radio/" + program_data["title"]
-    res = dbx.files_list_folder('/radio')
-    db_list = [d.name for d in res.entries]
-    if not program_data["title"] in db_list:
-        dbx.files_create_folder(dbx_path)
     #保存先パスの作成
     file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
     file_path = file_path.replace(" ", "_")
-    dbx_path += "/" +program_data["title"]+"_"+program_data["ft"][:12]+ ".m4a"
-    #print(program_data["title"])
     #stream urlの取得
     url = 'http://f-radiko.smartstream.ne.jp/%s/_definst_/simul-stream.stream/playlist.m3u8' % program_data["station"]
     m3u8 = gen_temp_chunk_m3u8_url(url, AuthToken)
@@ -142,9 +136,18 @@ def rec(data):
     time.sleep(10)
     if (f.is_recording_succeeded(file_path)):
         f.recording_successful_toline(program_data["title"])
-        fs = open(file_path+".m4a", "rb")
-        dbx.files_upload(fs.read(), dbx_path)
-        fs.close()
+        # fs = open(file_path+".m4a", "rb")
+        # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
+        url = f.Swift.upload_file(filePath=file_path + ".m4a")
+        f.Mysql.insert(
+            title= program_data["title"].replace(" ", "_"),
+            pfm= program_data["pfm"],
+            timestamp= program_data["ft"],
+            station= program_data["station"],
+            uri= url,
+            info= program_data["info"]
+        )
+        # fs.close()
     else:
         f.recording_failure_toline(program_data["title"])
 

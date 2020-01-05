@@ -8,10 +8,9 @@ import datetime as DT
 import subprocess
 
 class hibiki:
-    def __init__(self, keywords, SAVEROOT, dbx):
+    def __init__(self, keywords, SAVEROOT):
         self.change_keywords(keywords)
         self.SAVEROOT = SAVEROOT
-        self.dbx = dbx
 
     def change_keywords(self, keywords):
         if bool(keywords):
@@ -53,6 +52,8 @@ class hibiki:
                 url2 = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + program.get("access_id")
                 res2 = requests.get(url2, headers=headers)
                 tmpjson = json.loads(res2.text)
+                if (tmpjson.get("episode") is None) or (tmpjson["episode"].get("video") is None):
+                    continue
                 video_url = api_base + "videos/play_check?video_id=" + str(tmpjson["episode"]["video"]["id"])
                 res2 = requests.get(video_url, headers=headers)
                 tmpjson = json.loads(res2.text)
@@ -62,14 +63,17 @@ class hibiki:
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
                 subprocess.run(cwd, shell=True)
-                dbx_path = "/radio/" + title
-                res = self.dbx.files_list_folder('/radio')
-                db_list = [d.name for d in res.entries]
-                if not title in db_list:
-                    self.dbx.files_create_folder(dbx_path)
-                dbx_path += "/" + title + "_" + update_date.strftime("%Y%m%d") + ".m4a"
-                fs = open(file_path, "rb")
-                self.dbx.files_upload(fs.read(), dbx_path)
-                fs.close()
+
+                # fs = open(file_path, "rb")
+                # f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
+                # fs.close()
+                url = f.Swift.upload_file(filePath=file_path)
+                f.Mysql.insert(
+                    title= title,
+                    pfm= personality,
+                    timestamp= update_date.strftime("%Y%m%d"),
+                    station= "hibiki",
+                    uri= url,
+                )
         print("finish")
         return returnData
