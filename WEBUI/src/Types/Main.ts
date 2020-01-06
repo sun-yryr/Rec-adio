@@ -11,7 +11,13 @@ export interface Program {
 }
 
 export interface MainState {
-    loading: boolean,
-    nowplaying?: HTMLAudioElement,
-    audioQueue: Array<HTMLAudioElement>,
+    now: {
+        program?: Program,
+    },
+    audioQueue: Array<Program>,
+}
+
+export enum MAIN_ACTIONS {
+    ADD_PLAY = 'ADD_PLAY',
+    ADD_QUEUE = 'ADD_QUEUE',
 }
