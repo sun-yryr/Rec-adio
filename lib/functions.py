@@ -5,6 +5,7 @@ import requests
 import dropbox
 import mysql.connector as sql
 import hashlib
+import subprocess
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -159,17 +160,23 @@ class SwiftController():
         if not self.hadInit:
             return False
         self.renewal_token()
+        # create mp3 file 
+        cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
+        subprocess.run(cmd, shell=True)
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
         Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
-        f = open(filePath, "rb")
+        f = open(filePath.replace(".m4a", ".mp3"), "rb")
         res = requests.put(Path,
                             headers={
-                                "Content-Type" : "audio/m4a-latm",  # ここで送信するデータ形式を決める
+                                "Content-Type" : "audio/mpeg",  # ここで送信するデータ形式を決める
                                 "X-Auth-Token": self.token
                             },
                             data=f.read())
         print(res.status_code)
+        # delete mp3 file
+        cmd = 'rm "%s"' % (filePath.replace(".m4a", ".mp3"))
+        subprocess.run(cmd, shell=True)
         return Path
 
 Swift = SwiftController()
