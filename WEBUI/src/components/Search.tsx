@@ -11,6 +11,7 @@ interface State {
     keyword: string
 }
 
+interface StateToProps {}
 interface DispatchToProps {
     search: (query: string) => void,
 }
@@ -61,6 +62,8 @@ class Search extends React.Component<IProps, State> {
     }
 }
 
+const mapStateToProps = (): StateToProps => ({});
+
 const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, undefined, RootActions>): DispatchToProps => ({
     search: (query: string) => {
         dispatch(apiActionCreator.getData(query));
@@ -68,6 +71,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, undefined, RootAc
 });
 
 export default connect(
+    mapStateToProps,
     mapDispatchToProps,
 )(withRouter(Search));
 

@@ -1,17 +1,14 @@
-import { ActionCreator, Dispatch, Action } from 'redux';
+import { Dispatch, Action } from 'redux';
 import { ThunkAction } from 'redux-thunk';
-import axios, { AxiosResponse } from 'axios';
-import {
-    RootActions,
-    RootState,
-    Program,
-} from '../Types';
+import axios from 'axios';
+import { RootActions, RootState } from '../Types';
 import {
     StartFetchAction,
     FailureFetchAction,
     SuccessFetchAction,
     API_ACTIONS,
 } from '../Types/Api';
+import { Program } from '../Types/Main';
 
 class ApiActionCreator {
     private startFetch = (): StartFetchAction => ({

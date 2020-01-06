@@ -1,8 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { connect } from 'react-redux';
-import { Program, RootState } from '../Types';
+import { RootState } from '../Types';
+import { Program } from '../Types/Main';
+import { ResultCell } from './ResultCell';
 
 interface StateToProps {
     onFetch: boolean,
@@ -12,10 +13,15 @@ type IProps = StateToProps & RouteComponentProps;
 
 const ResultTable = (props: IProps) => {
     const { onFetch, data } = props;
+    const play = (url: string) => {
+        const tmp = new Audio();
+        tmp.play();
+    };
+
     if (onFetch) { return <p>loading</p>; }
     return (
         <div>
-            {data.map((prog) => <p>{prog.title}</p>)}
+            {data.map((prog) => <ResultCell key={prog.id} {...prog} play={play} />)}
         </div>
     );
 };
