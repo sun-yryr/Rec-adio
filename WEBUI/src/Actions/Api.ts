@@ -27,14 +27,18 @@ class ApiActionCreator {
 
     public getData = (query: string): ThunkAction<void, RootState, undefined, RootActions> => async (dispatch: Dispatch<Action>) => {
         dispatch(this.startFetch());
-        const res = await axios.get('https://radio.sun-yryr.com/api/search', {
+        const res: Array<any> = await axios.get('https://radio.sun-yryr.com/api/search', {
             params: {
                 q: query,
             },
         }).then((response) => response.data).catch((e) => {
             dispatch(this.failureFetch(e));
         });
-        dispatch(this.successFetch(res));
+        const r: Array<Program> = res.map((value) => ({
+            ...value,
+            recTimestamp: value['rec-timestamp'],
+        }));
+        dispatch(this.successFetch(r));
     }
 }
 
