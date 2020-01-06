@@ -40,6 +40,7 @@
         ],
         "max-len": [2, { "code": 200 }],
         "no-unused-vars": "warn",
-        "import/extensions": [2, "always", {"tsx": "never", "ts": "never", "jsx": "never", "js": "never"}]
+        "import/extensions": [2, "always", {"tsx": "never", "ts": "never", "jsx": "never", "js": "never"}],
+        "react/jsx-props-no-spreading": [1]
     }
 }

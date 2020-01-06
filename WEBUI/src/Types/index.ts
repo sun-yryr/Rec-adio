@@ -7,10 +7,6 @@ import { ApiState, ApiActions } from './Api';
 //     API_ACTIONS,
 // } from './Api';
 
-export {
-    Program,
-} from './Main';
-
 export interface RootState {
     Api: ApiState,
 }

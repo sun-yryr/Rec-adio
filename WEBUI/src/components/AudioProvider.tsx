@@ -1,5 +1,4 @@
-import * as React from '../../node_modules/@types/react';
-import { Url } from 'url';
+import * as React from 'react';
 
 interface Props {
     src: string
