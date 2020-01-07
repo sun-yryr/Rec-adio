@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch, Action } from 'redux';
-import { Button } from '@material-ui/core';
-import styled from 'styled-components';
+import { ButtonBase, Typography } from '@material-ui/core';
+import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
+import SkipNextRoundedIcon from '@material-ui/icons/SkipNextRounded';
+import PauseRoundedIcon from '@material-ui/icons/PauseRounded';
+import styled, { keyframes } from 'styled-components';
 import { Program } from '../Types/Main';
 import { RootState } from '../Types';
 import { mainActionCreator } from '../Actions/Main';
@@ -46,7 +49,7 @@ class AudioProvider extends React.Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
-        const { nowprog, queue } = this.props;
+        const { nowprog } = this.props;
         if (prevProps.nowprog?.id !== nowprog?.id) {
             const { player, isPlay, ...other } = this.state;
             player.src = nowprog.uri;
@@ -64,6 +67,9 @@ class AudioProvider extends React.Component<Props, State> {
 
     changePlay() {
         const { isPlay, player, ...other } = this.state;
+        if (other.nowProg === undefined) {
+            return;
+        }
         if (isPlay) {
             player.pause();
         } else {
@@ -79,18 +85,26 @@ class AudioProvider extends React.Component<Props, State> {
     render() {
         const { nowProg, isPlay } = this.state;
         const { skip, queue } = this.props;
-        console.log(nowProg);
+        const isSkip = queue.length > 0;
         return (
             <Root>
-                <Title>{(nowProg === undefined) ? '' : nowProg.title}</Title>
-                <Title>{(nowProg === undefined) ? '' : nowProg.recTimestamp}</Title>
+                <TickerWrap>
+                    <TickerMain>
+                        <Title variant="h6">{(nowProg) ? nowProg.title : 'にじさんじpresentsだいたいにじさんじのらじお'}</Title>
+                    </TickerMain>
+                </TickerWrap>
+                <Comment variant="body1">{(nowProg === undefined) ? '' : nowProg.recTimestamp}</Comment>
                 <LongBox>
-                    <Button variant="outlined" onClick={this.changePlay}>{(isPlay) ? 'Stop' : 'Start'}</Button>
+                    <CenterButtonBase onClick={this.changePlay}>
+                        {(isPlay) ? <PauseRoundedIcon /> : <PlayArrowRoundedIcon /> }
+                    </CenterButtonBase>
                 </LongBox>
                 <LongBox>
-                    {(queue.length > 0) ? (
-                        <Button variant="outlined" onClick={() => skip()}>skip</Button>
-                    ) : <Button variant="outlined" disabled onClick={() => skip()}>skip</Button>}
+                    <CenterButtonBase disabled={!isSkip} onClick={() => skip()}>
+                        {(isSkip) ? (
+                            <SkipNextRoundedIcon />
+                        ) : <SkipNextRoundedIcon color="disabled" />}
+                    </CenterButtonBase>
                 </LongBox>
             </Root>
         );
@@ -124,23 +138,60 @@ const Root = styled.div`
     right: 0;
     height: 12%;
     background-color: #f0f0f0;
-    padding: 5px;
+    padding: 5px 10px 5px 5px;
     margin: 0px;
     display: grid;
     grid-auto-flow: column;
-    grid-template-columns: 3fr 1fr 1fr;
+    grid-template-columns: 6fr 1fr 1fr;
     grid-template-rows: 1fr 1fr;
 `;
 
-const Title = styled.p`
+const Title = styled(Typography)`
     margin: auto 5px;
-    text-overflow: clip;
-    width: 95%;
-    overflow: auto;
-    white-space: nowrap;
+    // text-overflow: ellipsis;
+    // width: 95%;
+    // overflow: hidden;
+    // white-space: nowrap;
 `;
 
 const LongBox = styled.div`
     grid-row: 1 / 3;
     display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const CenterButtonBase = styled(ButtonBase)`
+    width: 35px;
+    height: 35px;
+`;
+
+const Comment = styled(Typography)`
+    margin: 0px 5px;
+`;
+
+/* ticker */
+const Ticker = keyframes`
+    0% {
+        transform: translate(0, 0);
+        visibility: visible;
+    }
+    100% {
+        transform: translate(-100%, 0);
+    }
+`;
+
+const TickerMain = styled.div`
+    display: inline-block;
+    height: 2rem;
+    line-height: 2rem;
+    white-space: nowrap;
+    box-sizing: content-box;
+    animation: ${Ticker} 30s linear infinite;
+    animation-delay: 3s;
+`;
+const TickerWrap = styled.div`
+    overflow: hidden;
+    height: 100%;
+    box-sizing: content-box;
 `;

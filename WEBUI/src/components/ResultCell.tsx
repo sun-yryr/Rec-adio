@@ -1,9 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import {
-    Card,
-    CardContent,
-    CardActionArea,
     Button,
     Typography,
 } from '@material-ui/core';
@@ -17,9 +14,6 @@ interface Props {
 
 export const ResultCell = (props: Props) => {
     const { addFront, program, addQueue } = props;
-    const clickhandler = () => {
-        addFront(program);
-    };
 
     return (
         <CardContentGrid>
@@ -53,8 +47,4 @@ const ButtonSet = styled.div`
     grid-column: 3/ 4;
     display: grid;
     grid-template-columns: 1fr 1fr;
-`;
-
-const GridButton = styled(Button)`
-    width: 10%;
 `;

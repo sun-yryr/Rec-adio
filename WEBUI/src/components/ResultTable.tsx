@@ -2,11 +2,11 @@ import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { Dispatch, Action } from 'redux';
+import styled from 'styled-components';
 import { RootState } from '../Types';
 import { Program } from '../Types/Main';
 import { ResultCell } from './ResultCell';
 import { mainActionCreator } from '../Actions/Main';
-import styled from 'styled-components';
 
 interface StateToProps {
     onFetch: boolean,
@@ -64,6 +64,7 @@ const Grid = styled.div`
     display: grid;
     grid-template-rows: repeat(7, 1fr);
     height: 86%;
+    overflow: scroll;
 `;
 
 const GridItem = styled.div`

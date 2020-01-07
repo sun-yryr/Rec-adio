@@ -1,4 +1,3 @@
-import { Action } from 'redux';
 import {
     Program,
     AddFrontAction,
