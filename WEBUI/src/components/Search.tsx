@@ -41,22 +41,24 @@ class Search extends React.Component<IProps, State> {
         const { keyword } = this.state;
         return (
             <Root>
-                <TextField
-                    id="outlined-full-width"
-                    style={{
-                        margin: 8,
-                        width: '80%',
-                    }}
-                    placeholder="search keyword"
-                    margin="normal"
-                    InputLabelProps={{
-                        shrink: true,
-                    }}
-                    variant="outlined"
-                    value={keyword}
-                    onChange={this.input}
-                />
-                <Button variant="contained" onClick={this.search}>検索</Button>
+                <GridItem>
+                    <TextField
+                        id="outlined-full-width"
+                        style={{
+                            padding: 8,
+                            margin: 0,
+                        }}
+                        placeholder="search keyword"
+                        margin="normal"
+                        InputLabelProps={{
+                            shrink: true,
+                        }}
+                        variant="outlined"
+                        value={keyword}
+                        onChange={this.input}
+                    />
+                    <SearchButton variant="contained" onClick={this.search}>検索</SearchButton>
+                </GridItem>
             </Root>
         );
     }
@@ -76,5 +78,21 @@ export default connect(
 )(withRouter(Search));
 
 const Root = styled.div`
-    text-align: center;
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: 80px auto;
+    height: 100%;
+`;
+
+const GridItem = styled.div`
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    align-content: center;
+`;
+
+const SearchButton = styled(Button)`
+    height: 55px;
+    padding: 0;
+    width: 90%;
+    margin: auto 0px;
 `;

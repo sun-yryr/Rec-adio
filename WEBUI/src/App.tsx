@@ -18,11 +18,13 @@ const store = createStore(
 const App: React.FC = () => (
     <Provider store={store}>
         <Root>
-            <BrowserRouter>
-                <Route exact path="/" component={Top} />
-                <Route exact path="/search" component={Search} />
-                <Route exact path="/result" component={ResultTable} />
-            </BrowserRouter>
+            <RouteRoot>
+                <BrowserRouter>
+                    <Route exact path="/" component={Top} />
+                    <Route exact path="/search" component={Search} />
+                    <Route exact path="/result" component={ResultTable} />
+                </BrowserRouter>
+            </RouteRoot>
             <AudioProvider />
         </Root>
     </Provider>
@@ -36,4 +38,9 @@ const Root = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
+`;
+
+const RouteRoot = styled.div`
+    height: 86%;
+    overflow: scroll;
 `;

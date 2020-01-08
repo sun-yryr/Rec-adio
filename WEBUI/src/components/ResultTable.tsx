@@ -63,8 +63,7 @@ export default connect(
 const Grid = styled.div`
     display: grid;
     grid-template-rows: repeat(7, 1fr);
-    height: 86%;
-    overflow: scroll;
+    height: 100%;
 `;
 
 const GridItem = styled.div`
