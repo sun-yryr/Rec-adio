@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { Dispatch, Action } from 'redux';
-import { ButtonBase, Typography } from '@material-ui/core';
+import { ButtonBase, Typography, Button } from '@material-ui/core';
 import PlayArrowRoundedIcon from '@material-ui/icons/PlayArrowRounded';
 import SkipNextRoundedIcon from '@material-ui/icons/SkipNextRounded';
 import PauseRoundedIcon from '@material-ui/icons/PauseRounded';
@@ -35,6 +35,8 @@ class AudioProvider extends React.Component<Props, State> {
             player: new Audio('https://object-storage.tyo1.conoha.io/v1/nc_92a6769609d54403bc799a178c136a31/radio/test'),
         };
         this.changePlay = this.changePlay.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleSkip = this.handleSkip.bind(this);
     }
 
     componentDidMount() {
@@ -64,7 +66,20 @@ class AudioProvider extends React.Component<Props, State> {
         }
     }
 
-    changePlay() {
+    handleOpen(e: React.SyntheticEvent<HTMLDivElement>) {
+        console.log(e.target);
+    }
+
+    handleSkip(e: React.SyntheticEvent<HTMLButtonElement>) {
+        e.stopPropagation();
+        const { skip } = this.props;
+        skip();
+    }
+
+    changePlay(e?: React.SyntheticEvent<HTMLButtonElement>) {
+        if (e) {
+            e.stopPropagation();
+        }
         const { isPlay, player, ...other } = this.state;
         if (other.nowProg === undefined) {
             return;
@@ -83,10 +98,10 @@ class AudioProvider extends React.Component<Props, State> {
 
     render() {
         const { nowProg, isPlay } = this.state;
-        const { skip, queue } = this.props;
+        const { queue } = this.props;
         const isSkip = queue.length > 0;
         return (
-            <Root>
+            <Root onClick={this.handleOpen}>
                 <TickerWrap>
                     <TickerMain>
                         <Title variant="h6">{(nowProg) ? nowProg.title : 'にじさんじpresentsだいたいにじさんじのらじお'}</Title>
@@ -99,7 +114,7 @@ class AudioProvider extends React.Component<Props, State> {
                     </CenterButtonBase>
                 </LongBox>
                 <LongBox>
-                    <CenterButtonBase disabled={!isSkip} onClick={() => skip()}>
+                    <CenterButtonBase disabled={!isSkip} onClick={this.handleSkip}>
                         {(isSkip) ? (
                             <SkipNextRoundedIcon />
                         ) : <SkipNextRoundedIcon color="disabled" />}
