@@ -53,15 +53,14 @@ class AudioProvider extends React.Component<Props, State> {
         if (prevProps.nowprog?.id !== nowprog?.id) {
             const { player, isPlay, ...other } = this.state;
             player.src = nowprog.uri;
+            // eslint-disable-next-line react/no-did-update-set-state
             this.setState({
                 ...other,
                 player,
                 isPlay: false,
                 nowProg: nowprog,
             });
-            if (true) {
-                setTimeout(() => this.changePlay(), 5);
-            }
+            setTimeout(() => this.changePlay(), 5);
         }
     }
 
