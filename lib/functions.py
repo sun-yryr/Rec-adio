@@ -59,7 +59,8 @@ def recording_failure_toline(title):
 def did_record_prog(filePath, title, timestamp):
     if (Mysql.hadInit):
         # DBあり
-        return True
+        res = Mysql.check(title, timestamp)
+        return (len(res) != 0)
     else:
         # DBなし
         return os.path.exists(filePath)
@@ -217,12 +218,11 @@ class DBController:
         self.conn.ping(reconnect=True)
         cur = self.conn.cursor()
         s = "SELECT id FROM Programs WHERE `title` = %s AND `rec-timestamp` = %s"
-        res = cur.execute(s, (title, timestamp))
-        print(res)
-        self.conn.commit()
-        cur.close()
+        cur.execute(s, (title, timestamp))
+        return cur.fetchall()
+
 
 Mysql = DBController()
 
 if __name__ == "__main__":
-    Mysql.check("にじさんじpresentsだいたいにじさんじのらじお", "20200112143000")
+    print(Mysql.check("にじさんじpresentsだいたいにじさんじのらじお", "20200112143000"))
