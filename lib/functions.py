@@ -225,4 +225,4 @@ class DBController:
 Mysql = DBController()
 
 if __name__ == "__main__":
-    print(Mysql.check("にじさんじpresentsだいたいにじさんじのらじお", "20200112143000"))
+    print(did_record_prog("a", "にじさんじpresentsだいたいにじさんじのらじお", "20200112143000"))
