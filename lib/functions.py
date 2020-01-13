@@ -56,6 +56,14 @@ def recording_failure_toline(title):
     payload = {"message": "\n"+title+" の録音に失敗しました"}
     requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
 
+def did_record_prog(filePath, title, timestamp):
+    if (Mysql.hadInit):
+        # DBあり
+        return True
+    else:
+        # DBなし
+        return os.path.exists(filePath)
+
 class DBXController():
     hadInit = False
     def __init__(self):
@@ -115,6 +123,7 @@ class SwiftController():
         # エラーがあったら初期化中止
         if not self.renewal_token():
             print("login error")
+            self.hadInit = False
             return
         self.create_container(self.containerName)
     
@@ -189,20 +198,31 @@ class DBController:
             password = tmpconf["mysql"]["password"],
             database = tmpconf["mysql"]["database"]
         )
+        # 接続できなかったら False にするべき？実行時エラーで止まる？
         self.hadInit = True
     
     def insert(self, title, pfm, timestamp, station, uri, info = ""):
+        if (not self.hadInit):
+            return
         self.conn.ping(reconnect=True)
         cur = self.conn.cursor()
         s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`, `info`) VALUES ( %s, %s, %s, %s, %s, %s)"
         cur.execute(s, (title, pfm, timestamp, station, uri, info))
         self.conn.commit()
         cur.close()
+    
+    def check(self, title, timestamp):
+        if (not self.hadInit):
+            return
+        self.conn.ping(reconnect=True)
+        cur = self.conn.cursor()
+        s = "SELECT id FROM Programs WHERE `title` = %s AND `rec-timestamp` = %s"
+        res = cur.execute(s, (title, timestamp))
+        print(res)
+        self.conn.commit()
+        cur.close()
 
 Mysql = DBController()
 
 if __name__ == "__main__":
-    test = SwiftController()
-    print(test.upload_file("/Users/sun-mm/Downloads/box.m4a"))
-    # test = DBController()
-    # test.insert()
+    Mysql.check("にじさんじpresentsだいたいにじさんじのらじお", "20200112143000")
