@@ -80,7 +80,7 @@ class agqr:
         #rtmpdumpは時間指定の終了ができるので以下を同期処理にする
         subprocess.run(cwd, shell=True)
         #変換をする
-        cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -acodec copy "%s.m4a"' % (file_path, file_path))
+        cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -c:a aac -b:a 256k "%s.m4a"' % (file_path, file_path))
         subprocess.run(cwd2, shell=True)
         print("agqr finish!")
         if (f.is_recording_succeeded(file_path)):

@@ -1,0 +1,45 @@
+import { Dispatch, Action } from 'redux';
+import { ThunkAction } from 'redux-thunk';
+import axios from 'axios';
+import { RootActions, RootState } from '../Types';
+import {
+    StartFetchAction,
+    FailureFetchAction,
+    SuccessFetchAction,
+    API_ACTIONS,
+} from '../Types/Api';
+import { Program } from '../Types/Main';
+
+class ApiActionCreator {
+    private startFetch = (): StartFetchAction => ({
+        type: API_ACTIONS.START,
+    });
+
+    private failureFetch = (payload: string): FailureFetchAction => ({
+        type: API_ACTIONS.FAILURE,
+        payload: { message: payload },
+    });
+
+    private successFetch = (payload: Array<Program>): SuccessFetchAction => ({
+        type: API_ACTIONS.SUCCESS,
+        payload,
+    });
+
+    public getData = (query: string): ThunkAction<void, RootState, undefined, RootActions> => async (dispatch: Dispatch<Action>) => {
+        dispatch(this.startFetch());
+        const res: Array<any> = await axios.get('https://radio.sun-yryr.com/api/search', {
+            params: {
+                q: query,
+            },
+        }).then((response) => response.data).catch((e) => {
+            dispatch(this.failureFetch(e));
+        });
+        const r: Array<Program> = res.map((value) => ({
+            ...value,
+            recTimestamp: value['rec-timestamp'],
+        }));
+        dispatch(this.successFetch(r));
+    }
+}
+
+export const apiActionCreator = new ApiActionCreator();
