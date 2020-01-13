@@ -170,9 +170,11 @@ class SwiftController():
         if not self.hadInit:
             return False
         self.renewal_token()
-        # create mp3 file 
-        cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
-        subprocess.run(cmd, shell=True)
+        # create mp3 file
+        (root, ext) = os.path.splitext(filePath)
+        if (ext == ".m4a"):
+            cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
+            subprocess.run(cmd, shell=True)
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
         Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
@@ -185,8 +187,9 @@ class SwiftController():
                             data=f.read())
         print(res.status_code)
         # delete mp3 file
-        cmd = 'rm "%s"' % (filePath.replace(".m4a", ".mp3"))
-        subprocess.run(cmd, shell=True)
+        if (ext == ".m4a"):
+            cmd = 'rm "%s"' % (filePath.replace(".m4a", ".mp3"))
+            subprocess.run(cmd, shell=True)
         return Path
 
 Swift = SwiftController()

@@ -95,6 +95,9 @@ class agqr:
                 station= "AGQR",
                 uri= url
             )
+            if (f.Swift.hadInit):
+                cmd = 'rm "%s"' % (file_path + ".m4a")
+                subprocess.run(cmd, shell=True)
             # fs.close()
         else:
             f.recording_failure_toline(program_data["title"])
