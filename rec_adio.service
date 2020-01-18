@@ -5,7 +5,7 @@ After = network.target
 [Service]
 User = yryr
 WorkingDirectory = /home/yryr/Rec-adio
-ExecStart = pipenv run start
+ExecStart = /home/yryr/.local/bin/pipenv run start
 Restart = no
 Type = simple
 
