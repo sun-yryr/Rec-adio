@@ -4,7 +4,8 @@ After = network.target
 
 [Service]
 User = yryr
-ExecStart = /home/yryr/radio/run.py
+WorkingDirectory = /home/yryr/Rec-adio
+ExecStart = pipenv run start
 Restart = no
 Type = simple
 
