@@ -56,7 +56,7 @@ sudo systemctl start rec_adio.service
     - `objectStorageUrl: string` 保存用Url。https~
 - **mysql** Mysql用
     - `hostname: string`
-    - `port: string`
+    - `port: string` default = 3306
     - `username: string`
     - `password: string`
     - `database: string` データベース名
