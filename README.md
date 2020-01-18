@@ -27,15 +27,17 @@ pip install pipenv --user
 
 Pipenvインストール済みの人
 ```
+sudo apt install -y ffmpeg rtmpdump
 git clone https://github.com/sun-yryr/Rec-adio.git
 cd Rec-adio
 pipenv install
 cp ./conf/example_config.json ./conf/config.json
 nano ./conf/config.json
-
 設定なので好みに合わせてください。キーワードは正規表現なので .+ とかやると全部取れるはずです。
 
-sudo apt install -y ffmpeg rtmpdump
+nano ./rec_adio.service
+ユーザー名，パスを環境に合わせて下さい（下記参照）
+
 sudo mv ./rec_adio.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable rec_adio.service
@@ -60,3 +62,9 @@ sudo systemctl start rec_adio.service
     - `username: string`
     - `password: string`
     - `database: string` データベース名
+
+### Systemd serviceファイル
+変更する箇所
+- User ユーザー名
+- WorkingDirectory `hogehoge/Rec-adio`になるように絶対パスで書く
+- ExecStart `which pipenv`で出力されたパス + `run start`にする
