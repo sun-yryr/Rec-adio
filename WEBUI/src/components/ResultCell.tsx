@@ -7,6 +7,7 @@ import {
     Typography,
     ButtonBase,
 } from '@material-ui/core';
+import moment from 'moment';
 import { Program } from '../Types/Main';
 
 interface Props {
@@ -23,11 +24,12 @@ export const ResultCell = (props: Props) => {
     const wrapAddQueue = () => {
         addQueue(program);
     };
+    const formatDate = moment(program.recTimestamp).format('YYYY年MM月DD日');
 
     return (
         <CardContentGrid>
             <Title variant="body1">{program.title}</Title>
-            <Text variant="caption">{program.recTimestamp}</Text>
+            <Text variant="caption">{formatDate}</Text>
             <ButtonSet>
                 <ExtendBBase
                     onClick={wrapAddFront}
