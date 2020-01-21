@@ -157,6 +157,8 @@ def gen_temp_chunk_m3u8_url( url, AuthToken ):
     }
     res  = requests.get(url, headers=headers)
     res.encoding = "utf-8"
+    if (res.status_code != 200):
+        print(res.text)
     body = res.text
     lines = re.findall( '^https?://.+m3u8$' , body, flags=(re.MULTILINE) )
     return lines[0]
