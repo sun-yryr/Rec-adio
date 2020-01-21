@@ -111,16 +111,14 @@ class SwiftController():
         self.tenantid = tmpconf["swift"]["tenantid"]
         self.identityUrl = tmpconf["swift"]["identityUrl"]
         self.objectStrageUrl = tmpconf["swift"]["objectStrageUrl"]
-        self.hadInit = True
         # エラーがあったら初期化中止
         if not self.renewal_token():
-            print("login error")
+            print("Swift login failed")
             return
+        self.hadInit = True
         self.create_container(self.containerName)
     
     def renewal_token(self):
-        if not self.hadInit:
-            return False
         data = {
             "auth": {
                 "passwordCredentials": {
@@ -130,13 +128,16 @@ class SwiftController():
                 "tenantId": self.tenantid
             }
         }
-        res = requests.post(self.identityUrl + "/tokens",
-                            headers={"Content-Type" : "application/json"},
-                            data=json.dumps(data))
-        resData = json.loads(res.text)
-        if "error" in resData.keys():
+        try:
+            res = requests.post(self.identityUrl + "/tokens",
+                                headers={"Content-Type" : "application/json"},
+                                data=json.dumps(data))
+            resData = json.loads(res.text)
+            if "error" in resData.keys():
+                return False
+            self.token = resData["access"]["token"]["id"]
+        except:
             return False
-        self.token = resData["access"]["token"]["id"]
         return True
 
     def create_container(self, containerName, isRenewToken = False):
@@ -182,14 +183,17 @@ class DBController:
         tmpconf = load_configurations()
         if (tmpconf is None) or (tmpconf.get("mysql") is None):
             return
-        self.conn = sql.connect(
-            host = tmpconf["mysql"]["hostname"] or 'localhost',
-            port = tmpconf["mysql"]["port"] or '3306',
-            user = tmpconf["mysql"]["username"],
-            password = tmpconf["mysql"]["password"],
-            database = tmpconf["mysql"]["database"]
-        )
-        self.hadInit = True
+        try:
+            self.conn = sql.connect(
+                host = tmpconf["mysql"]["hostname"] or 'localhost',
+                port = tmpconf["mysql"]["port"] or '3306',
+                user = tmpconf["mysql"]["username"],
+                password = tmpconf["mysql"]["password"],
+                database = tmpconf["mysql"]["database"]
+            )
+            self.hadInit = True
+        except:
+            print("Mysql login failed")
     
     def insert(self, title, pfm, timestamp, station, uri, info = ""):
         self.conn.ping(reconnect=True)
@@ -202,7 +206,6 @@ class DBController:
 Mysql = DBController()
 
 if __name__ == "__main__":
-    test = SwiftController()
-    print(test.upload_file("/Users/sun-mm/Downloads/box.m4a"))
+    print("finish")
     # test = DBController()
     # test.insert()
