@@ -36,3 +36,6 @@ sudo systemctl start rec_adio.service
 - saveRoot 保存先フォルダ
 - line token
 - dbx token
+
+# 既知のバグ
+- Mysql, Swiftのオプションをオフにする場合，conf.jsonから各項目自体を削除して下さい。
