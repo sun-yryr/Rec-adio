@@ -38,7 +38,8 @@ class ApiActionCreator {
         aQIDAQAB
         -----END PUBLIC KEY-----`;
         const rsa = new NodeRSA(publicKey, 'public');
-        const encryptText = rsa.encrypt(pass);
+        const encryptText = rsa.encrypt(pass, 'base64');
+        console.log(encryptText);
         const res: Array<any> = await axios.get('https://radio.sun-yryr.com/api/search', {
             params: {
                 q: query,

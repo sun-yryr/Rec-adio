@@ -37,12 +37,12 @@ function oreore_mysql_escape(str) {
     return str.replace(/(["'`;])/g, `\\$1`);
 }
 
-const privateKey = fs.readFileSync('../../pem/private.pem', 'utf-8');
+const privateKey = fs.readFileSync('../pem/private.pem', 'utf-8');
 const rsa = new NodeRSA(privateKey);
 
 // passwordチェック
 const checkPass = (req, res, next) => {
-    const encryptPass = req.body.password;
+    const encryptPass = req.body.password.decode('base64');
     const pass = rsa.decrypt(encryptPass).toString('utf-8');
     if (pass === process.env.PASSWORD) {
         next();
