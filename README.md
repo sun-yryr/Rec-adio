@@ -20,6 +20,8 @@
 - 録音完了をLINE Notifyで通知
 
 # 設定方法
+※ Setup.pyはまだ実装中です。使わないようにして下さい。
+
 Pipenvが必要です
 ```
 pip install pipenv --user
@@ -68,3 +70,34 @@ sudo systemctl start rec_adio.service
 - User ユーザー名
 - WorkingDirectory `hogehoge/Rec-adio`になるように絶対パスで書く
 - ExecStart `which pipenv`で出力されたパス + `run start`にする
+
+## WEB Client を使ってみたい人へ
+このリポジトリには録音したデータをChromeなどのブラウザで検索・視聴できるクライアントが付属しています。
+まだベータ版ですが使ってみたい人は下記とコードを参考にやってみてください。
+
+1. Setup.pyを実行。yを押し，RSA鍵を生成します。
+2. WEBUI/src/Actions/Api.ts に公開鍵がベタ書きされているので，先ほど生成した公開鍵をコピペします。
+1. また，同ファイルにアクセス先urlがあるので自分用に変更します。
+3. Rec-adio本体でMysql，Swiftを設定します。(conohaのオブジェクトストレージは確認済みです)
+2. API/.env を作成します。 
+    ```
+    DBNAME=
+    DBPASS=
+    DBUSER=
+    PASSWORD= WEBUIで使用するパスワード
+    ```
+6. API，WEBUIをそれぞれ localhost などで公開します。
+
+Mysqlのテーブル作成クエリ
+```
+CREATE TABLE `Programs` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `title` text NOT NULL,
+  `pfm` text,
+  `rec-timestamp` datetime NOT NULL,
+  `station` varchar(30) DEFAULT '',
+  `uri` text NOT NULL,
+  `info` text,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=206 DEFAULT CHARSET=utf8;
+```
