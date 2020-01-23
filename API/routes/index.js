@@ -47,8 +47,7 @@ const checkPass = (req, res, next) => {
     if (pass === process.env.PASSWORD) {
         next();
     } else {
-        res.status = 400;
-        res.send();
+        res.status(401).send('wrong password');
     }
 }
 

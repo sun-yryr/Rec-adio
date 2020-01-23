@@ -11,11 +11,13 @@ interface State {
     keyword: string
 }
 
-interface StateToProps {}
+interface StateToProps {
+    password: string,
+}
 interface DispatchToProps {
     search: (query: string, pass: string) => void,
 }
-type IProps = DispatchToProps & RouteComponentProps;
+type IProps = StateToProps & DispatchToProps & RouteComponentProps;
 
 class Search extends React.Component<IProps, State> {
     constructor(props: IProps) {
@@ -31,9 +33,9 @@ class Search extends React.Component<IProps, State> {
     }
 
     search() {
-        const { search, history } = this.props;
+        const { search, history, password } = this.props;
         const { keyword } = this.state;
-        search(keyword, '19990425');
+        search(keyword, password);
         history.push('/result');
     }
 
@@ -64,7 +66,12 @@ class Search extends React.Component<IProps, State> {
     }
 }
 
-const mapStateToProps = (): StateToProps => ({});
+const mapStateToProps = (state: RootState): StateToProps => {
+    const { Main } = state;
+    return {
+        password: Main.password,
+    }
+};
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, undefined, RootActions>): DispatchToProps => ({
     search: (query: string, pass: string) => {

@@ -4,6 +4,7 @@ import {
     MAIN_ACTIONS,
     AddQueueAction,
     SkipAction,
+    SetPassAction,
 } from '../Types/Main';
 
 class MainActionCreator {
@@ -19,6 +20,11 @@ class MainActionCreator {
 
     public skip = (): SkipAction => ({
         type: MAIN_ACTIONS.SKIP,
+    });
+
+    public setPassword = (pass: string): SetPassAction => ({
+        type: MAIN_ACTIONS.SET_PASS,
+        payload: { password: pass },
     });
 }
 export const mainActionCreator = new MainActionCreator();

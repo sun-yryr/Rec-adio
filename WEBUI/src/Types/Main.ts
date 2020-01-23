@@ -13,12 +13,14 @@ export interface Program {
 export interface MainState {
     nowProgram?: Program,
     audioQueue: Array<Program>,
+    password: string,
 }
 
 export enum MAIN_ACTIONS {
     ADD_FRONT = 'ADD_FRONT',
     ADD_QUEUE = 'ADD_QUEUE',
     SKIP = 'SKIP',
+    SET_PASS = 'SET_PASSWORD',
 }
 
 export interface AddFrontAction extends Action {
@@ -35,4 +37,9 @@ export interface SkipAction extends Action {
     type: MAIN_ACTIONS.SKIP;
 }
 
-export type MainActions = AddFrontAction & AddQueueAction & SkipAction;
+export interface SetPassAction extends Action {
+    type: MAIN_ACTIONS.SET_PASS;
+    payload: { password: string }
+}
+
+export type MainActions = AddFrontAction & AddQueueAction & SkipAction & SetPassAction;
