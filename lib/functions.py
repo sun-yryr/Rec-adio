@@ -5,6 +5,7 @@ import requests
 import dropbox
 import mysql.connector as sql
 import hashlib
+import subprocess
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -55,6 +56,15 @@ def recording_failure_toline(title):
     headers = {"Authorization": "Bearer %s" % line_token}
     payload = {"message": "\n"+title+" の録音に失敗しました"}
     requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
+
+def did_record_prog(filePath, title, timestamp):
+    if (Mysql.hadInit):
+        # DBあり
+        res = Mysql.check(title, timestamp)
+        return (len(res) != 0)
+    else:
+        # DBなし
+        return os.path.exists(filePath)
 
 class DBXController():
     hadInit = False
@@ -145,7 +155,7 @@ class SwiftController():
             return False
         if isRenewToken:
             self.renewal_token()
-        res = requests.put(self.objectStrageUrl + "/" + containerName,
+        res = requests.put(self.objectStorageUrl + "/" + containerName,
                             headers={
                                 "Content-Type" : "application/json",
                                 "X-Auth-Token": self.token,
@@ -160,17 +170,26 @@ class SwiftController():
         if not self.hadInit:
             return False
         self.renewal_token()
+        # create mp3 file
+        (root, ext) = os.path.splitext(filePath)
+        if (ext == ".m4a"):
+            cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
+            subprocess.run(cmd, shell=True)
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
-        Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
-        f = open(filePath, "rb")
+        Path = self.objectStorageUrl + "/" + self.containerName + "/" + hash
+        f = open(filePath.replace(".m4a", ".mp3"), "rb")
         res = requests.put(Path,
                             headers={
-                                "Content-Type" : "audio/m4a-latm",  # ここで送信するデータ形式を決める
+                                "Content-Type" : "audio/mpeg",  # ここで送信するデータ形式を決める
                                 "X-Auth-Token": self.token
                             },
                             data=f.read())
         print(res.status_code)
+        # delete mp3 file
+        if (ext == ".m4a"):
+            cmd = 'rm "%s"' % (filePath.replace(".m4a", ".mp3"))
+            subprocess.run(cmd, shell=True)
         return Path
 
 Swift = SwiftController()
@@ -196,12 +215,24 @@ class DBController:
             print("Mysql login failed")
     
     def insert(self, title, pfm, timestamp, station, uri, info = ""):
+        if (not self.hadInit):
+            return
         self.conn.ping(reconnect=True)
         cur = self.conn.cursor()
         s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`, `info`) VALUES ( %s, %s, %s, %s, %s, %s)"
         cur.execute(s, (title, pfm, timestamp, station, uri, info))
         self.conn.commit()
         cur.close()
+    
+    def check(self, title, timestamp):
+        if (not self.hadInit):
+            return
+        self.conn.ping(reconnect=True)
+        cur = self.conn.cursor()
+        s = "SELECT id FROM Programs WHERE `title` = %s AND `rec-timestamp` = %s"
+        cur.execute(s, (title, timestamp))
+        return cur.fetchall()
+
 
 Mysql = DBController()
 

@@ -47,7 +47,7 @@ class hibiki:
                 update_date = DT.datetime.strptime(episode["updated_at"].split(" ")[0], "%Y/%m/%d")
                 file_name = title.replace(" ", "_") + "_" + update_date.strftime("%Y%m%d") + ".m4a"
                 file_path = dir_path +"/"+ file_name
-                if file_name in os.listdir(dir_path):
+                if f.did_record_prog(file_path, title, update_date.strftime("%Y%m%d")):
                     continue
                 url2 = "https://vcms-api.hibiki-radio.jp/api/v1/programs/" + program.get("access_id")
                 res2 = requests.get(url2, headers=headers)
@@ -75,5 +75,8 @@ class hibiki:
                     station= "hibiki",
                     uri= url,
                 )
+                if (f.Swift.hadInit):
+                    cmd = 'rm "%s"' % (file_path)
+                    subprocess.run(cmd, shell=True)
         print("finish")
         return returnData

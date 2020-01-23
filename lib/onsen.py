@@ -54,23 +54,24 @@ class onsen:
                     # ファイル重複チェック
                     file_name = title.replace(" ", "_") +"#"+ count + ".mp3"
                     file_path = dir_path +"/"+ file_name
-                    if not file_name in os.listdir(dir_path):
-                        print(prog["update"], prog["title"], prog["personality"])
-                        returnData.append(title)
-                        res3 = requests.get(movie_url)
-                        fs = open(file_path, "wb")
-                        fs.write(res3.content)
-                        fs.close()
-                        # mp3 -> m4a 変換
-                        cwd = 'ffmpeg -loglevel error -i "%s" -c:a aac -b:a 256k "%s"' % (file_path, file_path.replace(".mp3", ".m4a"))
-                        subprocess.run(cwd, shell=True)
-                        # f.DropBox.upload_onsen(title, count, res3.content)
-                        url = f.Swift.upload_file(filePath=file_path.replace(".mp3", ".m4a"))
-                        f.Mysql.insert(
-                            title= title,
-                            pfm= personality,
-                            timestamp= update_DT,
-                            station= "onsen",
-                            uri= url
-                        )
+                    if (f.did_record_prog(file_path, title, update_DT)):
+                        continue
+                    # print(prog["update"], prog["title"], prog["personality"])
+                    returnData.append(title)
+                    res3 = requests.get(movie_url)
+                    fs = open(file_path, "wb")
+                    fs.write(res3.content)
+                    fs.close()
+                    # f.DropBox.upload_onsen(title, count, res3.content)
+                    url = f.Swift.upload_file(filePath=file_path)
+                    f.Mysql.insert(
+                        title= title,
+                        pfm= personality,
+                        timestamp= update_DT,
+                        station= "onsen",
+                        uri= url
+                    )
+                    if (f.Swift.hadInit):
+                        cmd = 'rm "%s"' % (file_path)
+                        subprocess.run(cmd, shell=True)
         return returnData
