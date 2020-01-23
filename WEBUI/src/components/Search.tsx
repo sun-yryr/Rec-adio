@@ -13,7 +13,7 @@ interface State {
 
 interface StateToProps {}
 interface DispatchToProps {
-    search: (query: string) => void,
+    search: (query: string, pass: string) => void,
 }
 type IProps = DispatchToProps & RouteComponentProps;
 
@@ -33,7 +33,7 @@ class Search extends React.Component<IProps, State> {
     search() {
         const { search, history } = this.props;
         const { keyword } = this.state;
-        search(keyword);
+        search(keyword, '19990425');
         history.push('/result');
     }
 
@@ -67,8 +67,8 @@ class Search extends React.Component<IProps, State> {
 const mapStateToProps = (): StateToProps => ({});
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<RootState, undefined, RootActions>): DispatchToProps => ({
-    search: (query: string) => {
-        dispatch(apiActionCreator.getData(query));
+    search: (query: string, pass: string) => {
+        dispatch(apiActionCreator.getData(query, pass));
     },
 });
 

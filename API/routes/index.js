@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-
+const NodeRSA = require('node-rsa');
+const fs = require('fs');
 var dotenv = require('dotenv');
 dotenv.config();
 
@@ -36,8 +37,23 @@ function oreore_mysql_escape(str) {
     return str.replace(/(["'`;])/g, `\\$1`);
 }
 
+const privateKey = fs.readFileSync('../../pem/private.pem', 'utf-8');
+const rsa = new NodeRSA(privateKey);
+
+// passwordチェック
+const checkPass = (req, res, next) => {
+    const encryptPass = req.body.password;
+    const pass = rsa.decrypt(encryptPass).toString('utf-8');
+    if (pass === process.env.PASSWORD) {
+        next();
+    } else {
+        res.status = 400;
+        res.end();
+    }
+}
+
 /* チャンネル一覧の取得 */
-router.get('/api/search', async function (req, res, next) {
+router.get('/api/search', checkPass, async function (req, res, next) {
     // qがない場合，エラー出して終了
     let q = req.query.q || '';
     if (q === '') {
