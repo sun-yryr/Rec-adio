@@ -42,7 +42,7 @@ const rsa = new NodeRSA(privateKey);
 
 // passwordチェック
 const checkPass = (req, res, next) => {
-    const encryptPass = new Buffer(req.body.password, 'base64');
+    const encryptPass = new Buffer(req.query.password, 'base64');
     const pass = rsa.decrypt(encryptPass).toString('utf-8');
     if (pass === process.env.PASSWORD) {
         next();
