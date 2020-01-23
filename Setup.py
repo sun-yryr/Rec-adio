@@ -38,9 +38,9 @@ def main():
     ans = input()
     if (ans == 'y'):
         # port の指定
-        print('React access port (default = 2332) : ', end='')
-        port = input()
-        if (port == ''): port = '2332'
+        # print('React access port (default = 2332) : ', end='')
+        # port = input()
+        # if (port == ''): port = '2332'
         # 公開鍵認証の設定
         os.makedirs('./pem', exist_ok=True)
         random_func = Random.new().read
@@ -54,12 +54,12 @@ def main():
         with open('./pem/public.pem', 'w') as f:
             f.write(public_pem)
         # ログイン用パスワードの設定
-        print('please passphrase : ', end='')
-        passphrase = input()
-        f = open('./API/.env', 'w')
-        f.write("PORT = '%s'" % port)
-        f.write("PASSWORD = '%s'" % passphrase)
-        f.close()
+        # print('please passphrase : ', end='')
+        # passphrase = input()
+        # f = open('./API/.env', 'w')
+        # f.write("PORT = '%s'" % port)
+        # f.write("PASSWORD = '%s'" % passphrase)
+        # f.close()
     elif (ans == 'n'):
         pass
     else:
