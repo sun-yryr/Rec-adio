@@ -61,7 +61,7 @@ class hibiki:
                 if (tmpjson.get("playlist_url") is None):
                     continue
                 returnData.append(title)
-                cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
+                cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy -bsf aac_adtstoasc "%s"' % (tmpjson["playlist_url"], file_path)
                 subprocess.run(cwd, shell=True)
 
                 # fs = open(file_path, "rb")
