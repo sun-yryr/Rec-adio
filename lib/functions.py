@@ -106,7 +106,27 @@ class DBXController():
 
 DropBox = DBXController()
 
+# rclone
+ 
+class RcloneController():
+    hadInit = False
 
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf["all"]["rclone_method"] == ""):
+            return
+        self.rcl    = tmpconf["all"]["rclone_method"]
+        self.outdir = tmpconf["all"]["rclone_outdir"]
+        self.rclop  = tmpconf["all"]["rclone_options"]
+
+        self.hadInit = True
+    def upload(self, save_dir):
+        cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir, self.rclop)) 
+        p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+
+Rclone = RcloneController()
+
+# 
 
 class SwiftController():
     hadInit = False
