@@ -12,8 +12,13 @@ from signal import SIGINT
 
 class radiko:
     RADIKO_URL = "http://radiko.jp/v3/program/today/JP13.xml"
+
     def __init__(self):
-        res = requests.get(self.RADIKO_URL)
+
+        tmpconf = f.load_configurations()
+        if (tmpconf is None) or (tmpconf.get("Radiko_URL") is None):
+            res = requests.get(self.RADIKO_URL)
+        res = requests.get(tmpconf["all"]["Radiko_URL"])
         res.encoding = "utf-8"
         self.isKeyword = False
         self.reload_date = DT.date.today()
