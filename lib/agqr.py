@@ -87,6 +87,7 @@ class agqr:
             f.recording_successful_toline(program_data["title"])
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
+            f.Rclone.upload(SAVEROOT)
             url = f.Swift.upload_file(filePath=file_path+".m4a")
             f.Mysql.insert(
                 title= program_data["title"].replace(" ", "_"),
