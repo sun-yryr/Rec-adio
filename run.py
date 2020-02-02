@@ -80,7 +80,7 @@ if __name__ == "__main__":
     if (config is None):
         exit(code=-1)
     f.line_token = config["all"]["line_token"]
-    SAVEROOT = f.createSaveDirPath()
+    SAVEROOT = f.createSaveDirPath(config["all"]["savedir"])
     print("SAVEROOT : " + SAVEROOT)
     keywords = config["all"]["keywords"]
     ps = [
