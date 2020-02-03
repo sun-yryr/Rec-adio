@@ -29,7 +29,7 @@ class radiko:
         res.encoding = "utf-8"
         self.program_radiko = ET.fromstring(res.text)
         self.reload_date = DT.date.today()
-    
+
     def change_keywords(self, keywords):
         if bool(keywords):
             word = "("
@@ -46,7 +46,7 @@ class radiko:
 
     def delete_keywords(self):
         self.change_keywords([])
-        
+
     def search(self):
         if (self.isKeyword is False): return []
         res = []
@@ -74,7 +74,8 @@ class radiko:
                         "ftl": prog.get("ftl"),
                         "tol": prog.get("tol"),
                         "dur": int(prog.get("dur")),
-                        "pfm": pfm.replace("，", ","),
+#                        "pfm": pfm.replace("，", ","),
+                        "pfm": "",
                         "info": info
                     })
         if bool(res): return res
