@@ -19,7 +19,7 @@ def load_configurations():
     tmp = json.load(f)
     return tmp
 
-def createSaveDirPath(path = ""):
+def createSaveDirPath(path):
     ROOT = (__file__.replace("/lib/functions.py", ""))
     if (ROOT == __file__):
         ROOT = ROOT.replace("functions.py", ".")
