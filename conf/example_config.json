@@ -5,7 +5,7 @@
         "line_token": "",
         "rclone_method": "",
         "rclone_outdir": "",
-        "rclone_options": "--delete-empty-src-dirs --dry-run",
+        "rclone_options": "",
         "Radiko_URL": "http://radiko.jp/v3/program/today/JP13.xml",
         "keywords": [
             "夏川椎菜",
