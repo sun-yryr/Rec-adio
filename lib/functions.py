@@ -107,7 +107,7 @@ class DBXController():
 DropBox = DBXController()
 
 # rclone
- 
+
 class RcloneController():
     hadInit = False
 
@@ -120,7 +120,9 @@ class RcloneController():
         self.rclop  = tmpconf["all"]["rclone_options"]
 
         self.hadInit = True
+
     def upload(self, save_dir):
+        sleep(10)
         cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir, self.rclop)) 
         p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
 
