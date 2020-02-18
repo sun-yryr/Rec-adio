@@ -6,6 +6,7 @@ import dropbox
 import mysql.connector as sql
 import hashlib
 import subprocess
+import time
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -122,7 +123,7 @@ class RcloneController():
         self.hadInit = True
 
     def upload(self, save_dir):
-        sleep(10)
+        time.sleep(5)
         cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir, self.rclop)) 
         p1 = subprocess.Popen(cwd.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
 
