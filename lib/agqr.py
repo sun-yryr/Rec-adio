@@ -23,7 +23,7 @@ class agqr:
         res.encoding = "utf-8"
         self.program_agqr = json.loads(res.text)
         self.reload_date = DT.date.today()
-    
+
     def change_keywords(self, keywords):
         if bool(keywords):
             word = "("
@@ -40,7 +40,7 @@ class agqr:
 
     def delete_keywords(self):
         self.change_keywords([])
-        
+
     def search(self):
         if (self.isKeyword is False): return []
         res = []
@@ -65,7 +65,7 @@ class agqr:
 
     def rec(self, data):
         program_data = data[0]
-        #print(program_data)
+        print(program_data)
         wait_start_time = data[1]
         SAVEROOT = data[2]
 
