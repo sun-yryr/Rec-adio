@@ -62,7 +62,7 @@ class hibiki:
                     continue
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy -bsf aac_adtstoasc "%s"' % (tmpjson["playlist_url"], file_path)
-                subprocess.run(cwd, shell=True)
+                subprocess.run(cwd.split())
 
                 # fs = open(file_path, "rb")
                 # f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
@@ -79,5 +79,5 @@ class hibiki:
                 if (f.Swift.hadInit):
                     cmd = 'rm "%s"' % (file_path)
                     subprocess.run(cmd, shell=True)
-        print("finish")
+        print("hibiki:finished")
         return returnData
