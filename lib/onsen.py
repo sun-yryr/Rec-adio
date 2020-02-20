@@ -74,5 +74,5 @@ class onsen:
                     )
                     if (f.Swift.hadInit):
                         cmd = 'rm "%s"' % (file_path)
-                        subprocess.run(cmd, shell=True)
+                        subprocess.run(cmd.split())
         return returnData
