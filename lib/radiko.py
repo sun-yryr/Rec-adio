@@ -122,6 +122,7 @@ def rec(data):
     wait_start_time = data[1]
     AuthToken = data[2]
     SAVEROOT = data[3]
+    print(program_data["title"])
     #ディレクトリの作成
     dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
     f.createSaveDir(dir_path)
