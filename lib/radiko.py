@@ -172,4 +172,8 @@ def gen_temp_chunk_m3u8_url( url, AuthToken ):
         print(res.text)
     body = res.text
     lines = re.findall( '^https?://.+m3u8$' , body, flags=(re.MULTILINE) )
+    if len(lines) <= 0:
+        print("Radiko: no m3u8 in the responce.")
+        return ""
+
     return lines[0]

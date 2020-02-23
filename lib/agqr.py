@@ -65,9 +65,10 @@ class agqr:
 
     def rec(self, data):
         program_data = data[0]
-        print(program_data)
         wait_start_time = data[1]
         SAVEROOT = data[2]
+
+        print(program_data[0])
 
         dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
         f.createSaveDir(dir_path)
