@@ -68,7 +68,7 @@ class agqr:
         wait_start_time = data[1]
         SAVEROOT = data[2]
 
-        print(program_data[0])
+        print(program_data["title"])
 
         dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
         f.createSaveDir(dir_path)
