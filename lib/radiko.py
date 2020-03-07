@@ -124,7 +124,7 @@ def rec(data):
     SAVEROOT = data[3]
     print(program_data["title"])
     #ディレクトリの作成
-    dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
+    dir_path = f.delete_serial(SAVEROOT + "/" + program_data["title"].replace(" ", "_"))
     f.createSaveDir(dir_path)
     #保存先パスの作成
     file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]

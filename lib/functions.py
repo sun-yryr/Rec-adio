@@ -7,6 +7,7 @@ import mysql.connector as sql
 import hashlib
 import subprocess
 import time
+import re
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -66,6 +67,13 @@ def did_record_prog(filePath, title, timestamp):
     else:
         # DBなし
         return os.path.exists(filePath)
+
+# delete serial number words
+def delete_serial(Path):
+    drm_regex = re.compile(r'（.*?）|［.*?］')
+    rtn_message = drm_regex.sub("", Path)
+    return (rtn_message)
+#
 
 class DBXController():
     hadInit = False
@@ -260,6 +268,6 @@ class DBController:
 Mysql = DBController()
 
 if __name__ == "__main__":
-    print("finish")
-    # test = DBController()
+    test=("新日曜名作座　雲上雲下　［終］（９）")
+    print(delete_serial(test))
     # test.insert()
