@@ -41,7 +41,8 @@ class hibiki:
             personality = program.get("cast")
             if (self.keyword.search(title) or self.keyword.search(personality)):
                 # フォルダの作成
-                dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
+                dir_name = title.replace(" ", "_")
+                dir_path = self.SAVEROOT + "/" + dir_name
                 f.createSaveDir(dir_path)
                 # ファイル重複チェック
                 update_date = DT.datetime.strptime(episode["updated_at"].split(" ")[0], "%Y/%m/%d")
@@ -67,7 +68,7 @@ class hibiki:
                 # fs = open(file_path, "rb")
                 # f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
                 # fs.close()
-                f.Rclone.upload(self.SAVEROOT)
+                f.Rclone.upload(file_path, dir_name)
                 url = f.Swift.upload_file(filePath=file_path)
                 f.Mysql.insert(
                     title= title,

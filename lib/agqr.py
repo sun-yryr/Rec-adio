@@ -70,7 +70,8 @@ class agqr:
 
         print(program_data["title"])
 
-        dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
+        dir_name = program_data["title"].replace(" ", "_")
+        dir_path = SAVEROOT + "/" + dir_name
         f.createSaveDir(dir_path)
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
@@ -88,7 +89,7 @@ class agqr:
             f.recording_successful_toline(program_data["title"])
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
-            f.Rclone.upload(SAVEROOT)
+            f.Rclone.upload(file_path, dir_name)
             url = f.Swift.upload_file(filePath=file_path+".m4a")
             f.Mysql.insert(
                 title= program_data["title"].replace(" ", "_"),
