@@ -68,7 +68,7 @@ class hibiki:
                 # fs = open(file_path, "rb")
                 # f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
                 # fs.close()
-                f.Rclone.upload(file_path, dir_name)
+                f.Rclone.upload(dir_path, dir_name)
                 url = f.Swift.upload_file(filePath=file_path)
                 f.Mysql.insert(
                     title= title,

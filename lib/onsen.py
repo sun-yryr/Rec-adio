@@ -64,7 +64,7 @@ class onsen:
                     fs.write(res3.content)
                     fs.close()
                     # f.DropBox.upload_onsen(title, count, res3.content)
-                    f.Rclone.upload(file_path, dir_name)
+                    f.Rclone.upload(dir_path, dir_name)
                     url = f.Swift.upload_file(filePath=file_path)
                     f.Mysql.insert(
                         title= title,

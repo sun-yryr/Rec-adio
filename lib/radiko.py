@@ -122,6 +122,7 @@ def rec(data):
     wait_start_time = data[1]
     AuthToken = data[2]
     SAVEROOT = data[3]
+    #タイトルを表示
     print(program_data["title"])
     #ディレクトリの作成
     dir_name = program_data["title"].replace(" ", "_")
@@ -146,7 +147,7 @@ def rec(data):
         f.recording_successful_toline(program_data["title"])
         # fs = open(file_path+".m4a", "rb")
         # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
-        f.Rclone.upload(file_path, dir_name)
+        f.Rclone.upload(dir_path, dir_name)
         url = f.Swift.upload_file(filePath=file_path + ".m4a")
         f.Mysql.insert(
             title= program_data["title"].replace(" ", "_"),
