@@ -124,8 +124,8 @@ def rec(data):
     SAVEROOT = data[3]
     print(program_data["title"])
     #ディレクトリの作成
-    file_dst = program_data["title"].replace(" ", "_")
-    dir_path = f.delete_serial(SAVEROOT + "/" + file_dst)
+    dir_name = program_data["title"].replace(" ", "_")
+    dir_path = f.delete_serial(SAVEROOT + "/" + dir_name)
     f.createSaveDir(dir_path)
     #保存先パスの作成
     file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
@@ -146,7 +146,7 @@ def rec(data):
         f.recording_successful_toline(program_data["title"])
         # fs = open(file_path+".m4a", "rb")
         # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
-        f.Rclone.upload(file_path, file_dst)
+        f.Rclone.upload(file_path, dir_name)
         url = f.Swift.upload_file(filePath=file_path + ".m4a")
         f.Mysql.insert(
             title= program_data["title"].replace(" ", "_"),
