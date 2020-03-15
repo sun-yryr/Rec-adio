@@ -125,7 +125,7 @@ def rec(data):
     #タイトルを表示
     print(program_data["title"])
     #ディレクトリの作成
-    dir_name = program_data["title"].replace(" ", "_")
+    dir_name = program_data["title"].replace(" ", "_").replace("　","_")
     dir_path = f.delete_serial(SAVEROOT + "/" + dir_name)
     f.createSaveDir(dir_path)
     #保存先パスの作成
