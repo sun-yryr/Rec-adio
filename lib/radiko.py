@@ -125,8 +125,8 @@ def rec(data):
     #タイトルを表示
     print(program_data["title"])
     #ディレクトリの作成
-    dir_name = program_data["title"].replace(" ", "_").replace("　","_")
-    dir_path = f.delete_serial(SAVEROOT + "/" + dir_name)
+    dir_name = f.delete_serial(program_data["title"].replace(" ", "_").replace("　","_"))
+    dir_path = SAVEROOT + "/" + dir_name
     f.createSaveDir(dir_path)
     #保存先パスの作成
     file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
@@ -140,6 +140,7 @@ def rec(data):
     p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
     print("Radiko: sleep for " + str(program_data["dur"]-10))
     time.sleep(program_data["dur"]-10)
+    time.sleep(15)
     print("STOP SIGNAL......")
     p1.communicate(b'q')
     time.sleep(10)
