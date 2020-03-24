@@ -155,7 +155,7 @@ class SwiftController():
             return False
         if isRenewToken:
             self.renewal_token()
-        res = requests.put(self.objectStorageUrl + "/" + containerName,
+        res = requests.put(self.objectStrageUrl + "/" + containerName,
                             headers={
                                 "Content-Type" : "application/json",
                                 "X-Auth-Token": self.token,
@@ -177,7 +177,7 @@ class SwiftController():
             subprocess.run(cmd, shell=True)
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
-        Path = self.objectStorageUrl + "/" + self.containerName + "/" + hash
+        Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
         f = open(filePath.replace(".m4a", ".mp3"), "rb")
         res = requests.put(Path,
                             headers={
