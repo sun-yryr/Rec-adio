@@ -75,12 +75,8 @@ class agqr:
         f.createSaveDir(dir_path)
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
-<<<<<<< HEAD
         cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1 ')
-=======
-        cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1b ')
         cwd += ('--app "live"')
->>>>>>> raspberrypi
         cwd += ('--stop %s ' % str(program_data["dur"]*60))
         cwd += ('--live -o "%s.flv"' % (file_path))
         time.sleep(wait_start_time)
