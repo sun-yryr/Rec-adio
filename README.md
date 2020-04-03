@@ -1,5 +1,7 @@
 # radio
-オタク！ラジオを聞き逃すな！ってことで作るradio録音
+オタク！ラジオを聞き逃すな！ってことで作るradio録音  
+のカスタマイズ？版  
+説明文は最低限書き換えてます。変更点についてはwikiを見てください。  
 
 ## 録音対応プラットフォーム
 - Radiko
@@ -30,7 +32,7 @@ pip install pipenv --user
 Pipenvインストール済みの人
 ```
 sudo apt install -y ffmpeg rtmpdump
-git clone https://github.com/sun-yryr/Rec-adio.git
+git clone https://github.com/chottokun/Rec-adio.git
 cd Rec-adio
 pipenv install
 cp ./conf/example_config.json ./conf/config.json

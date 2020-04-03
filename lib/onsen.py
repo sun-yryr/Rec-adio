@@ -49,7 +49,8 @@ class onsen:
                     # title の長さ
                     title = title[:30]
                     # フォルダの作成
-                    dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
+                    dir_name = title.replace(" ", "_")
+                    dir_path = self.SAVEROOT + "/" + dir_name
                     f.createSaveDir(dir_path)
                     # ファイル重複チェック
                     file_name = title.replace(" ", "_") +"#"+ count + ".mp3"
@@ -63,6 +64,7 @@ class onsen:
                     fs.write(res3.content)
                     fs.close()
                     # f.DropBox.upload_onsen(title, count, res3.content)
+                    f.Rclone.upload(dir_path, dir_name)
                     url = f.Swift.upload_file(filePath=file_path)
                     f.Mysql.insert(
                         title= title,
@@ -73,5 +75,5 @@ class onsen:
                     )
                     if (f.Swift.hadInit):
                         cmd = 'rm "%s"' % (file_path)
-                        subprocess.run(cmd, shell=True)
+                        subprocess.run(cmd.split())
         return returnData

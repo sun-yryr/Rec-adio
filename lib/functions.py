@@ -6,6 +6,8 @@ import dropbox
 import mysql.connector as sql
 import hashlib
 import subprocess
+import time
+import re
 
 def load_configurations():
     ROOT = (__file__.replace("/lib/functions.py", ""))
@@ -19,7 +21,7 @@ def load_configurations():
     tmp = json.load(f)
     return tmp
 
-def createSaveDirPath(path = ""):
+def createSaveDirPath(path):
     ROOT = (__file__.replace("/lib/functions.py", ""))
     if (ROOT == __file__):
         ROOT = ROOT.replace("functions.py", ".")
@@ -66,6 +68,13 @@ def did_record_prog(filePath, title, timestamp):
         # DBなし
         return os.path.exists(filePath)
 
+# delete serial number words
+def delete_serial(Path):
+    drm_regex = re.compile(r'（.*?）|［.*?］')
+    rtn_message = drm_regex.sub("", Path)
+    return (rtn_message)
+#
+
 class DBXController():
     hadInit = False
     def __init__(self):
@@ -106,7 +115,29 @@ class DBXController():
 
 DropBox = DBXController()
 
+# rclone
 
+class RcloneController():
+    hadInit = False
+
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf["all"]["rclone_method"] == ""):
+            return
+        self.rcl    = tmpconf["all"]["rclone_method"]
+        self.outdir = tmpconf["all"]["rclone_outdir"]
+        self.rclop  = tmpconf["all"]["rclone_options"]
+
+        self.hadInit = True
+
+    def upload(self, save_dir, dist_dir):
+        time.sleep(5)
+        cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir+dist_dir+"/" , self.rclop)) 
+        p1 = subprocess.Popen(cwd.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+Rclone = RcloneController()
+
+# 
 
 class SwiftController():
     hadInit = False
@@ -174,7 +205,7 @@ class SwiftController():
         (root, ext) = os.path.splitext(filePath)
         if (ext == ".m4a"):
             cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
-            subprocess.run(cmd, shell=True)
+            subprocess.run(cmd.split())
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
         Path = self.objectStrageUrl + "/" + self.containerName + "/" + hash
@@ -237,6 +268,6 @@ class DBController:
 Mysql = DBController()
 
 if __name__ == "__main__":
-    print("finish")
-    # test = DBController()
+    test=("新日曜名作座　雲上雲下　［終］（９）")
+    print(delete_serial(test))
     # test.insert()
