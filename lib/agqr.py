@@ -83,7 +83,7 @@ class agqr:
         subprocess.run(cwd, shell=True)
         #変換をする
         cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -c:a aac -b:a 256k "%s.m4a"' % (file_path, file_path))
-        subprocess.run(cwd2, shell=True)
+        subprocess.run(cwd2.split())
         print("agqr: finished!")
         if (f.is_recording_succeeded(file_path)):
             f.recording_successful_toline(program_data["title"])

@@ -14,6 +14,9 @@ class radiko:
     RADIKO_URL = "http://radiko.jp/v3/program/today/JP13.xml"
 
     def __init__(self):
+        tmpconf = f.load_configurations()
+        if (tmpconf.get("Radiko_URL") != ""):
+            self.RADIKO_URL = tmpconf.get("Radiko_URL")
         res = requests.get(self.RADIKO_URL)
         res.encoding = "utf-8"
         self.isKeyword = False
@@ -61,6 +64,7 @@ class radiko:
                 if (ck is False) and (desc is not None):
                     if (self.keyword.search(desc)): ck = True
                 if (ck):
+                    pfm = pfm or ""
                     res.append({
                         "station": station.get("id"),
                         "title": title.replace(" ", "_"),
