@@ -131,9 +131,11 @@ class RcloneController():
         self.hadInit = True
 
     def upload(self, save_dir, dist_dir):
+        if not self.hadInit:
+            return
         time.sleep(5)
         cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir+dist_dir+"/" , self.rclop)) 
-        p1 = subprocess.Popen(cwd.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        p1 = subprocess.run(cwd.split())
 
 Rclone = RcloneController()
 

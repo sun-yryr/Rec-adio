@@ -141,9 +141,14 @@ def rec(data):
     time.sleep(10)
     if (f.is_recording_succeeded(file_path)):
         f.recording_successful_toline(program_data["title"])
+        # dropbox
         # fs = open(file_path+".m4a", "rb")
         # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
+        # fs.close()
+
+        #rclone
         f.Rclone.upload(dir_path, dir_name)
+        #object storage
         url = f.Swift.upload_file(filePath=file_path + ".m4a")
         f.Mysql.insert(
             title= program_data["title"].replace(" ", "_"),
@@ -156,7 +161,6 @@ def rec(data):
         if (f.Swift.hadInit):
             cmd = 'rm "%s"' % (file_path + ".m4a")
             subprocess.run(cmd, shell=True)
-        # fs.close()
     else:
         f.recording_failure_toline(program_data["title"])
 
