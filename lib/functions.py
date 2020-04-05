@@ -122,11 +122,11 @@ class RcloneController():
 
     def __init__(self):
         tmpconf = load_configurations()
-        if (tmpconf is None) or (tmpconf["all"]["rclone_method"] == ""):
+        if (tmpconf is None) or (tmpconf["rclone"]["method"] == ""):
             return
-        self.rcl    = tmpconf["all"]["rclone_method"]
-        self.outdir = tmpconf["all"]["rclone_outdir"]
-        self.rclop  = tmpconf["all"]["rclone_options"]
+        self.rcl    = tmpconf["rclone"]["method"]
+        self.outdir = tmpconf["rclone"]["outdir"]
+        self.rclop  = tmpconf["rclone"]["options"]
 
         self.hadInit = True
 
