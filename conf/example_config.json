@@ -31,5 +31,10 @@
         "username": "",
         "password": "",
         "database": ""
+    },
+    "rclone": {
+        "method": "",
+        "outdir": "",
+        "options": ""
     }
 }

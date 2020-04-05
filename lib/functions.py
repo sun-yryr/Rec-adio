@@ -6,6 +6,7 @@ import dropbox
 import mysql.connector as sql
 import hashlib
 import subprocess
+import time
 import re
 
 def load_configurations():
@@ -74,6 +75,13 @@ def delete_serial(Path):
 	return (rtn_message)
 #
 
+# delete serial number words
+def delete_serial(Path):
+    drm_regex = re.compile(r'（.*?）|［.*?］')
+    rtn_message = drm_regex.sub("", Path)
+    return (rtn_message)
+#
+
 class DBXController():
 	hadInit = False
 	def __init__(self):
@@ -113,6 +121,32 @@ class DBXController():
 		self.dbx.files_upload(fileData, dbx_path)
 
 DropBox = DBXController()
+
+# rclone
+
+class RcloneController():
+    hadInit = False
+
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf is None) or (tmpconf["rclone"]["method"] == ""):
+            return
+        self.rcl    = tmpconf["rclone"]["method"]
+        self.outdir = tmpconf["rclone"]["outdir"]
+        self.rclop  = tmpconf["rclone"]["options"]
+
+        self.hadInit = True
+
+    def upload(self, save_dir, dist_dir):
+        if not self.hadInit:
+            return
+        time.sleep(5)
+        cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir+dist_dir+"/" , self.rclop)) 
+        p1 = subprocess.run(cwd.split())
+
+Rclone = RcloneController()
+
+# 
 
 class SwiftController():
     hadInit = False
@@ -180,7 +214,7 @@ class SwiftController():
         (root, ext) = os.path.splitext(filePath)
         if (ext == ".m4a"):
             cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
-            subprocess.run(cmd, shell=True)
+            subprocess.run(cmd.split())
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
         Path = self.objectStorageUrl + "/" + self.containerName + "/" + hash
