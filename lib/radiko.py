@@ -12,7 +12,11 @@ from signal import SIGINT
 
 class radiko:
     RADIKO_URL = "http://radiko.jp/v3/program/today/JP13.xml"
+
     def __init__(self):
+        tmpconf = f.load_configurations()
+        if (tmpconf.get("Radiko_URL") != ""):
+            self.RADIKO_URL = tmpconf.get("Radiko_URL")
         res = requests.get(self.RADIKO_URL)
         res.encoding = "utf-8"
         self.isKeyword = False
@@ -24,7 +28,7 @@ class radiko:
         res.encoding = "utf-8"
         self.program_radiko = ET.fromstring(res.text)
         self.reload_date = DT.date.today()
-    
+
     def change_keywords(self, keywords):
         if bool(keywords):
             word = "("
@@ -41,7 +45,7 @@ class radiko:
 
     def delete_keywords(self):
         self.change_keywords([])
-        
+
     def search(self):
         if (self.isKeyword is False): return []
         res = []
@@ -60,6 +64,7 @@ class radiko:
                 if (ck is False) and (desc is not None):
                     if (self.keyword.search(desc)): ck = True
                 if (ck):
+                    pfm = pfm or ""
                     res.append({
                         "station": station.get("id"),
                         "title": title.replace(" ", "_"),
@@ -116,8 +121,11 @@ def rec(data):
     wait_start_time = data[1]
     AuthToken = data[2]
     SAVEROOT = data[3]
+    #タイトルを表示
+    print(program_data["title"])
     #ディレクトリの作成
-    dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
+    dir_name = f.delete_serial(program_data["title"].replace(" ", "_").replace("　","_"))
+    dir_path = SAVEROOT + "/" + dir_name
     f.createSaveDir(dir_path)
     #保存先パスの作成
     file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
@@ -129,7 +137,7 @@ def rec(data):
     time.sleep(wait_start_time)
     cwd = ('ffmpeg -loglevel error -headers "X-Radiko-AuthToken: %s" -i "%s" -acodec copy  "%s.m4a"' % (AuthToken, m3u8, file_path))
     p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
-    print("sleep for " + str(program_data["dur"]-10))
+    print("Radiko: sleep for " + str(program_data["dur"]-10))
     time.sleep(program_data["dur"]-10)
     print("STOP SIGNAL......")
     p1.communicate(b'q')
@@ -164,4 +172,7 @@ def gen_temp_chunk_m3u8_url( url, AuthToken ):
         print(res.text)
     body = res.text
     lines = re.findall( '^https?://.+m3u8$' , body, flags=(re.MULTILINE) )
+    if len(lines) <= 0:
+        print("Radiko: no m3u8 in the responce.")
+        return ""
     return lines[0]
