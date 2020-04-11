@@ -19,6 +19,7 @@ def load_configurations():
 		return None
 	f = open(Path, "r")
 	tmp = json.load(f)
+	f.close()
 	return tmp
 
 def createSaveDirPath(path = ""):
@@ -41,7 +42,7 @@ def is_recording_succeeded(Path):
 	m4a_path = Path + ".m4a"
 	if (os.path.isfile(m4a_path)):
 		size = os.path.getsize(m4a_path)
-		print("rec size = " + str(size))
+		# print("rec size = " + str(size))
 		if (size >= 1024):
 			return True
 		else:
@@ -163,7 +164,7 @@ class SwiftController():
         self.objectStorageUrl = tmpconf["swift"]["objectStorageUrl"]
         # エラーがあったら初期化中止
         if not self.renewal_token():
-            print("Swift login failed")
+            # print("Swift login failed")
             return
         self.hadInit = True
         self.create_container(self.containerName)
@@ -252,8 +253,8 @@ class DBController:
 			)
 			self.hadInit = True
 		except:
-			print("Mysql login failed")
-	
+			# print("Mysql login failed")
+			pass
 	def insert(self, title, pfm, timestamp, station, uri, info = ""):
 		if (not self.hadInit):
 			return
