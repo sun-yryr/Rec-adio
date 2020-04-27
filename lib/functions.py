@@ -16,7 +16,7 @@ def load_configurations():
 	Path = ROOT + "/conf/config.json"
 	if (os.path.isfile(Path) is False):
 		print("config file is not found")
-		return None
+		exit(1)
 	f = open(Path, "r")
 	tmp = json.load(f)
 	return tmp
@@ -86,7 +86,7 @@ class DBXController():
 	hadInit = False
 	def __init__(self):
 		tmpconf = load_configurations()
-		if (tmpconf is None) or (tmpconf["all"]["dbx_token"] == ""):
+		if (tmpconf.get("all") is None) or (tmpconf["all"].get("dbx_token") is None):
 			return
 		self.dbx = dropbox.Dropbox(tmpconf["all"]["dbx_token"])
 		self.dbx.users_get_current_account()
@@ -129,7 +129,7 @@ class RcloneController():
 
     def __init__(self):
         tmpconf = load_configurations()
-        if (tmpconf is None) or (tmpconf["rclone"]["method"] == ""):
+        if (tmpconf.get("rclone") is None):
             return
         self.rcl    = tmpconf["rclone"]["method"]
         self.outdir = tmpconf["rclone"]["outdir"]
@@ -154,7 +154,7 @@ class SwiftController():
 
     def __init__(self):
         tmpconf = load_configurations()
-        if (tmpconf is None) or (tmpconf.get("swift") is None):
+        if (tmpconf.get("swift") is None):
             return
         self.username = tmpconf["swift"]["username"]
         self.password = tmpconf["swift"]["password"]
@@ -240,7 +240,7 @@ class DBController:
 
 	def __init__(self):
 		tmpconf = load_configurations()
-		if (tmpconf is None) or (tmpconf.get("mysql") is None):
+		if (tmpconf.get("mysql") is None):
 			return
 		try:
 			self.conn = sql.connect(
