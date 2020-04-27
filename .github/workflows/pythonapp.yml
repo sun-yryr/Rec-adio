@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ master ]
+    branches: [ release ]
   pull_request:
-    branches: [ master, release ]
+    branches: [ release, develop ]
 
 jobs:
   build:
@@ -30,4 +30,3 @@ jobs:
     - name: Test with unittest
       run: |
         pipenv run test
- 
