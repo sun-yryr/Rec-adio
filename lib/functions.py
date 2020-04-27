@@ -49,15 +49,26 @@ def is_recording_succeeded(Path):
 	else:
 		return False
 
-def recording_successful_toline(title):
-	headers = {"Authorization": "Bearer %s" % line_token}
-	payload = {"message": "\n"+title+" を録音しました!"}
-	requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
+class LineController:
+	hadInit = False
+    def __init__(self):
+        tmpconf = load_configurations()
+        if (tmpconf.get("all") is None) or (tmpconf["all"].get("line_token") is None):
+            return
+        self.token = tmpconf["all"]["line_token"]
+        self.hadInit = True
 
-def recording_failure_toline(title):
-	headers = {"Authorization": "Bearer %s" % line_token}
-	payload = {"message": "\n"+title+" の録音に失敗しました"}
-	requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
+	def recording_successful_toline(self, title):
+		headers = {"Authorization": "Bearer %s" % self.line_token}
+		payload = {"message": "\n"+title+" を録音しました!"}
+		requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
+
+	def recording_failure_toline(self, title):
+		headers = {"Authorization": "Bearer %s" % self.line_token}
+		payload = {"message": "\n"+title+" の録音に失敗しました"}
+		requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
+
+LINE = LineController()
 
 def did_record_prog(filePath, title, timestamp):
 	if (Mysql.hadInit):
