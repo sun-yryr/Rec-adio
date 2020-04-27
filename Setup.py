@@ -117,6 +117,8 @@ def mysql_create_table():
             ) ENGINE=InnoDB AUTO_INCREMENT=395 DEFAULT CHARSET=utf8;
             """, table)
         )
+        cur.close()
+        conn.close()
     except:
         print("Mysql setup failed")
     
