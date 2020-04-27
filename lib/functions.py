@@ -51,12 +51,13 @@ def is_recording_succeeded(Path):
 
 class LineController:
 	hadInit = False
-    def __init__(self):
-        tmpconf = load_configurations()
-        if (tmpconf.get("all") is None) or (tmpconf["all"].get("line_token") is None):
-            return
-        self.token = tmpconf["all"]["line_token"]
-        self.hadInit = True
+	
+	def __init__(self):
+		tmpconf = load_configurations()
+		if (tmpconf.get("all") is None) or (tmpconf["all"].get("line_token") is None):
+			return
+		self.token = tmpconf["all"]["line_token"]
+		self.hadInit = True
 
 	def recording_successful_toline(self, title):
 		headers = {"Authorization": "Bearer %s" % self.line_token}
@@ -88,9 +89,9 @@ def delete_serial(Path):
 
 # delete serial number words
 def delete_serial(Path):
-    drm_regex = re.compile(r'（.*?）|［.*?］')
-    rtn_message = drm_regex.sub("", Path)
-    return (rtn_message)
+	drm_regex = re.compile(r'（.*?）|［.*?］')
+	rtn_message = drm_regex.sub("", Path)
+	return (rtn_message)
 #
 
 class DBXController():
@@ -136,112 +137,112 @@ DropBox = DBXController()
 # rclone
 
 class RcloneController():
-    hadInit = False
+	hadInit = False
 
-    def __init__(self):
-        tmpconf = load_configurations()
-        if (tmpconf.get("rclone") is None):
-            return
-        self.rcl    = tmpconf["rclone"]["method"]
-        self.outdir = tmpconf["rclone"]["outdir"]
-        self.rclop  = tmpconf["rclone"]["options"]
+	def __init__(self):
+		tmpconf = load_configurations()
+		if (tmpconf.get("rclone") is None):
+			return
+		self.rcl    = tmpconf["rclone"]["method"]
+		self.outdir = tmpconf["rclone"]["outdir"]
+		self.rclop  = tmpconf["rclone"]["options"]
 
-        self.hadInit = True
+		self.hadInit = True
 
-    def upload(self, save_dir, dist_dir):
-        if not self.hadInit:
-            return
-        time.sleep(5)
-        cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir+dist_dir+"/" , self.rclop)) 
-        p1 = subprocess.run(cwd.split())
+	def upload(self, save_dir, dist_dir):
+		if not self.hadInit:
+			return
+		time.sleep(5)
+		cwd = ('rclone %s %s %s %s' % (self.rcl, save_dir, self.outdir+dist_dir+"/" , self.rclop)) 
+		p1 = subprocess.run(cwd.split())
 
 Rclone = RcloneController()
 
 # 
 
 class SwiftController():
-    hadInit = False
-    containerName = "radio"
+	hadInit = False
+	containerName = "radio"
 
-    def __init__(self):
-        tmpconf = load_configurations()
-        if (tmpconf.get("swift") is None):
-            return
-        self.username = tmpconf["swift"]["username"]
-        self.password = tmpconf["swift"]["password"]
-        self.tenantid = tmpconf["swift"]["tenantid"]
-        self.identityUrl = tmpconf["swift"]["identityUrl"]
-        self.objectStorageUrl = tmpconf["swift"]["objectStorageUrl"]
-        # エラーがあったら初期化中止
-        if not self.renewal_token():
-            print("Swift login failed")
-            return
-        self.hadInit = True
-        self.create_container(self.containerName)
-    
-    def renewal_token(self):
-        data = {
-            "auth": {
-                "passwordCredentials": {
-                    "username": self.username,
-                    "password": self.password
-                },
-                "tenantId": self.tenantid
-            }
-        }
-        try:
-            res = requests.post(self.identityUrl + "/tokens",
-                                headers={"Content-Type" : "application/json"},
-                                data=json.dumps(data))
-            resData = json.loads(res.text)
-            if "error" in resData.keys():
-                return False
-            self.token = resData["access"]["token"]["id"]
-        except:
-            return False
-        return True
+	def __init__(self):
+		tmpconf = load_configurations()
+		if (tmpconf.get("swift") is None):
+			return
+		self.username = tmpconf["swift"]["username"]
+		self.password = tmpconf["swift"]["password"]
+		self.tenantid = tmpconf["swift"]["tenantid"]
+		self.identityUrl = tmpconf["swift"]["identityUrl"]
+		self.objectStorageUrl = tmpconf["swift"]["objectStorageUrl"]
+		# エラーがあったら初期化中止
+		if not self.renewal_token():
+			print("Swift login failed")
+			return
+		self.hadInit = True
+		self.create_container(self.containerName)
+	
+	def renewal_token(self):
+		data = {
+			"auth": {
+				"passwordCredentials": {
+					"username": self.username,
+					"password": self.password
+				},
+				"tenantId": self.tenantid
+			}
+		}
+		try:
+			res = requests.post(self.identityUrl + "/tokens",
+								headers={"Content-Type" : "application/json"},
+								data=json.dumps(data))
+			resData = json.loads(res.text)
+			if "error" in resData.keys():
+				return False
+			self.token = resData["access"]["token"]["id"]
+		except:
+			return False
+		return True
 
-    def create_container(self, containerName, isRenewToken = False):
-        if not self.hadInit:
-            return False
-        if isRenewToken:
-            self.renewal_token()
-        res = requests.put(self.objectStorageUrl + "/" + containerName,
-                            headers={
-                                "Content-Type" : "application/json",
-                                "X-Auth-Token": self.token,
-                                "X-Container-Read": ".r:*"
-                            })
-        if res.status_code in [200, 201, 204]:
-            return True
-        else:
-            return False
-    
-    def upload_file(self, filePath):
-        if not self.hadInit:
-            return False
-        self.renewal_token()
-        # create mp3 file
-        (root, ext) = os.path.splitext(filePath)
-        if (ext == ".m4a"):
-            cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
-            subprocess.run(cmd.split())
-        # stationとdatetimeでObjectNameを生成する。md5
-        hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
-        Path = self.objectStorageUrl + "/" + self.containerName + "/" + hash
-        f = open(filePath.replace(".m4a", ".mp3"), "rb")
-        res = requests.put(Path,
-                            headers={
-                                "Content-Type" : "audio/mpeg",  # ここで送信するデータ形式を決める
-                                "X-Auth-Token": self.token
-                            },
-                            data=f.read())
-        print(res.status_code)
-        # delete mp3 file
-        if (ext == ".m4a"):
-            cmd = 'rm "%s"' % (filePath.replace(".m4a", ".mp3"))
-            subprocess.run(cmd, shell=True)
-        return Path
+	def create_container(self, containerName, isRenewToken = False):
+		if not self.hadInit:
+			return False
+		if isRenewToken:
+			self.renewal_token()
+		res = requests.put(self.objectStorageUrl + "/" + containerName,
+							headers={
+								"Content-Type" : "application/json",
+								"X-Auth-Token": self.token,
+								"X-Container-Read": ".r:*"
+							})
+		if res.status_code in [200, 201, 204]:
+			return True
+		else:
+			return False
+	
+	def upload_file(self, filePath):
+		if not self.hadInit:
+			return False
+		self.renewal_token()
+		# create mp3 file
+		(root, ext) = os.path.splitext(filePath)
+		if (ext == ".m4a"):
+			cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
+			subprocess.run(cmd.split())
+		# stationとdatetimeでObjectNameを生成する。md5
+		hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
+		Path = self.objectStorageUrl + "/" + self.containerName + "/" + hash
+		f = open(filePath.replace(".m4a", ".mp3"), "rb")
+		res = requests.put(Path,
+							headers={
+								"Content-Type" : "audio/mpeg",  # ここで送信するデータ形式を決める
+								"X-Auth-Token": self.token
+							},
+							data=f.read())
+		print(res.status_code)
+		# delete mp3 file
+		if (ext == ".m4a"):
+			cmd = 'rm "%s"' % (filePath.replace(".m4a", ".mp3"))
+			subprocess.run(cmd, shell=True)
+		return Path
 
 Swift = SwiftController()
 
