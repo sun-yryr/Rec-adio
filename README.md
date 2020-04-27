@@ -16,6 +16,7 @@
     - DropBox
     - Object-Storage(Swift)
     - ローカル
+    - rcloneによる同期
 - 録音番組情報をMysqlに登録
 - 録音完了をLINE Notifyで通知
 
@@ -64,6 +65,10 @@ sudo systemctl start rec_adio.service
     - `username: string`
     - `password: string`
     - `database: string` データベース名
+- **rclone** rclone用
+    - `method: string`
+    - `outdir: string`
+    - `options: string`
 
 ### Systemd serviceファイル
 変更する箇所

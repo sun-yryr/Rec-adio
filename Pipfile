@@ -5,6 +5,7 @@ verify_ssl = true
 
 [scripts]
 start = "python3 run.py"
+test = "echo Now not test"
 
 [dev-packages]
 

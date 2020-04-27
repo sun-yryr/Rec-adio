@@ -41,11 +41,12 @@ class hibiki:
             personality = program.get("cast")
             if (self.keyword.search(title) or self.keyword.search(personality)):
                 # フォルダの作成
-                dir_path = self.SAVEROOT + "/" + title.replace(" ", "_")
+                dir_name = title.replace(" ", "_")
+                dir_path = self.SAVEROOT + "/" + dir_name
                 f.createSaveDir(dir_path)
                 # ファイル重複チェック
                 update_date = DT.datetime.strptime(episode["updated_at"].split(" ")[0], "%Y/%m/%d")
-                file_name = title.replace(" ", "_") + "_" + update_date.strftime("%Y%m%d") + ".m4a"
+                file_name = title.replace(" ", "_").replace(",", "_") + "_" + update_date.strftime("%Y%m%d") + ".m4a"
                 file_path = dir_path +"/"+ file_name
                 if f.did_record_prog(file_path, title, update_date.strftime("%Y%m%d")):
                     continue
@@ -62,11 +63,16 @@ class hibiki:
                     continue
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
-                subprocess.run(cwd, shell=True)
+                subprocess.run(cwd.split())
 
+                # dropbox
                 # fs = open(file_path, "rb")
                 # f.DropBox.upload(title, update_date.strftime("%Y%m%d"), fs.read())
                 # fs.close()
+
+                #rclone
+                f.Rclone.upload(dir_path, dir_name)
+                #object storage
                 url = f.Swift.upload_file(filePath=file_path)
                 f.Mysql.insert(
                     title= title,
@@ -78,5 +84,5 @@ class hibiki:
                 if (f.Swift.hadInit):
                     cmd = 'rm "%s"' % (file_path)
                     subprocess.run(cmd, shell=True)
-        print("finish")
+        print("hibiki:finished")
         return returnData

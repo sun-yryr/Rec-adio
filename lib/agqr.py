@@ -23,7 +23,7 @@ class agqr:
         res.encoding = "utf-8"
         self.program_agqr = json.loads(res.text)
         self.reload_date = DT.date.today()
-    
+
     def change_keywords(self, keywords):
         if bool(keywords):
             word = "("
@@ -40,7 +40,7 @@ class agqr:
 
     def delete_keywords(self):
         self.change_keywords([])
-        
+
     def search(self):
         if (self.isKeyword is False): return []
         res = []
@@ -65,11 +65,13 @@ class agqr:
 
     def rec(self, data):
         program_data = data[0]
-        #print(program_data)
         wait_start_time = data[1]
         SAVEROOT = data[2]
 
-        dir_path = SAVEROOT + "/" + program_data["title"].replace(" ", "_")
+        # print(program_data["title"])
+
+        dir_name = program_data["title"].replace(" ", "_")
+        dir_path = SAVEROOT + "/" + dir_name
         f.createSaveDir(dir_path)
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
@@ -81,12 +83,18 @@ class agqr:
         subprocess.run(cwd, shell=True)
         #変換をする
         cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -c:a aac -b:a 256k "%s.m4a"' % (file_path, file_path))
-        subprocess.run(cwd2, shell=True)
-        print("agqr finish!")
+        subprocess.run(cwd2.split())
+        print("agqr: finished!")
         if (f.is_recording_succeeded(file_path)):
             f.recording_successful_toline(program_data["title"])
+            # dropbox
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
+            # fs.close()
+            
+            # rclone
+            f.Rclone.upload(dir_path, dir_name)
+            #object storage
             url = f.Swift.upload_file(filePath=file_path+".m4a")
             f.Mysql.insert(
                 title= program_data["title"].replace(" ", "_"),
@@ -98,7 +106,6 @@ class agqr:
             if (f.Swift.hadInit):
                 cmd = 'rm "%s"' % (file_path + ".m4a")
                 subprocess.run(cmd, shell=True)
-            # fs.close()
         else:
             f.recording_failure_toline(program_data["title"])
         os.remove(file_path + ".flv")
