@@ -10,7 +10,6 @@ import json
 import requests
 import re
 import os
-import dropbox
 
 SAVEROOT = ""
 T_BASELINE = DT.timedelta(seconds=60)
