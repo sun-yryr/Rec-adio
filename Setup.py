@@ -147,3 +147,4 @@ if __name__ == "__main__":
         },
     }
     main()
+    print("Rec-adioを使うにはffmpegとrtmpdumpが必要です。")
