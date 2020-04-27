@@ -4,6 +4,7 @@ import json
 import requests
 import dropbox
 import mysql.connector as sql
+from bs4 import BeautifulSoup as BS
 import hashlib
 import subprocess
 import time
@@ -272,9 +273,23 @@ class DBController:
 		self.conn.ping(reconnect=True)
 		cur = self.conn.cursor()
 		s = "INSERT INTO Programs (`title`, `pfm`, `rec-timestamp`, `station`, `uri`, `info`) VALUES ( %s, %s, %s, %s, %s, %s)"
-		cur.execute(s, (title, pfm, timestamp, station, uri, info))
+		cur.execute(s, (title, pfm, timestamp, station, uri, self.escape_html(info)))
 		self.conn.commit()
 		cur.close()
+
+	def escape_html(self, html):
+		soup = BS(html, "html.parser")
+		for script in soup(["script", "style"]):
+			script.extract()
+		# get text
+		text = soup.get_text()
+		# break into lines and remove leading and trailing space on each
+		lines = (line.strip() for line in text.splitlines())
+		# break multi-headlines into a line each
+		chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+		# drop blank lines
+		text = '\n'.join(chunk for chunk in chunks if chunk)
+		return text
 	
 	def check(self, title, timestamp):
 		if (not self.hadInit):
@@ -289,6 +304,6 @@ class DBController:
 Mysql = DBController()
 
 if __name__ == "__main__":
-	test=("新日曜名作座　雲上雲下　［終］（９）")
-	print(delete_serial(test))
+	s = "<img src='http://www.joqr.co.jp/qr_img/detail/20150928195756.jpg' style=\"max-width: 200px;\"> <br /><br /><br />番組メールアドレス：<br /><a href=\"mailto:mar@joqr.net\">mar@joqr.net</a><br />番組Webページ：<br /><a href=\"http://portal.million-arthurs.com/kairi/radio/\">http://portal.million-arthurs.com/kairi/radio/</a><br /><br />パーソナリティは盗賊アーサーを演じる『佐倉綾音』さん、歌姫アーサーを演じる『内田真礼』さん、そして期待の新人『鈴木亜理沙』さん。<br />番組では「乖離性ミリオンアーサー」の最新情報はもちろん、パーソナリティのここだけでしか聞けない話、ゲストをお招きしてのトークなど盛りだくさんでお送りします。<br /><br />初回＆2回目放送は内田真礼さん＆鈴木亜理沙さんのコンビで、その次の2週を佐倉綾音さん＆鈴木亜理沙さんのコンビで2週毎にパーソナリティがローテーションしていく今までにない斬新な番組となります。<br /><br /><br />twitterハッシュタグは「<a href=\"http://twitter.com/search?q=%23millionradio\">#millionradio</a>」<br />twitterアカウントは「<a href=\"http://twitter.com/joqrpr\">@joqrpr</a>」<br />facebookページは「<a href='http://www.facebook.com/1134joqr'>http://www.facebook.com/1134joqr</a>」<br />"
+	print(Mysql.escape_html(s))
 	# test.insert()

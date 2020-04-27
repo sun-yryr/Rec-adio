@@ -10,9 +10,10 @@ test = "echo Now not test"
 [dev-packages]
 
 [packages]
-dropbox = "==9.4.0"
-mysql-connector-python = "==8.0.18"
-requests = "==2.22.0"
+beautifulsoup4 = "*"
+requests = "*"
+mysql-connector-python = "*"
+dropbox = "*"
 
 [requires]
-python_version = "3.x"
+python_version = "3.8"
