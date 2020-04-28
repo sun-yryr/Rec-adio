@@ -12,7 +12,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -21,8 +21,7 @@ jobs:
       with:
         python-version: 3.6
     - name: Install ffmpeg & rtmpdump
-      run: | 
-        sudo apt install -y ffmpeg rtmpdump
+      run: sudo apt install -y ffmpeg rtmpdump
     - name: Install Pipenv
       run: |
         python -m pip install --upgrade pip
