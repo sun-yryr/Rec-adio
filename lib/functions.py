@@ -221,7 +221,7 @@ class SwiftController():
         (root, ext) = os.path.splitext(filePath)
         if (ext == ".m4a"):
             cmd = 'ffmpeg -loglevel error -i "%s" -vn -c:a libmp3lame "%s"' % (filePath, filePath.replace(".m4a", ".mp3"))
-            subprocess.run(cmd.split())
+            subprocess.run(cmd, shell=True)
         # stationとdatetimeでObjectNameを生成する。md5
         hash = hashlib.md5(filePath.encode('utf-8')).hexdigest()
         Path = self.objectStorageUrl + "/" + self.containerName + "/" + hash
