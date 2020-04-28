@@ -62,7 +62,7 @@ class hibiki:
                     continue
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
-                subprocess.run(cwd.split())
+                subprocess.run(cwd, shell=True)
 
                 # dropbox
                 # fs = open(file_path, "rb")
