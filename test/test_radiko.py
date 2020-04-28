@@ -21,6 +21,37 @@ class TestRadiko(unittest.TestCase):
         self.Radiko.change_keywords(keywords)
         self.assertTrue(self.Radiko.keyword.search("麻倉もも"))
         self.assertFalse(self.Radiko.keyword.search("朝倉もも"))
+    
+    def test_auth(self):
+        token = self.Radiko.authorization()
+        self.assertIsNotNone(token)
+
+    def test_rec(self):
+        import datetime as DT
+        from pathlib import Path
+        # 録音時に使うのは title と dur だけ
+        dummy_title = "test_rec_radiko"
+        dummy_data = {
+            "station": "QRR",
+            "title": dummy_title,
+            "ft": "20200429044500",
+            "dur": 15,
+            "pfm": "test",
+            "info": "test"
+        }
+        token = self.Radiko.authorization()
+        savePath = Path().resolve() / "save_r"
+        savePath.mkdir()
+        self.Radiko.rec([dummy_data, 0, token, str(savePath)])
+        # check file
+        fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
+        path = savePath / dummy_title / fileName
+        print(str(path))
+        self.assertTrue(path.is_file())
+        # remove file
+        path.unlink()
+        path.parent.rmdir()
+        savePath.rmdir()
 
 if __name__ == "__main__":
     unittest.main()

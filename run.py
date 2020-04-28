@@ -32,7 +32,7 @@ def main_radiko():
                     radiko_data.remove(data)
                 elif (tmp_time < T_BASELINE):
                     AuthToken = Radiko.authorization()
-                    p = Process(target=radiko.rec, args=([data, tmp_time.total_seconds(), AuthToken, SAVEROOT],))
+                    p = Process(target=Radiko.rec, args=([data, tmp_time.total_seconds(), AuthToken, SAVEROOT],))
                     p.start()
                     radiko_data.remove(data)
         if (now.hour == 6 and now.minute <= 5 and Radiko.reload_date != DT.date.today()):

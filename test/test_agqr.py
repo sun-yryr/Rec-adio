@@ -35,12 +35,12 @@ class TestAGQR(unittest.TestCase):
             "dur": 0.09,
             "pfm": "test"
         }
-        savePath = Path().resolve() / "save"
+        savePath = Path().resolve() / "save_a"
         print("aaa", str(savePath))
         savePath.mkdir()
         self.Agqr.rec([dummy_data, 0, str(savePath)])
         # check file
-        fileName = dummy_title + "_" + dummy_data["ft"] + ".m4a"
+        fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
         path = savePath / dummy_title / fileName
         self.assertTrue(path.is_file())
         # remove file
