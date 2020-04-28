@@ -86,14 +86,7 @@ def did_record_prog(filePath, title, timestamp):
 def delete_serial(Path):
 	drm_regex = re.compile(r'（.*?）|［.*?］')
 	rtn_message = drm_regex.sub("", Path)
-	return (rtn_message)
-#
-
-# delete serial number words
-def delete_serial(Path):
-	drm_regex = re.compile(r'（.*?）|［.*?］')
-	rtn_message = drm_regex.sub("", Path)
-	return (rtn_message)
+	return rtn_message.strip
 #
 
 class DBXController():
