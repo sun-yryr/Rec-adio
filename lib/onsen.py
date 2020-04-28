@@ -3,9 +3,9 @@ import requests
 import json
 import re
 import os
-import lib.functions as f
 import datetime as DT
 import subprocess
+from . import functions as f
 
 class onsen:
     def __init__(self, keywords, SAVEROOT):

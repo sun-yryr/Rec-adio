@@ -5,10 +5,10 @@ import xml.etree.ElementTree as ET
 import re
 import base64
 import datetime as DT
-import lib.functions as f
 import time
 import subprocess
 from signal import SIGINT
+from . import functions as f
 
 class radiko:
     RADIKO_URL = "http://radiko.jp/v3/program/today/JP13.xml"

@@ -3,10 +3,10 @@ import requests
 import json
 import re
 import datetime as DT
-import lib.functions as f
 import time
 import subprocess
 import os
+from . import functions as f
 
 
 class agqr:
