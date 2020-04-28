@@ -11,9 +11,10 @@ test = "bash -c \"cp 'conf/example_config.json' 'conf/config.json'; python -m un
 pylint = "*"
 
 [packages]
-dropbox = "==9.4.0"
-mysql-connector-python = "==8.0.18"
-requests = "==2.22.0"
+beautifulsoup4 = "*"
+requests = "*"
+mysql-connector-python = "*"
+dropbox = "*"
 
 [requires]
 python_version = "3.6"

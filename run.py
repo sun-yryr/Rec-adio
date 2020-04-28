@@ -11,7 +11,6 @@ import json
 import requests
 import re
 import os
-import dropbox
 
 SAVEROOT = ""
 T_BASELINE = DT.timedelta(seconds=60)
@@ -72,7 +71,7 @@ def main_onsen_hibiki():
             titles = Onsen.rec()
             titles.extend(Hibiki.rec())
             if (bool(titles)):
-                f.recording_successful_toline("、".join(titles))
+                f.LINE.recording_successful_toline("、".join(titles))
             else:
                 print("in onsen, hibiki. there aren't new title.")
         time.sleep(300)
@@ -84,9 +83,6 @@ def signalHandler(signal, handler) :
 
 if __name__ == "__main__":
     config = f.load_configurations()
-    if (config is None):
-        exit(code=-1)
-    f.line_token = config["all"]["line_token"]
     SAVEROOT = f.createSaveDirPath(config["all"]["savedir"])
     print("SAVEROOT : " + SAVEROOT)
     keywords = config["all"]["keywords"]

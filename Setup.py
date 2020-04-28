@@ -2,74 +2,149 @@
 # -*- coding: utf-8 -*-
 import subprocess as shell
 import os
-from Crypto.PublicKey import RSA
-from Crypto import Random
-
-
-class pycolor:
-    BLACK = '\033[30m'
-    RED = '\033[31m'
-    GREEN = '\033[32m'
-    YELLOW = '\033[33m'
-    BLUE = '\033[34m'
-    PURPLE = '\033[35m'
-    CYAN = '\033[36m'
-    WHITE = '\033[37m'
-    RETURN = '\033[07m' #反転
-    ACCENT = '\033[01m' #強調
-    FLASH = '\033[05m' #点滅
-    RED_FLASH = '\033[05;41m' #赤背景+点滅
-    END = '\033[0m'
-    def format(Color, text):
-        return Color + text + pycolor.END
+import json
+import mysql.connector as sql
 
 def main():
-    # rtmpdump と ffmpeg のインストール確認 返り値を受け取ってパスかどうか確認する
-    rtmpPath = shell.check_output(['which', 'rtmpdump']).decode('utf-8').replace('\n', '')
-    ffmpegPath = shell.check_output(['which', 'ffmpeg']).decode('utf-8').replace('\n', '')
-    if not (os.path.exists(rtmpPath) and os.path.exists(ffmpegPath)):
-        print(pycolor.format(pycolor.RED, 'rtmpdump or ffmpeg not found. please download\n'))
-        print('ex: ', end='')
-        print(pycolor.format(pycolor.ACCENT, 'apt install rtmpdump ffmpeg\n'))
-        exit()
-    print('ffmpeg, rtmpdump OK.')
-    # # react を立てるか確認
-    print('Will you use Rec-adio Web Client? y/n : ', end='')
-    ans = input()
-    if (ans == 'y'):
-        # port の指定
-        # print('React access port (default = 2332) : ', end='')
-        # port = input()
-        # if (port == ''): port = '2332'
-        # 公開鍵認証の設定
-        os.makedirs('./pem', exist_ok=True)
-        random_func = Random.new().read
-        rsa = RSA.generate(2048, random_func)
-        # 秘密鍵作成
-        private_pem = rsa.exportKey().decode('utf-8')
-        with open('./pem/private.pem', 'w') as f:
-            f.write(private_pem)
-        # 公開鍵作成
-        public_pem = rsa.publickey().exportKey().decode('utf-8')
-        with open('./pem/public.pem', 'w') as f:
-            f.write(public_pem)
-        # ログイン用パスワードの設定
-        # print('please passphrase : ', end='')
-        # passphrase = input()
-        # f = open('./API/.env', 'w')
-        # f.write("PORT = '%s'" % port)
-        # f.write("PASSWORD = '%s'" % passphrase)
-        # f.close()
-    elif (ans == 'n'):
-        pass
-    else:
-        print(pycolor.format(pycolor.RED, 'must input y or n.'))
-    # config のコピー
-    shell.run(['cp', '-n', './conf/example_config.json', './conf/config.json'])
-    print('please edit ./conf/config.json')
-    # run.py で起動する旨
-    print('\nstart for ', end='')
-    print(pycolor.format(pycolor.ACCENT, 'python3 run.py'))
+    print("configを生成します")
+    print("録音ファイルの保存先を指定してください\nデフォルト ./savefile => ", end="")
+    tmp = input()
+    conf["all"]["savedir"] = tmp if tmp!="" else ""
+    print("lineで通知する場合はトークンを入力してください => ", end="")
+    tmp = input()
+    if tmp != "":
+        conf["all"]["line_token"] = tmp
+    print("オブジェクトストレージを使いますか？ y/n => ", end="")
+    tmp = input()
+    if tmp == "y":
+        main_objectstorage()
+    print("mysqlを使いますか？ y/n => ", end="")
+    tmp = input()
+    if tmp == "y":
+        main_mysql()
+    print("rcloneを使いますか？ y/n => ", end="")
+    tmp = input()
+    if tmp == "y":
+        main_rclone()
+    print("./conf/config.jsonに保存しました")
+    with open("./conf/config.json", "w") as f:
+        json.dump(conf, f, ensure_ascii=False)
+
+
+def main_objectstorage():
+    conf["swift"] = {}
+    print("object storage swift")
+    print("tenantid => ", end="")
+    tmp = input()
+    conf["swift"]["tenantid"] = tmp
+
+    print("username => ", end="")
+    tmp = input()
+    conf["swift"]["username"] = tmp
+
+    print("password => ", end="")
+    tmp = input()
+    conf["swift"]["password"] = tmp
+
+    print("identityUrl => ", end="")
+    tmp = input()
+    conf["swift"]["identityUrl"] = tmp
+
+    print("objectStorageUrl => ", end="")
+    tmp = input()
+    conf["swift"]["objectStorageUrl"] = tmp
+
+def main_mysql():
+    conf["mysql"] = {}
+    print("mysql")
+    print("hostname\nデフォルト localhost => ", end="")
+    tmp = input()
+    conf["mysql"]["hostname"] = tmp if tmp!="" else "localhost"
+
+    print("port\nデフォルト 3306 => ", end="")
+    tmp = input()
+    conf["mysql"]["port"] = tmp if tmp!="" else "3306"
+
+    print("username => ", end="")
+    tmp = input()
+    if tmp == "":
+        print("正しい値を入力してください")
+        exit(1)
+    conf["mysql"]["username"] = tmp
+
+    print("password => ", end="")
+    tmp = input()
+    if tmp == "":
+        print("正しい値を入力してください")
+        exit(1)
+    conf["mysql"]["password"] = tmp
+
+    print("database name => ", end="")
+    tmp = input()
+    if tmp == "":
+        print("正しい値を入力してください")
+        exit(1)
+    conf["mysql"]["database"] = tmp
+
+    print("テーブルを自動生成しますか？(新規インストールの方はyを入力してください)\ny/n => ", end="")
+    tmp = input()
+    if tmp == "y":
+        mysql_create_table()
+
+def mysql_create_table():
+    try:
+        conn = sql.connect(
+            host = conf["mysql"]["hostname"],
+            port = conf["mysql"]["port"],
+            user = conf["mysql"]["username"],
+            password = conf["mysql"]["password"],
+            database = conf["mysql"]["database"]
+        )
+        cur = conn.cursor()
+        table = "Programs"
+        cur.execute("DROP TABLE IF EXISTS `%s`;", table)
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS `%s` (
+            `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+            `title` text NOT NULL,
+            `pfm` text,
+            `rec-timestamp` datetime NOT NULL,
+            `station` varchar(30) DEFAULT '',
+            `uri` text NOT NULL,
+            `info` text,
+            PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=395 DEFAULT CHARSET=utf8;
+            """, table)
+        )
+        cur.close()
+        conn.close()
+    except:
+        print("Mysql setup failed")
+    
+
+def main_rclone():
+    conf["rclone"] = {}
+    print("rclone")
+    print("method => ", end="")
+    tmp = input()
+    conf["rclone"]["method"] = tmp
+
+    print("outdir => ", end="")
+    tmp = input()
+    conf["rclone"]["outdir"] = tmp
+
+    print("options => ", end="")
+    tmp = input()
+    conf["rclone"]["options"] = tmp
 
 if __name__ == "__main__":
+    conf = {
+        "all": {
+            "savedir": "",
+            "Radiko_URL": "http://radiko.jp/v3/program/today/JP13.xml",
+            "keywords": []
+        },
+    }
     main()
+    print("Rec-adioを使うにはffmpegとrtmpdumpが必要です。")

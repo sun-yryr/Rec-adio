@@ -141,7 +141,7 @@ def rec(data):
     p1.communicate(b'q')
     time.sleep(10)
     if (f.is_recording_succeeded(file_path)):
-        f.recording_successful_toline(program_data["title"])
+        f.LINE.recording_successful_toline(program_data["title"])
         # dropbox
         # fs = open(file_path+".m4a", "rb")
         # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
@@ -163,7 +163,7 @@ def rec(data):
             cmd = 'rm "%s"' % (file_path + ".m4a")
             subprocess.run(cmd, shell=True)
     else:
-        f.recording_failure_toline(program_data["title"])
+        f.LINE.recording_failure_toline(program_data["title"])
 
 def gen_temp_chunk_m3u8_url( url, AuthToken ):
     headers =  {
