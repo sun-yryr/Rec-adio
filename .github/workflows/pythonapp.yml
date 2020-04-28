@@ -7,7 +7,7 @@ on:
   push:
     branches: [ release ]
   pull_request:
-    branches: [ release, develop ]
+    branches: [ master, release, develop ]
 
 jobs:
   build:
@@ -26,7 +26,7 @@ jobs:
         pip install pipenv
     - name: Install dependencies
       run: |
-        pipenv sync
+        pipenv install
     - name: Test with unittest
       run: |
         pipenv run test

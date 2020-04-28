@@ -5,10 +5,10 @@ import xml.etree.ElementTree as ET
 import re
 import base64
 import datetime as DT
-import lib.functions as f
 import time
 import subprocess
 from signal import SIGINT
+from . import functions as f
 
 class radiko:
     RADIKO_URL = "http://radiko.jp/v3/program/today/JP13.xml"
@@ -18,11 +18,8 @@ class radiko:
         # TODO: 正規表現で https:// から始まる文字列ならに変更する
         if (tmpconf["all"].get("Radiko_URL") is not None):
             self.RADIKO_URL = tmpconf["all"].get("Radiko_URL")
-        res = requests.get(self.RADIKO_URL)
-        res.encoding = "utf-8"
+        self.reload_program()
         self.isKeyword = False
-        self.reload_date = DT.date.today()
-        self.program_radiko = ET.fromstring(res.text)
 
     def reload_program(self):
         res = requests.get(self.RADIKO_URL)
@@ -38,7 +35,6 @@ class radiko:
                 word += "|"
             word = word.rstrip("|")
             word += ")"
-            print(word)
             self.isKeyword = True
             self.keyword = re.compile(word)
         else:

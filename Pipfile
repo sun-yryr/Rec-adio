@@ -4,10 +4,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [scripts]
-start = "python3 run.py"
-test = "echo Now not test"
+start = "python run.py"
+test = "bash -c \"cp 'conf/example_config.json' 'conf/config.json'; python -m unittest discover\""
 
 [dev-packages]
+pylint = "*"
 
 [packages]
 beautifulsoup4 = "*"
