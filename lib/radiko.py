@@ -35,7 +35,6 @@ class radiko:
                 word += "|"
             word = word.rstrip("|")
             word += ")"
-            print(word)
             self.isKeyword = True
             self.keyword = re.compile(word)
         else:
