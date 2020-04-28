@@ -18,11 +18,8 @@ class radiko:
         # TODO: 正規表現で https:// から始まる文字列ならに変更する
         if (tmpconf["all"].get("Radiko_URL") is not None):
             self.RADIKO_URL = tmpconf["all"].get("Radiko_URL")
-        res = requests.get(self.RADIKO_URL)
-        res.encoding = "utf-8"
+        self.reload_program()
         self.isKeyword = False
-        self.reload_date = DT.date.today()
-        self.program_radiko = ET.fromstring(res.text)
 
     def reload_program(self):
         res = requests.get(self.RADIKO_URL)
