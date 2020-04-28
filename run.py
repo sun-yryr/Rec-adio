@@ -15,6 +15,7 @@ import dropbox
 SAVEROOT = ""
 T_BASELINE = DT.timedelta(seconds=60)
 T_ZERO = DT.timedelta()
+keywords = []
 
 
 def main_radiko():
