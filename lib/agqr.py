@@ -12,12 +12,9 @@ from . import functions as f
 class agqr:
     AGQR_URL = "https://agqr.sun-yryr.com/api/today"
     def __init__(self):
-        res = requests.get(self.AGQR_URL)
-        res.encoding = "utf-8"
+        self.reload_program()
         self.isKeyword = False
-        self.reload_date = DT.date.today()
-        self.program_agqr = json.loads(res.text)
-
+        
     def reload_program(self):
         res = requests.get(self.AGQR_URL)
         res.encoding = "utf-8"
@@ -32,7 +29,6 @@ class agqr:
                 word += "|"
             word = word.rstrip("|")
             word += ")"
-            print(word)
             self.isKeyword = True
             self.keyword = re.compile(word)
         else:
