@@ -23,7 +23,6 @@ jobs:
     - name: Install ffmpeg & rtmpdump
       run: |
         sudo apt update
-        sudo apt upgrade
         sudo apt install -y ffmpeg rtmpdump
     - name: Install Pipenv
       run: |
