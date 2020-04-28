@@ -46,6 +46,16 @@ class TestFunction(unittest.TestCase):
         subprocess.run(cmd.replace("1000", "1500"), shell=True)
         self.assertTrue(f.is_recording_succeeded(testfile.replace(".m4a", "")))
         Path(testfile).unlink()
+    
+    def test_delete_serial(self):
+        # なんかいい感じに書きたい
+        from lib import functions as f
+        inp = "新日曜名作座　雲上雲下　［終］（９）"
+        out = f.delete_serial(inp)
+        self.assertEqual(out, "新日曜名作座　雲上雲下")
+        inp = "aaaaaaaaaaaaa"
+        out = f.delete_serial(inp)
+        self.assertEqual(out, inp)
         
 
 if __name__ == "__main__":
