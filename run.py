@@ -4,6 +4,7 @@ from lib import radiko, agqr, onsen, hibiki, functions as f
 import subprocess
 from multiprocessing import Process
 from signal import SIGINT
+import signal
 import time
 import datetime as DT
 import json
@@ -76,6 +77,11 @@ def main_onsen_hibiki():
                 print("in onsen, hibiki. there aren't new title.")
         time.sleep(300)
 
+def signalHandler(signal, handler) :
+    for i in ps:
+        i.terminate()
+    exit(0)
+
 if __name__ == "__main__":
     config = f.load_configurations()
     if (config is None):
@@ -89,7 +95,9 @@ if __name__ == "__main__":
         Process(target=main_agqr),
         Process(target=main_onsen_hibiki)
     ]
+    signal.signal(signal.SIGINT,  signalHandler)
+    signal.signal(signal.SIGTERM, signalHandler)
     for i in ps:
         i.start()
     while(True):
-        time.sleep(1000)
+        time.sleep(1)
