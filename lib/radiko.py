@@ -15,8 +15,9 @@ class radiko:
 
     def __init__(self):
         tmpconf = f.load_configurations()
-        if (tmpconf.get("Radiko_URL") != ""):
-            self.RADIKO_URL = tmpconf.get("Radiko_URL")
+        # TODO: 正規表現で https:// から始まる文字列ならに変更する
+        if (tmpconf["all"].get("Radiko_URL") is not None):
+            self.RADIKO_URL = tmpconf["all"].get("Radiko_URL")
         res = requests.get(self.RADIKO_URL)
         res.encoding = "utf-8"
         self.isKeyword = False
