@@ -3,9 +3,9 @@ import requests
 import json
 import re
 import os
-import lib.functions as f
 import datetime as DT
 import subprocess
+from . import functions as f
 
 class onsen:
     def __init__(self, keywords, SAVEROOT):
@@ -21,7 +21,6 @@ class onsen:
                 word += "|"
             word = word.rstrip("|")
             word += ")"
-            print(word)
             self.isKeyword = True
             self.keyword = re.compile(word)
         else:

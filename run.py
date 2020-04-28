@@ -4,17 +4,18 @@ from lib import radiko, agqr, onsen, hibiki, functions as f
 import subprocess
 from multiprocessing import Process
 from signal import SIGINT
+import signal
 import time
 import datetime as DT
 import json
 import requests
 import re
 import os
-import dropbox
 
 SAVEROOT = ""
 T_BASELINE = DT.timedelta(seconds=60)
 T_ZERO = DT.timedelta()
+keywords = []
 
 
 def main_radiko():
@@ -70,16 +71,18 @@ def main_onsen_hibiki():
             titles = Onsen.rec()
             titles.extend(Hibiki.rec())
             if (bool(titles)):
-                f.recording_successful_toline("、".join(titles))
+                f.LINE.recording_successful_toline("、".join(titles))
             else:
                 print("in onsen, hibiki. there aren't new title.")
         time.sleep(300)
 
+def signalHandler(signal, handler) :
+    for i in ps:
+        i.terminate()
+    exit(0)
+
 if __name__ == "__main__":
     config = f.load_configurations()
-    if (config is None):
-        exit(code=-1)
-    f.line_token = config["all"]["line_token"]
     SAVEROOT = f.createSaveDirPath(config["all"]["savedir"])
     print("SAVEROOT : " + SAVEROOT)
     keywords = config["all"]["keywords"]
@@ -88,7 +91,9 @@ if __name__ == "__main__":
         Process(target=main_agqr),
         Process(target=main_onsen_hibiki)
     ]
+    signal.signal(signal.SIGINT,  signalHandler)
+    signal.signal(signal.SIGTERM, signalHandler)
     for i in ps:
         i.start()
     while(True):
-        time.sleep(1000)
+        time.sleep(1)

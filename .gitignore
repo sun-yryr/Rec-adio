@@ -4,3 +4,5 @@ savefile/*
 .DS_Store
 conf/config.json
 pem/
+Pipfile.lock
+

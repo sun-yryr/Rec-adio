@@ -3,21 +3,18 @@ import requests
 import json
 import re
 import datetime as DT
-import lib.functions as f
 import time
 import subprocess
 import os
+from . import functions as f
 
 
 class agqr:
     AGQR_URL = "https://agqr.sun-yryr.com/api/today"
     def __init__(self):
-        res = requests.get(self.AGQR_URL)
-        res.encoding = "utf-8"
+        self.reload_program()
         self.isKeyword = False
-        self.reload_date = DT.date.today()
-        self.program_agqr = json.loads(res.text)
-
+        
     def reload_program(self):
         res = requests.get(self.AGQR_URL)
         res.encoding = "utf-8"
@@ -32,7 +29,6 @@ class agqr:
                 word += "|"
             word = word.rstrip("|")
             word += ")"
-            print(word)
             self.isKeyword = True
             self.keyword = re.compile(word)
         else:
@@ -86,7 +82,7 @@ class agqr:
         subprocess.run(cwd2.split())
         print("agqr: finished!")
         if (f.is_recording_succeeded(file_path)):
-            f.recording_successful_toline(program_data["title"])
+            f.LINE.recording_successful_toline(program_data["title"])
             # dropbox
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
@@ -107,5 +103,5 @@ class agqr:
                 cmd = 'rm "%s"' % (file_path + ".m4a")
                 subprocess.run(cmd, shell=True)
         else:
-            f.recording_failure_toline(program_data["title"])
+            f.LINE.recording_failure_toline(program_data["title"])
         os.remove(file_path + ".flv")
