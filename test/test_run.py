@@ -12,8 +12,6 @@ class TestRun(unittest.TestCase):
         if proc.poll() is not None:
             self.assertIsNone(proc.poll())
         proc.send_signal(SIGINT)
-        sleep(2)
-        proc.kill()
 
 if __name__ == "__main__":
     unittest.main()
