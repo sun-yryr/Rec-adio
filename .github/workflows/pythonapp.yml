@@ -21,7 +21,9 @@ jobs:
       with:
         python-version: 3.6
     - name: Install ffmpeg & rtmpdump
-      run: sudo apt install -y ffmpeg rtmpdump
+      run: |
+        sudo apt autoremove
+        sudo apt install -y ffmpeg rtmpdump
     - name: Install Pipenv
       run: |
         python -m pip install --upgrade pip
