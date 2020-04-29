@@ -41,7 +41,7 @@ jobs:
         import subprocess
         import base64
         code=os.environ.get('ENC_SETTING')
-        with open("tmp.tar.gz", 'w') as f:
+        with open("tmp.tar.gz", 'wb') as f:
           f.write(base64.b64decode(code))
       shell: python
     - name: Umcompress file
