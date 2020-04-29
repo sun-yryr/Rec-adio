@@ -26,6 +26,9 @@ class TestRadiko(unittest.TestCase):
     def test_auth(self):
         token = self.Radiko.authorization()
         self.assertIsNotNone(token)
+        url = 'http://f-radiko.smartstream.ne.jp/QRR/_definst_/simul-stream.stream/playlist.m3u8'
+        m3u8 = self.Radiko.gen_temp_chunk_m3u8_url(url, token)
+        self.assertNotEqual(m3u8, "")
 
     def test_rec(self):
         # 録音時に使うのは title と dur だけ
@@ -39,7 +42,6 @@ class TestRadiko(unittest.TestCase):
             "info": "test"
         }
         token = self.Radiko.authorization()
-        print("authtoken....=> ", token)
         savePath = Path().resolve() / "save_r"
         savePath.mkdir(parents=True)
         self.Radiko.rec([dummy_data, 0, token, str(savePath)])
@@ -47,7 +49,6 @@ class TestRadiko(unittest.TestCase):
         # check file
         fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
         path = savePath / dummy_title / fileName
-        print(str(path))
         self.assertTrue(path.is_file())
         # remove file
         path.unlink()

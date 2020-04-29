@@ -41,7 +41,6 @@ class TestAGQR(unittest.TestCase):
         # check file
         fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
         path = savePath / dummy_title / fileName
-        print(str(path))
         self.assertTrue(path.is_file())
         # remove file
         path.unlink()
