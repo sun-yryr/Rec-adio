@@ -39,6 +39,7 @@ class TestRadiko(unittest.TestCase):
             "info": "test"
         }
         token = self.Radiko.authorization()
+        print("authtoken....=> ", token)
         savePath = Path().resolve() / "save_r"
         savePath.mkdir(parents=True)
         self.Radiko.rec([dummy_data, 0, token, str(savePath)])
