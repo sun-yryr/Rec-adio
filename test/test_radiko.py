@@ -1,6 +1,8 @@
 import unittest
 from pathlib import Path
 from lib.radiko import radiko
+import datetime as DT
+from time import sleep
 
 class TestRadiko(unittest.TestCase):
     def setUp(self):
@@ -10,7 +12,6 @@ class TestRadiko(unittest.TestCase):
         self.Radiko = None
     
     def test_init(self):
-        import datetime as DT
         self.assertEqual(self.Radiko.reload_date, DT.date.today())
         self.assertIsNotNone(self.Radiko.program_radiko)
         
@@ -27,8 +28,6 @@ class TestRadiko(unittest.TestCase):
         self.assertIsNotNone(token)
 
     def test_rec(self):
-        import datetime as DT
-        from pathlib import Path
         # 録音時に使うのは title と dur だけ
         dummy_title = "test_rec_radiko"
         dummy_data = {
@@ -41,8 +40,9 @@ class TestRadiko(unittest.TestCase):
         }
         token = self.Radiko.authorization()
         savePath = Path().resolve() / "save_r"
-        savePath.mkdir()
+        savePath.mkdir(parents=True)
         self.Radiko.rec([dummy_data, 0, token, str(savePath)])
+        sleep(2)
         # check file
         fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
         path = savePath / dummy_title / fileName

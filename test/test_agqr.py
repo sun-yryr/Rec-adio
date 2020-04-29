@@ -1,6 +1,8 @@
 import unittest
 from pathlib import Path
 from lib.agqr import agqr
+import datetime as DT
+from time import sleep
 
 class TestAGQR(unittest.TestCase):
     def setUp(self):
@@ -10,7 +12,6 @@ class TestAGQR(unittest.TestCase):
         self.Agqr = None
     
     def test_init(self):
-        import datetime as DT
         self.assertEqual(self.Agqr.reload_date, DT.date.today())
         self.assertIs(type(self.Agqr.program_agqr), list)
     
@@ -23,8 +24,6 @@ class TestAGQR(unittest.TestCase):
         self.assertFalse(self.Agqr.keyword.search("朝倉もも"))
     
     def test_rec(self):
-        import datetime as DT
-        from pathlib import Path
         # 録音時に使うのは title と dur だけ
         dummy_title = "test_rec_agqr"
         dummy_data = {
@@ -36,9 +35,9 @@ class TestAGQR(unittest.TestCase):
             "pfm": "test"
         }
         savePath = Path().resolve() / "save_a"
-        print("aaa", str(savePath))
-        savePath.mkdir()
+        savePath.mkdir(parents=True)
         self.Agqr.rec([dummy_data, 0, str(savePath)])
+        sleep(2)
         # check file
         fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
         path = savePath / dummy_title / fileName
