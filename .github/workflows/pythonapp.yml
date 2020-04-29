@@ -33,25 +33,25 @@ jobs:
         pipenv install
     - name: Install Open VPN
       run: sudo apt install openvpn
-    - name: Open VPN setup
+    - name: Decode setting file
       env:
-        NAME: ${{ secrets.USERNAME }}
-        PASS: ${{ secrets.PASSWORD }}
+        ENC_SETTING: ${{ secrets.EncodedVPNSettings }}
       run: |
-        echo $NAME > .github/vpn/text.txt
-        echo $PASS >> .github/vpn/text.txt
-    - name: Connect VPN
-      uses: golfzaptw/action-connect-ovpn@master
-      id: connect_vpn
-      with:
-        PING_URL: '127.0.0.1'
-        FILE_OVPN: '.github/vpn/config.ovpn'
-      env:
-        CA_CRT: ${{ secrets.CA_CRT}}
-        USER_CRT: ""
-        USER_KEY: ""
-    - name: Check Connect VPN
-      run: echo ${{ steps.connect_vpn.outputs.STATUS }}
+        import os
+        import subprocess
+        import base64
+        code=os.environ.get('ENC_SETTING')
+        with open("tmp.tar.gz", 'w') as f:
+          f.write(base64.b64decode(code))
+      shell: python
+    - name: Umcompress file
+      run: |
+        tar -xvzf tmp.tar.gz
+        mv config/* ./
+    - name: Connect
+      run: |
+        CONF=`ls *.ovpn`
+        sudo -b openvpn --config ${CONF}
     - name: Test with unittest
       run: |
         pipenv run test
