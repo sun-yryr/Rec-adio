@@ -5,4 +5,4 @@ savefile/*
 conf/config.json
 pem/
 Pipfile.lock
-
+ch_test.py
