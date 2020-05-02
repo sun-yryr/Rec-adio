@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python application
+name: main-ci
 
 on:
   push:
@@ -12,7 +12,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
@@ -20,6 +20,10 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: 3.6
+    - name: Install ffmpeg & rtmpdump
+      run: |
+        sudo apt update
+        sudo apt install -y ffmpeg rtmpdump
     - name: Install Pipenv
       run: |
         python -m pip install --upgrade pip
@@ -27,6 +31,26 @@ jobs:
     - name: Install dependencies
       run: |
         pipenv install
+    - name: Install Open VPN
+      run: sudo apt install openvpn
+    - name: Decode setting file
+      env:
+        ENC_SETTING: ${{ secrets.EncodedVPNSettings }}
+      run: |
+        import os
+        import subprocess
+        import base64
+        code=os.environ.get('ENC_SETTING')
+        with open("tmp.tar.gz", 'wb') as f:
+          f.write(base64.b64decode(code))
+      shell: python
+    - name: Umcompress file
+      run: |
+        tar -xvzf tmp.tar.gz
+        mv config/* ./
+    - name: Connect
+      run: |
+        sudo -b openvpn --config config.ovpn
     - name: Test with unittest
       run: |
         pipenv run test
