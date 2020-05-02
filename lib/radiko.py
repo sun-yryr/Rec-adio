@@ -114,68 +114,68 @@ class radiko:
             print("Authorization2 Failed")
             return None
 
-def rec(data):
-    program_data = data[0]
-    wait_start_time = data[1]
-    AuthToken = data[2]
-    SAVEROOT = data[3]
-    #タイトルを表示
-    print(program_data["title"])
-    #ディレクトリの作成
-    dir_name = f.delete_serial(program_data["title"].replace(" ", "_").replace("　","_"))
-    dir_path = SAVEROOT + "/" + dir_name
-    f.createSaveDir(dir_path)
-    #保存先パスの作成
-    file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
-    file_path = file_path.replace(" ", "_")
-    #stream urlの取得
-    url = 'http://f-radiko.smartstream.ne.jp/%s/_definst_/simul-stream.stream/playlist.m3u8' % program_data["station"]
-    m3u8 = gen_temp_chunk_m3u8_url(url, AuthToken)
-    #コマンドの実行
-    time.sleep(wait_start_time)
-    cwd = ('ffmpeg -loglevel error -headers "X-Radiko-AuthToken: %s" -i "%s" -acodec copy  "%s.m4a"' % (AuthToken, m3u8, file_path))
-    p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
-    print("Radiko: sleep for " + str(program_data["dur"]-10))
-    time.sleep(program_data["dur"]-10)
-    print("STOP SIGNAL......")
-    p1.communicate(b'q')
-    time.sleep(10)
-    if (f.is_recording_succeeded(file_path)):
-        f.LINE.recording_successful_toline(program_data["title"])
-        # dropbox
-        # fs = open(file_path+".m4a", "rb")
-        # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
-        # fs.close()
+    def rec(self, data):
+        program_data = data[0]
+        wait_start_time = data[1]
+        AuthToken = data[2]
+        SAVEROOT = data[3]
+        #タイトルを表示
+        print(program_data["title"])
+        #ディレクトリの作成
+        dir_name = f.delete_serial(program_data["title"].replace(" ", "_").replace("　","_"))
+        dir_path = SAVEROOT + "/" + dir_name
+        f.createSaveDir(dir_path)
+        #保存先パスの作成
+        file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
+        file_path = file_path.replace(" ", "_")
+        #stream urlの取得
+        url = 'http://f-radiko.smartstream.ne.jp/%s/_definst_/simul-stream.stream/playlist.m3u8' % program_data["station"]
+        m3u8 = self.gen_temp_chunk_m3u8_url(url, AuthToken)
+        #コマンドの実行
+        time.sleep(wait_start_time)
+        cwd = ('ffmpeg -loglevel error -headers "X-Radiko-AuthToken: %s" -i "%s" -acodec copy  "%s.m4a"' % (AuthToken, m3u8, file_path))
+        p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
+        print("Radiko: sleep for " + str(program_data["dur"]-10))
+        time.sleep(program_data["dur"]-10)
+        print("STOP SIGNAL......")
+        p1.communicate(b'q')
+        time.sleep(10)
+        if (f.is_recording_succeeded(file_path)):
+            f.LINE.recording_successful_toline(program_data["title"])
+            # dropbox
+            # fs = open(file_path+".m4a", "rb")
+            # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
+            # fs.close()
 
-        #rclone
-        f.Rclone.upload(dir_path, dir_name)
-        #object storage
-        url = f.Swift.upload_file(filePath=file_path + ".m4a")
-        f.Mysql.insert(
-            title= program_data["title"].replace(" ", "_"),
-            pfm= program_data["pfm"],
-            timestamp= program_data["ft"],
-            station= program_data["station"],
-            uri= url,
-            info= program_data["info"]
-        )
-        if (f.Swift.hadInit):
-            cmd = 'rm "%s"' % (file_path + ".m4a")
-            subprocess.run(cmd, shell=True)
-    else:
-        f.LINE.recording_failure_toline(program_data["title"])
+            #rclone
+            f.Rclone.upload(dir_path, dir_name)
+            #object storage
+            url = f.Swift.upload_file(filePath=file_path + ".m4a")
+            f.Mysql.insert(
+                title= program_data["title"].replace(" ", "_"),
+                pfm= program_data["pfm"],
+                timestamp= program_data["ft"],
+                station= program_data["station"],
+                uri= url,
+                info= program_data["info"]
+            )
+            if (f.Swift.hadInit):
+                cmd = 'rm "%s"' % (file_path + ".m4a")
+                subprocess.run(cmd, shell=True)
+        else:
+            f.LINE.recording_failure_toline(program_data["title"])
 
-def gen_temp_chunk_m3u8_url( url, AuthToken ):
-    headers =  {
-        "X-Radiko-AuthToken": AuthToken,
-    }
-    res  = requests.get(url, headers=headers)
-    res.encoding = "utf-8"
-    if (res.status_code != 200):
-        print(res.text)
-    body = res.text
-    lines = re.findall( '^https?://.+m3u8$' , body, flags=(re.MULTILINE) )
-    if len(lines) <= 0:
-        print("Radiko: no m3u8 in the responce.")
-        return ""
-    return lines[0]
+    def gen_temp_chunk_m3u8_url(self, url, AuthToken ):
+        headers =  {
+            "X-Radiko-AuthToken": AuthToken,
+        }
+        res  = requests.get(url, headers=headers)
+        res.encoding = "utf-8"
+        if (res.status_code != 200):
+            print(res.text)
+        body = res.text
+        lines = re.findall( '^https?://.+m3u8$' , body, flags=(re.MULTILINE) )
+        if len(lines) <= 0:
+            print("Radiko: no m3u8 in the responce.")
+            return ""
+        return lines[0]

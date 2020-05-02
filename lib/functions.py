@@ -62,11 +62,15 @@ class LineController:
 		self.hadInit = True
 
 	def recording_successful_toline(self, title):
+		if not self.hadInit:
+			return
 		headers = {"Authorization": "Bearer %s" % self.token}
 		payload = {"message": "\n"+title+" を録音しました!"}
 		requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
 
 	def recording_failure_toline(self, title):
+		if not self.hadInit:
+			return
 		headers = {"Authorization": "Bearer %s" % self.token}
 		payload = {"message": "\n"+title+" の録音に失敗しました"}
 		requests.post("https://notify-api.line.me/api/notify", headers=headers, data=payload)
