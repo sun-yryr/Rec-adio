@@ -52,7 +52,7 @@ jobs:
       run: |
         sudo -b openvpn --config config.ovpn
     - name: Check Global IP adress
-      -run: |
+      run: |
         curl https://env.b4iine.net/isp.php > res
         grep '<p class="main-txt">' res
     - name: Test with unittest
