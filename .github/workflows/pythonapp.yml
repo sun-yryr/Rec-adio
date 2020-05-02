@@ -52,6 +52,9 @@ jobs:
       run: |
         CONF=`ls *.ovpn`
         sudo -b openvpn --config ${CONF}
+    - name: Check Global IP adress
+      -run: |
+      curl https://env.b4iine.net/isp.php | grep '<p class="main-txt">'
     - name: Test with unittest
       run: |
         pipenv run test
