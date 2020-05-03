@@ -8,6 +8,11 @@ jobs:
       - image: ubuntu:18.04
     steps:
       - checkout
+      - run:
+          name: env
+          command: |
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
       - run: 
           name: apt install
           command: apt update && apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip
@@ -16,8 +21,6 @@ jobs:
           command: |
             python3 -m pip install --upgrade pip
             pip install pipenv
-            export LC_ALL=C.UTF-8
-            export LANG=C.UTF-8
             pipenv install
       - run: apt install -y openvpn
       - run: pipenv run python .circleci/decode.py
