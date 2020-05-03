@@ -15,8 +15,6 @@ jobs:
       - run:
           command: sudo apt update && sudo apt install -y ffmpeg rtmpdump
 
-      # Postgres ユーザーとデータベースを作成
-      # 整形に使う YAML のヒアドキュメントの「|」に注意
       - run: |
           python -m pip install --upgrade pip
           pip install pipenv
@@ -41,11 +39,3 @@ jobs:
           sudo -b openvpn --config config.ovpn
       - run:
         command: pipenv run test
-
-
-workflows:
-  # Name the workflow "welcome"
-  build:
-    # Run the welcome/run job in its own container
-    jobs:
-      - build
