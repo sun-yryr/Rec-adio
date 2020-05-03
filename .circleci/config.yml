@@ -11,10 +11,14 @@ jobs:
       - run: 
           name: apt install
           command: apt update && apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip
-      - run: |
-          python3 -m pip install --upgrade pip
-          pip install pipenv
-          pipenv install
+      - run: 
+          name: pipenv install
+          command: |
+            python3 -m pip install --upgrade pip
+            pip install pipenv
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            pipenv install
       - run: apt install -y openvpn
       - run: pipenv run python .circleci/decode.py
       - run: |
