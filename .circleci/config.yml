@@ -28,4 +28,9 @@ jobs:
           tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
           mv config/* ./
           nohup openvpn --config config.ovpn &
-      - run: pipenv run test
+      - run:
+          name: run test
+          command: |
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            pipenv run test
