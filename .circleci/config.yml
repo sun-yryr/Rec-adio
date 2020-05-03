@@ -25,7 +25,7 @@ jobs:
           export LANG=C.UTF-8
           pipenv run python .circleci/decoder.py
       - run: |
-          tar -xvzf tmp.tar.gz
+          tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
           mv config/* ./
           sudo -b openvpn --config config.ovpn
       - run: pipenv run test
