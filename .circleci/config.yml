@@ -30,6 +30,11 @@ jobs:
           nohup openvpn --config config.ovpn &
           sleep 10
       - run:
+          name: check Grobal IP
+          command: |
+            curl https://env.b4iine.net/isp.php > res
+            grep '<p class="main-txt">' res
+      - run:
           name: run test
           command: |
             export LC_ALL=C.UTF-8
