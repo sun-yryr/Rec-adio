@@ -1,0 +1,51 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+# Use a package of configuration called an orb.
+# Orchestrate or schedule a set of jobs
+jobs:
+  build:
+    docker:
+      - image: ubuntu:18.04
+
+    working_directory: ~/my-project
+
+    steps:
+      - checkout
+
+      - run:
+          command: sudo apt update && sudo apt install -y ffmpeg rtmpdump
+
+      # Postgres ユーザーとデータベースを作成
+      # 整形に使う YAML のヒアドキュメントの「|」に注意
+      - run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install
+
+      - run:
+        command: sudo apt install -y openvpn
+      
+      - run:
+        shell: python
+        command: |
+          import os
+          import subprocess
+          import base64
+          code=os.environ.get('ENC_SETTING')
+          with open("tmp.tar.gz", 'wb') as f:
+            f.write(base64.b64decode(code))
+      - run:
+        command: |
+          tar -xvzf tmp.tar.gz
+          mv config/* ./
+          sudo -b openvpn --config config.ovpn
+      - run:
+        command: pipenv run test
+
+
+workflows:
+  # Name the workflow "welcome"
+  build:
+    # Run the welcome/run job in its own container
+    jobs:
+      - build
