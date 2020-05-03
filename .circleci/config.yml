@@ -28,6 +28,7 @@ jobs:
           tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
           mv config/* ./
           nohup openvpn --config config.ovpn &
+          sleep 10
       - run:
           name: run test
           command: |
