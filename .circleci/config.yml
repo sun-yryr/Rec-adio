@@ -23,7 +23,7 @@ jobs:
       - run: |
           export LC_ALL=C.UTF-8
           export LANG=C.UTF-8
-          pipenv run python .circleci/decode.py
+          pipenv run python .circleci/decoder.py
       - run: |
           tar -xvzf tmp.tar.gz
           mv config/* ./
