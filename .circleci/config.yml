@@ -10,7 +10,7 @@ jobs:
       - checkout
       - run: 
           name: apt install
-          command: apt update && apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip
+          command: apt update && apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip curl
       - run: 
           name: pipenv install
           command: |
