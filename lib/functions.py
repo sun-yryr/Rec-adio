@@ -88,7 +88,7 @@ def did_record_prog(filePath, title, timestamp):
 
 # delete serial number words
 def delete_serial(Path):
-	drm_regex = re.compile(r'（.*?）|［.*?］')
+	drm_regex = re.compile(r'（.*?）|［.*?］|第.*?回')
 	rtn_message = drm_regex.sub("", Path)
 	return rtn_message.rstrip("_ ")
 #
