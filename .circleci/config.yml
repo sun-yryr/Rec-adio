@@ -2,10 +2,15 @@
 version: 2.1
 # Use a package of configuration called an orb.
 # Orchestrate or schedule a set of jobs
-jobs:
-  build:
+executors:
+  my-executor:
     docker:
       - image: ubuntu:18.04
+orbs:
+  openvpn: titel-media/openvpn@0.1.1
+jobs:
+  install:
+    executor: my-executor
     steps:
       - checkout
       - run: 
@@ -19,19 +24,10 @@ jobs:
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             pipenv install
-      - run: apt install -y openvpn
-      - run: |
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
-          pipenv run python .circleci/decoder.py
-      - run: |
-          tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
-          mv config/* ./
-          openvpn --config config.ovpn > openvpn.log 2>&1 &
-          while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
-            sleep 0.1;
-          done
-          cat openvpn.log
+  test:
+    executor: my-executor
+    steps:
+      - checkout
       - run:
           name: check Grobal IP
           command: |
@@ -43,3 +39,19 @@ jobs:
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             pipenv run test
+
+workflows:
+  main:
+    jobs:
+      - install
+      - openvpn/install
+      - openvpn/connect:
+          requires:
+            - install
+            - openvpn/install
+      - test:
+          requires:
+            - openvpn/connect
+      - openvpn/disconnect:
+          requires:
+            - test
