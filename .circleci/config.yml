@@ -6,8 +6,6 @@ executors:
   my-executor:
     docker:
       - image: ubuntu:18.04
-orbs:
-  openvpn: titel-media/openvpn@0.1.1
 jobs:
   install:
     executor: my-executor
@@ -31,8 +29,8 @@ jobs:
       - run:
           name: check Grobal IP
           command: |
-            curl https://env.b4iine.net/isp.php > res1
-            grep '<p class="main-txt">' res1
+            curl https://env.b4iine.net/isp.php > res
+            grep '<p class="main-txt">' res
       - run:
           name: run test
           command: |
@@ -42,16 +40,18 @@ jobs:
 
 workflows:
   main:
+    orbs:
+      vpn: titel-media/openvpn@0.1.1
     jobs:
       - install
-      - openvpn/install
-      - openvpn/connect:
+      - vpn/install
+      - vpn/connect:
           requires:
             - install
-            - openvpn/install
+            - vpn/install
       - test:
           requires:
-            - openvpn/connect
-      - openvpn/disconnect:
+            - vpn/connect
+      - vpn/disconnect:
           requires:
             - test
