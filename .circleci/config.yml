@@ -31,8 +31,8 @@ jobs:
       - run:
           name: check Grobal IP
           command: |
-            curl https://env.b4iine.net/isp.php > res
-            grep '<p class="main-txt">' res
+            curl https://env.b4iine.net/isp.php > res1
+            grep '<p class="main-txt">' res1
       - run:
           name: run test
           command: |
