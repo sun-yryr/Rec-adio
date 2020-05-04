@@ -31,13 +31,12 @@ jobs:
           tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
           mv config/* ./
           # Connect to VPN
-          sudo openvpn \
-            --config config.ovpn > openvpn.log 2>&1 &
-          cat openvpn.log
+          sudo -b openvpn --config config.ovpn
+          route
+          curl https://env.b4iine.net/isp.php > res
       - run:
           name: check Grobal IP
           command: |
-            curl https://env.b4iine.net/isp.php > res
             grep '<p class="main-txt">' res
       - run:
           name: run test
