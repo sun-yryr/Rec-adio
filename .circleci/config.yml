@@ -13,12 +13,12 @@ jobs:
       - checkout
       - run: 
           name: apt install
-          command: sudo apt update && sudo apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip curl
+          command: sudo rm /etc/apt/sources.list.d/circleci_trusty.list* && sudo apt update && sudo apt install -y ffmpeg rtmpdump
       - run: 
           name: pipenv install
           command: |
             python3 -m pip install --upgrade pip
-            pip install pipenv
+            pip3 install pipenv
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             pipenv install
