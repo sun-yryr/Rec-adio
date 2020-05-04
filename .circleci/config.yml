@@ -30,10 +30,15 @@ jobs:
       - run: |
           tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
           mv config/* ./
-          sudo -b openvpn --config config.ovpn
-          while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
-            sleep 0.1;
-          done
+          # Connect to VPN
+          sudo openvpn \
+            --config config.ovpn > openvpn.log 2>&1 &
+
+          # Add internal DNS
+          sudo /bin/bash \
+            -c 'echo "nameserver 10.255.0.2
+          nameserver 172.16.10.1" > /run/resolvconf/resolv.conf'
+          cat openvpn.log
       - run:
           name: check Grobal IP
           command: |
