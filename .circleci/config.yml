@@ -22,30 +22,10 @@ jobs:
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             pipenv install
-      - run: sudo apt install -y openvpn
-      - run: |
-          export LC_ALL=C.UTF-8
-          export LANG=C.UTF-8
-          pipenv run python .circleci/decoder.py
-      - run: |
-          tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
-          mv config/* ./
-          wget -qO- http://checkip.amazonaws.com | tee initial.ip
-          sudo openvpn --config config.ovpn > openvpn.log 2>&1 &
-          while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
-            sleep 0.1;
-          done
-          cat openvpn.log
-          wget -qO- http://checkip.amazonaws.com | tee final.ip
-          if [ "$(cat initial.ip)" == "$(cat final.ip)" ]
-          then
-            echo "This computer's apparent public IP address was not different after connecting"
-            echo "This may mean that your VPN is not configured correctly."
-            exit 1
-          fi
       - run:
           name: run test
           command: |
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
-            pipenv run test
+            cp conf/example_config.json conf/config.json
+            pipenv run python -m unittest test.test_run test.test_func test.test_hibiki test.test_onsen test.test_agqr
