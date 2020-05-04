@@ -56,6 +56,9 @@ class TestFunction(unittest.TestCase):
         inp = "情報学の技術第5回"
         out = f.delete_serial(inp)
         self.assertEqual(out, "情報学の技術")
+        inp = "青春アドベンチャー　阪堺電車１７７号の追憶（１）"
+        out = f.delete_serial(inp)
+        self.assertEqual(out, "青春アドベンチャー　阪堺電車１７７号の追憶")
         
 
 if __name__ == "__main__":
