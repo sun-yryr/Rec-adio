@@ -50,7 +50,7 @@ class TestFunction(unittest.TestCase):
     def test_delete_serial(self):
         # なんかいい感じに書きたい
         from lib import functions as f
-        inp = "新日曜名作座　雲上雲下  　［終］（９）"
+        inp = "新日曜名作座　雲上雲下  ［終］（９）"
         out = f.delete_serial(inp)
         self.assertEqual(out, "新日曜名作座　雲上雲下")
         inp = "情報学の技術第5回"
