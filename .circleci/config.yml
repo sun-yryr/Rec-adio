@@ -4,7 +4,8 @@ version: 2.1
 # Orchestrate or schedule a set of jobs
 executors:
   default:
-    machine: true
+    machine:
+      image: ubuntu-1604:202004-01
 jobs:
   build:
     executor: default
