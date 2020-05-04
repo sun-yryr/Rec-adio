@@ -3,17 +3,16 @@ version: 2.1
 # Use a package of configuration called an orb.
 # Orchestrate or schedule a set of jobs
 executors:
-  my-executor:
-    docker:
-      - image: ubuntu:18.04
+  default:
+    machine: true
 jobs:
-  install:
-    executor: my-executor
+  build:
+    executor: default
     steps:
       - checkout
       - run: 
           name: apt install
-          command: apt update && apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip curl
+          command: sudo apt update && sudo apt install -y ffmpeg rtmpdump python3.6 python3.6-dev python3-pip curl
       - run: 
           name: pipenv install
           command: |
@@ -22,10 +21,19 @@ jobs:
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             pipenv install
-  test:
-    executor: my-executor
-    steps:
-      - checkout
+      - run: sudo apt install -y openvpn
+      - run: |
+          export LC_ALL=C.UTF-8
+          export LANG=C.UTF-8
+          pipenv run python .circleci/decoder.py
+      - run: |
+          tar --no-same-permissions --no-same-owner -xvzf tmp.tar.gz
+          mv config/* ./
+          sudo openvpn --config config.ovpn > openvpn.log 2>&1 &
+          while [ -n "$(ip addr show tun0 2>&1 > /dev/null)" ]; do
+            sleep 0.1;
+          done
+          cat openvpn.log
       - run:
           name: check Grobal IP
           command: |
@@ -37,21 +45,3 @@ jobs:
             export LC_ALL=C.UTF-8
             export LANG=C.UTF-8
             pipenv run test
-
-workflows:
-  main:
-    orbs:
-      vpn: titel-media/openvpn@0.1.1
-    jobs:
-      - install
-      - vpn/install
-      - vpn/connect:
-          requires:
-            - install
-            - vpn/install
-      - test:
-          requires:
-            - vpn/connect
-      - vpn/disconnect:
-          requires:
-            - test
