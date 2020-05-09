@@ -4,12 +4,21 @@ import subprocess as shell
 import os
 import json
 import mysql.connector as sql
+import requests
+import re
+
 
 def main():
     print("configを生成します")
     print("録音ファイルの保存先を指定してください\nデフォルト ./savefile => ", end="")
     tmp = input()
     conf["all"]["savedir"] = tmp if tmp!="" else ""
+    
+    print("Radikoの地域判定を行いますか? y/n => ", end="")
+    tmp = input()
+    if tmp =="y":
+        main_radiko()
+
     print("lineで通知する場合はトークンを入力してください => ", end="")
     tmp = input()
     if tmp != "":
@@ -28,7 +37,7 @@ def main():
         main_rclone()
     print("./conf/config.jsonに保存しました")
     with open("./conf/config.json", "w") as f:
-        json.dump(conf, f, ensure_ascii=False)
+        json.dump(conf, f, ensure_ascii=False, indent=4, separators=(',', ': '))
 
 
 def main_objectstorage():
@@ -116,12 +125,10 @@ def mysql_create_table():
             PRIMARY KEY (`id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=395 DEFAULT CHARSET=utf8;
             """, table)
-        )
         cur.close()
         conn.close()
     except:
         print("Mysql setup failed")
-    
 
 def main_rclone():
     conf["rclone"] = {}
@@ -137,6 +144,17 @@ def main_rclone():
     print("options => ", end="")
     tmp = input()
     conf["rclone"]["options"] = tmp
+
+def main_radiko():
+    radiko_area = requests.get("https://radiko.jp/area")
+    result_no = re.search(r'JP\d+',radiko_area.text)
+    result_area = re.search(r'(?<=>).*\s.*(?=</span>)',radiko_area.text)
+    tmp = ""
+    if result_no:
+        print("Radikoの視聴地域は" + result_area.group(0) + "です。設定しますか？\ny/n => ", end="")
+        tmp = input()
+        if tmp == "y":
+            conf["all"]["Radiko_URL"] = "http://radiko.jp/v3/program/today/" + result_no.group(0) +".xml"
 
 if __name__ == "__main__":
     conf = {
