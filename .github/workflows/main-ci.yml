@@ -6,8 +6,8 @@ name: main-ci
 on:
   push:
     branches: [ release ]
-  pull_request:
-    branches: [ master, release, develop ]
+  # pull_request:
+  #   branches: [ master, release, develop ]
 
 jobs:
   build:
