@@ -14,7 +14,7 @@ class agqr:
     def __init__(self):
         self.reload_program()
         self.isKeyword = False
-        
+
     def reload_program(self):
         res = requests.get(self.AGQR_URL)
         res.encoding = "utf-8"
@@ -80,9 +80,12 @@ class agqr:
         #cwd += ('--live -o "%s.flv"' % (file_path))
         time.sleep(wait_start_time)
         p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
-        print("Agqr: sleep for " + str(program_data["dur"]))
-        time.sleep(program_data["dur"])
+        print("Agqr: sleep for " + str(program_data["dur"] * 60))
+        time.sleep(program_data["dur"] * 60)
         print("STOP SIGNAL......")
+        p1.communicate(b'q')
+        time.sleep(10)
+
         #rtmpdumpは時間指定の終了ができるので以下を同期処理にする
         #subprocess.run(cwd, shell=True)
         #変換をする
