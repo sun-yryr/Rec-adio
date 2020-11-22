@@ -64,7 +64,7 @@ class agqr:
         wait_start_time = data[1]
         SAVEROOT = data[2]
 
-        # print(program_data["title"])
+        print(program_data["title"])
 
         dir_name = program_data["title"].replace(" ", "_")
         dir_path = SAVEROOT + "/" + dir_name
@@ -72,12 +72,9 @@ class agqr:
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
 
-	#
+	# recording....
         url = "https://icraft.hs.llnwd.net/agqr10/aandg1.m3u8"
         cwd = ('ffmpeg -loglevel error -i "%s" -acodec copy  "%s.m4a"' % (url, file_path))
-        #cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1 ')
-        #cwd += ('--stop %s ' % str(program_data["dur"]*60))
-        #cwd += ('--live -o "%s.flv"' % (file_path))
         time.sleep(wait_start_time)
         p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
         print("Agqr: sleep for " + str(program_data["dur"] * 60))
@@ -85,20 +82,16 @@ class agqr:
         print("STOP SIGNAL......")
         p1.communicate(b'q')
         time.sleep(10)
-
-        #rtmpdumpは時間指定の終了ができるので以下を同期処理にする
-        #subprocess.run(cwd, shell=True)
-        #変換をする
-        #cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -c:a aac -b:a 256k "%s.m4a"' % (file_path, file_path))
-        #subprocess.run(cwd2, shell=True)
         print("agqr: finished!")
+        time.sleep(10)
+
         if (f.is_recording_succeeded(file_path)):
             f.LINE.recording_successful_toline(program_data["title"])
             # dropbox
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
             # fs.close()
-            
+
             # rclone
             f.Rclone.upload(dir_path, dir_name)
             #object storage
@@ -115,4 +108,3 @@ class agqr:
                 subprocess.run(cmd, shell=True)
         else:
             f.LINE.recording_failure_toline(program_data["title"])
-        #os.remove(file_path + ".flv")
