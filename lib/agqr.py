@@ -71,15 +71,23 @@ class agqr:
         f.createSaveDir(dir_path)
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
-        cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1 ')
-        cwd += ('--stop %s ' % str(program_data["dur"]*60))
-        cwd += ('--live -o "%s.flv"' % (file_path))
+
+	#
+        url = "https://icraft.hs.llnwd.net/agqr10/aandg1.m3u8"
+        cwd = ('ffmpeg -loglevel error -i "%s" -acodec copy  "%s.m4a"' % (url, file_path))
+        #cwd  = ('rtmpdump -r rtmp://fms-base1.mitene.ad.jp/agqr/aandg1 ')
+        #cwd += ('--stop %s ' % str(program_data["dur"]*60))
+        #cwd += ('--live -o "%s.flv"' % (file_path))
         time.sleep(wait_start_time)
+        p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
+        print("Agqr: sleep for " + str(program_data["dur"]))
+        time.sleep(program_data["dur"])
+        print("STOP SIGNAL......")
         #rtmpdumpは時間指定の終了ができるので以下を同期処理にする
-        subprocess.run(cwd, shell=True)
+        #subprocess.run(cwd, shell=True)
         #変換をする
-        cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -c:a aac -b:a 256k "%s.m4a"' % (file_path, file_path))
-        subprocess.run(cwd2, shell=True)
+        #cwd2 = ('ffmpeg -loglevel error -i "%s.flv" -vn -c:a aac -b:a 256k "%s.m4a"' % (file_path, file_path))
+        #subprocess.run(cwd2, shell=True)
         print("agqr: finished!")
         if (f.is_recording_succeeded(file_path)):
             f.LINE.recording_successful_toline(program_data["title"])
