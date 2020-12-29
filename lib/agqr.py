@@ -73,7 +73,7 @@ class agqr:
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
 
 	# recording....
-        url = "https://icraft.hs.llnwd.net/agqr10/aandg1.m3u8"
+        url = "https://icraft.hs.llnwd.net/agqr10/aandg3.m3u8"
         cwd = ('ffmpeg -loglevel error -i "%s" -acodec copy  "%s.m4a"' % (url, file_path))
         time.sleep(wait_start_time)
         p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
