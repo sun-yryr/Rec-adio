@@ -7,16 +7,21 @@ on:
   schedule:
     # JST 7:12
     - cron: '12 22 * * *'
+  pull_request:
+    branches:
+      - develop
 
 jobs:
   check:
-
-    runs-on: ubuntu-18.04
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v2
+      if: ${{ env.GITHUB_EVENT_NAME == "schedule" }}
       with:
         ref: 'release'
+    - uses: actions/checkout@v2
+      if: ${{ env.GITHUB_EVENT_NAME == "pull_request"}}
     - name: Set up Python 3.6
       uses: actions/setup-python@v1
       with:
@@ -32,26 +37,6 @@ jobs:
     - name: Install dependencies
       run: |
         pipenv install
-    - name: Install Open VPN
-      run: sudo apt install openvpn
-    - name: Decode setting file
-      env:
-        ENC_SETTING: ${{ secrets.EncodedVPNSettings }}
-      run: |
-        import os
-        import subprocess
-        import base64
-        code=os.environ.get('ENC_SETTING')
-        with open("tmp.tar.gz", 'wb') as f:
-          f.write(base64.b64decode(code))
-      shell: python
-    - name: Umcompress file
-      run: |
-        tar -xvzf tmp.tar.gz
-        mv config/* ./
-    - name: Connect
-      run: |
-        sudo -b openvpn --config config.ovpn
     - name: Test with unittest
       run: |
         cp 'conf/example_config.json' 'conf/config.json'
