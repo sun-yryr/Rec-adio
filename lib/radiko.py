@@ -164,3 +164,28 @@ class radiko:
             print("Radiko: no m3u8 in the responce.")
             return ""
         return lines[0]
+
+# サンプル: pipenv run python -m lib.radiko "rec-sample" "2020-01-01" "1" "./"
+if __name__ == "__main__":
+    import sys
+    args = sys.argv
+    title = args[1]
+    ft = args[2]
+    dur = args[3]
+    path = args[4]
+    
+    program_data = {
+        "title": title,
+        "ft": ft,
+        "dur": dur,
+        "pfm": "sample"
+    }
+    
+    client = radiko()
+    authToken = client.authorization()
+    client.rec([
+        program_data,
+        0,
+        authToken,
+        path
+    ])

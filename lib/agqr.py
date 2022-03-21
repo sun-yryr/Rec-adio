@@ -93,3 +93,26 @@ class agqr:
                 station= "AGQR",
                 uri= "http://example.com" # TODO: 削除する
             )
+
+# サンプル: pipenv run python -m lib.agqr "rec-sample" "2020-01-01" "1" "./"
+if __name__ == "__main__":
+    import sys
+    args = sys.argv
+    title = args[1]
+    ft = args[2]
+    dur = (int) (args[3])
+    path = args[4]
+    
+    program_data = {
+        "title": title,
+        "ft": ft,
+        "dur": dur,
+        "pfm": "sample"
+    }
+    
+    client = agqr()
+    client.rec([
+        program_data,
+        0,
+        path
+    ])
