@@ -84,13 +84,9 @@ class agqr:
         time.sleep(10)
 
         if (f.is_recording_succeeded(file_path)):
-            f.Mysql.insert(
-                title= program_data["title"].replace(" ", "_"),
-                pfm= program_data["pfm"],
-                timestamp= program_data["ft"] + "00",
-                station= "AGQR",
-                uri= "http://example.com" # TODO: 削除する
-            )
+            return
+        else:
+            exit(1)
 
 # サンプル: pipenv run python -m lib.agqr "rec-sample" "2020-01-01" "1" "./"
 if __name__ == "__main__":

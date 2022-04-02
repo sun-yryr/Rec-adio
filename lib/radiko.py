@@ -141,14 +141,9 @@ class radiko:
         p1.communicate(b'q')
         time.sleep(10)
         if (f.is_recording_succeeded(file_path)):
-            f.Mysql.insert(
-                title= program_data["title"].replace(" ", "_"),
-                pfm= program_data["pfm"],
-                timestamp= program_data["ft"],
-                station= program_data["station"],
-                uri= "http://example.com",
-                info= program_data["info"]
-            )
+            return
+        else:
+            exit(1)
 
     def gen_temp_chunk_m3u8_url(self, url, AuthToken ):
         headers =  {

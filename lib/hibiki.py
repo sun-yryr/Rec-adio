@@ -63,12 +63,5 @@ class hibiki:
                 returnData.append(title)
                 cwd = 'ffmpeg -loglevel error -i "%s" -acodec copy "%s"' % (tmpjson["playlist_url"], file_path)
                 subprocess.run(cwd, shell=True)
-                f.Mysql.insert(
-                    title= title,
-                    pfm= personality,
-                    timestamp= update_date.strftime("%Y%m%d"),
-                    station= "hibiki",
-                    uri= "http://example.com",
-                )
         print("hibiki:finished")
         return returnData

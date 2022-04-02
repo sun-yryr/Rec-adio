@@ -62,11 +62,4 @@ class onsen:
                     fs = open(file_path, "wb")
                     fs.write(res3.content)
                     fs.close()
-                    f.Mysql.insert(
-                        title= title,
-                        pfm= personality,
-                        timestamp= update_DT,
-                        station= "onsen",
-                        uri= "http://example.com"
-                    )
         return returnData
