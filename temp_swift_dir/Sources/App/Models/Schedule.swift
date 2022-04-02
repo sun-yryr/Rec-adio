@@ -22,13 +22,17 @@ final class Schedule: Model {
 
     @Field(key: "platform")
     var platform: String
+
+    @Parent(key: "program_info_id")
+    var programInfo: ProgramInfo
     
-    init(id: Int? = nil, title: String, startDatetime: Date, duration: Int, isProcessing: Bool = false, platform: String) {
+    init(id: Int? = nil, title: String, startDatetime: Date, duration: Int, isProcessing: Bool = false, platform: String, programInfoId: ProgramInfo.IDValue) {
         self.id = id
         self.title = title
         self.startDatetime = startDatetime
         self.duration = duration
         self.isProcessing = isProcessing
         self.platform = platform
+        self.$programInfo.id = programInfoId
     }
 }

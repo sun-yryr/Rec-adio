@@ -18,7 +18,9 @@ public func configure(_ app: Application) throws {
         tlsConfiguration: tlsConfigure
     ), as: .mysql)
 
+    app.migrations.add(CreateProgramInfo())
     app.migrations.add(CreateSchedule())
+    app.migrations.add(CreateRecord())
 
     // register routes
     try routes(app)
