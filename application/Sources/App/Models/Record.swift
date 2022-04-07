@@ -26,7 +26,7 @@ final class Record: Model {
     @Parent(key: "program_info_id")
     var programInfo: ProgramInfo
 
-    init(id: Int?, title: String, recordDatetime: Date, duration: Int, path: String, platform: String, programInfoId: ProgramInfo.IDValue) {
+    init(id: Int? = nil, title: String, recordDatetime: Date, duration: Int, path: String, platform: String, programInfoId: ProgramInfo.IDValue) {
         self.id = id
         self.title = title
         self.recordDatetime = recordDatetime
@@ -34,5 +34,9 @@ final class Record: Model {
         self.path = path
         self.platform = platform
         self.$programInfo.id = programInfoId
+    }
+
+    convenience init(schedule: Schedule, path: String, recordDatetime: Date = Date()) {
+        self.init(title: schedule.title, recordDatetime: recordDatetime, duration: schedule.duration, path: path, platform: schedule.platform, programInfoId: schedule.$programInfo.id)
     }
 }

@@ -19,7 +19,7 @@ final class ProgramInfo: Model {
     @Field(key: "program_url")
     var programUrl: String
 
-    init(id: Int?, title: String, platform: String, pfm: String, programUrl: String) {
+    init(id: Int? = nil, title: String, platform: String, pfm: String, programUrl: String) {
         self.id = id
         self.title = title
         self.platform = platform

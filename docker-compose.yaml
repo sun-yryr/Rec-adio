@@ -1,14 +1,40 @@
 version: '3'
+
+volumes:
+  db_data:
+  redis_data:
+
+x-shared_environment: &shared_environment
+  LOG_LEVEL: info
+  DATABASE_HOST: db
+  DATABASE_NAME: recadio
+  DATABASE_USERNAME: recadio_user
+  DATABASE_PASSWORD: password
+  REDIS_URL: redis://redis:6379
+
 services:
-  rec:
+  main:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    volumes:
-      - .:/app
-    tty: true
+    command: ['queues', '--scheduled', '--log', 'info']
+    environment:
+      <<: *shared_environment
+    depends_on:
+      - db
+  recorder:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      <<: *shared_environment
+    depends_on:
+      - db
+    command: ['queues', '--log', 'info']
   db:
     image: mysql:8.0
+    volumes:
+      - db_data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=recadio
@@ -16,3 +42,9 @@ services:
       - MYSQL_PASSWORD=password
     ports:
       - "3306:3306"
+  redis:
+    image: redis:latest
+    ports: 
+      - '6379:6379'
+    volumes:
+      - redis_data:/data

@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"lldb.library": "/Applications/Xcode.app/Contents/SharedFrameworks/LLDB.framework/Versions/A/LLDB",
+		"cSpell.words": [
+			"agqr",
+			"Datetime"
+		],
+		"files.watcherExclude": {
+			"**/.build/**": true
+		},
+		"search.followSymlinks": false
+	},
+	"extensions": {
+		"recommendations": [
+			"njpwerner.autodocstring",
+			"ms-python.vscode-pylance",
+			"ms-python.python"
+		]
+	}
+}

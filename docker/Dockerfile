@@ -1,11 +1,17 @@
-FROM python:3.9-slim-buster
+FROM swift:5.6-focal
 
 WORKDIR /app
 
 RUN apt update \
-    && apt install -y ffmpeg rtmpdump
+    && apt install -y ffmpeg
 
-COPY . .
+COPY application/Package.* .
+RUN swift package resolve
 
-RUN pip install pipenv
-RUN pipenv install
+COPY application/ .
+RUN swift build -c release
+RUN cp "$(swift build --package-path /app -c release --show-bin-path)/Run" ./
+
+ENTRYPOINT ["./Run"]
+CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
+
