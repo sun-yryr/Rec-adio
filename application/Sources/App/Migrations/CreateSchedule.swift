@@ -10,6 +10,7 @@ struct CreateSchedule: AsyncMigration {
             .field("is_processing", .bool, .required)
             .field("platform", .string, .required)
             .field("program_info_id", .int, .required, .references("program_infos", "id"))
+            .field("extra_field", .string)
             .create()
     }
 
