@@ -218,6 +218,15 @@
         }
       },
       {
+        "package": "TwitterAPIKit",
+        "repositoryURL": "https://github.com/mironal/TwitterAPIKit.git",
+        "state": {
+          "branch": null,
+          "revision": "89308a343bd908689d74c1f799f9932afe24d447",
+          "version": "0.2.0"
+        }
+      },
+      {
         "package": "vapor",
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
