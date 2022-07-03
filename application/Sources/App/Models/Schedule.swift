@@ -25,8 +25,11 @@ final class Schedule: Model {
 
     @Parent(key: "program_info_id")
     var programInfo: ProgramInfo
+
+    @OptionalField(key: "extra_field")
+    var extraField: String?
     
-    init(id: Int? = nil, title: String, startDatetime: Date, duration: Int, isProcessing: Bool = false, platform: String, programInfoId: ProgramInfo.IDValue) {
+    init(id: Int? = nil, title: String, startDatetime: Date, duration: Int, isProcessing: Bool = false, platform: String, programInfoId: ProgramInfo.IDValue, extraField: String? = nil) {
         self.id = id
         self.title = title
         self.startDatetime = startDatetime
@@ -34,5 +37,6 @@ final class Schedule: Model {
         self.isProcessing = isProcessing
         self.platform = platform
         self.$programInfo.id = programInfoId
+        self.extraField = extraField
     }
 }
