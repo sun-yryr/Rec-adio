@@ -22,6 +22,7 @@ services:
       <<: *shared_environment
     depends_on:
       - db
+      - redis
   recorder:
     build:
       context: .
@@ -30,6 +31,7 @@ services:
       <<: *shared_environment
     depends_on:
       - db
+      - redis
     command: ['queues', '--log', 'info']
   db:
     image: mysql:8.0
@@ -40,11 +42,7 @@ services:
       - MYSQL_DATABASE=recadio
       - MYSQL_USER=recadio_user
       - MYSQL_PASSWORD=password
-    ports:
-      - "3306:3306"
   redis:
     image: redis:latest
-    ports: 
-      - '6379:6379'
     volumes:
       - redis_data:/data
