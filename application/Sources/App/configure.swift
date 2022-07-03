@@ -2,6 +2,7 @@ import Fluent
 import FluentMySQLDriver
 import Vapor
 import QueuesRedisDriver
+import Leaf
 
 // configures your application
 public func configure(_ app: Application) throws {
@@ -39,6 +40,9 @@ public func configure(_ app: Application) throws {
     app.queues.add(RecordingJob())
     // MEMO: 同じプロセスで動かした場合に同時録音ができない可能性あり
     // try app.queues.startScheduledJobs()
+
+    // leaf
+    app.views.use(.leaf)
 
     // register routes
     try routes(app)
