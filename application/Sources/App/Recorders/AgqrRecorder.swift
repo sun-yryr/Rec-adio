@@ -2,7 +2,7 @@ import Foundation
 import Vapor
 
 struct AgqrRecorder: Recorder {
-    var supportPlatform: String = "agqr"
+    let supportPlatform: String = "agqr"
     let saveDirName: String
     let streamingUrl: String
 
@@ -22,7 +22,7 @@ struct AgqrRecorder: Recorder {
         process.standardError = pipeErr
         process.standardOutput = Pipe()
         process.standardInput = Pipe()
-        process.executableURL = URL(fileURLWithPath: "/usr/local/bin/ffmpeg")
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/ffmpeg")
         process.arguments = [
             "-i",
             self.streamingUrl,

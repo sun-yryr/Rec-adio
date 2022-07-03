@@ -16,9 +16,14 @@ struct RecordingScheduleJob: AsyncScheduledJob {
             .filter(\.$startDatetime, .lessThan, searchEndAt)
             .all()
         for schedule in schedules {
-            try await context.queue.dispatch(RecordingJob.self, schedule, delayUntil: schedule.startDatetime)
-            schedule.isProcessing = true
-            try await schedule.save(on: context.application.db)
+            do {
+                try await context.queue.dispatch(RecordingJob.self, schedule, delayUntil: schedule.startDatetime)
+                schedule.isProcessing = true
+                try await schedule.save(on: context.application.db)
+            } catch {
+                // エラーが発生しても後続は通す
+                context.logger.error("RecordingJobの登録に失敗しました。 schedule_id[\(schedule.id ?? -1)]")
+            }
         }
     }
 }
