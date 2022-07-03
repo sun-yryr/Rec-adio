@@ -31,15 +31,17 @@ public func configure(_ app: Application) throws {
     // radio
     app.radioCore.initialize()
     app.radio.addRecorder(AgqrRecorder(saveDirName: "agqr", streamingUrl: "https://fms2.uniqueradio.jp/agqr10/aandg1.m3u8"))
+    app.radio.addRecorder(SpaceRecorder(saveDirName: "space"))
     
     // job queue
     try app.queues.use(.redis(url: Environment.get("REDIS_URL")!))
     app.queues.schedule(RecordingScheduleJob())
         .minutely()
         .at(0)
+    app.queues.schedule(SearchSpaceScheduleJob(client: .init(.bearer(Environment.get("TWITTER_BEARER_TOKEN")!))))
+        .minutely()
+        .at(0)
     app.queues.add(RecordingJob())
-    // MEMO: 同じプロセスで動かした場合に同時録音ができない可能性あり
-    // try app.queues.startScheduledJobs()
 
     // register routes
     try routes(app)
