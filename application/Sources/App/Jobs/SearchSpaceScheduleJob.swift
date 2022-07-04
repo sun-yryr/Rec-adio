@@ -20,9 +20,19 @@ struct SearchSpaceScheduleJob: AsyncScheduledJob {
         
         let activeSpaces = response.data.filter { $0.state == " live" }
         for activeSpace in activeSpaces {
+            let isProcessingSchedule = try? await Schedule.query(on: context.application.db)
+                .filter(\.$extraField, .equal, activeSpace.id)
+                .filter(\.$platform, .equal, "space")
+                .first()
+            if (isProcessingSchedule != nil) {
+                // 存在する場合はスキップ
+                continue
+            }
+
             guard let twitterUser = twitterUsers.filter({ $0.userId == activeSpace.creator_id }).first else {
                 continue
             }
+
             let schedule = Schedule(
                 title: activeSpace.title,
                 startDatetime: startDatetime,
