@@ -27,6 +27,7 @@ public func configure(_ app: Application) throws {
     // commands
     app.commands.use(SampleCommand(), as: "sample")
     app.commands.use(AddScheduleCommand(), as: "schedule:add")
+    app.commands.use(AddTwitterUserCommand(), as: "twitter_user:add")
 
     // radio
     app.radioCore.initialize()
