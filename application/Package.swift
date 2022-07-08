@@ -12,7 +12,7 @@ let package = Package(
         .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent-mysql-driver.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/queues-redis-driver.git", from: "1.0.0"),
-        .package(url: "https://github.com/mironal/TwitterAPIKit.git", from: "0.2.0"),
+        .package(url: "https://github.com/mironal/TwitterAPIKit.git", branch: "linux-support"),
     ],
     targets: [
         .target(

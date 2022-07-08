@@ -3,7 +3,7 @@ import Queues
 import TwitterAPIKit
 
 struct SearchSpaceScheduleJob: AsyncScheduledJob {
-    let client: TwitterAPIClient
+    let client: TwitterAPIKit // MEMO: 0.2.0だとTwitterAPIClientに変更
     let calendar = Calendar(identifier: .gregorian)
 
     func run(context: QueueContext) async throws {
