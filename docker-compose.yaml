@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    command: ['queues', '--scheduled', '--log', 'info']
+    # command: ['queues', '--scheduled', '--log', 'info']
     environment:
       <<: *shared_environment
     depends_on:
@@ -33,6 +33,18 @@ services:
       - db
       - redis
     command: ['queues', '--log', 'info']
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      <<: *shared_environment
+    depends_on:
+      - db
+      - redis
+    command: ['migrate']
+    profiles:
+      - extra
   db:
     image: mysql:8.0
     volumes:
