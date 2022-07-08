@@ -10,7 +10,7 @@ final class TwitterUser: Model {
     @Field(key: "name")
     var name: String
 
-    @Field(key: "userId")
+    @Field(key: "user_id")
     var userId: String
 
     @Parent(key: "program_info_id")
