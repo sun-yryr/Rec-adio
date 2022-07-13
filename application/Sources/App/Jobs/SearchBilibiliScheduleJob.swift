@@ -1,6 +1,9 @@
 import Vapor
 import Queues
 import FluentKit
+#if canImport(FoundationNetworking)
+    import FoundationNetworking
+#endif
 
 struct SearchBilibiliScheduleJob: AsyncScheduledJob {
     let calendar = Calendar(identifier: .gregorian)
@@ -18,8 +21,8 @@ struct SearchBilibiliScheduleJob: AsyncScheduledJob {
         // urlを使って生放送をやっているかどうか確認
         let decoder = JSONDecoder()
         for bilibiliUser in bilibiliUsers {
-            let url = URL(string: "https://api.bilibili.com/x/space/acc/info?mid=349991143")!
-            let result = try await URLSession.shared.data(from: url)
+            let url = URL(string: "https://api.bilibili.com/x/space/acc/info?mid=\(bilibiliUser.userId)")!
+            let result = try await URLSession.shared.asyncData(from: url)
             guard let response = result.1 as? HTTPURLResponse,
                 response.statusCode == 200,
                 let jsonResponse = try? decoder.decode(GetBilibiliSpaceResponse.self, from: result.0),
