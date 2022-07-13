@@ -9,6 +9,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt install -y nodejs \
     && npm i -g space-dl
 
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp
+
 COPY application/Package.* .
 RUN swift package resolve
 
