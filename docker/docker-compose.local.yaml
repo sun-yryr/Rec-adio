@@ -1,6 +1,14 @@
 version: '3'
 
 services:
+  scheduler:
+    environment:
+      - LOG_LEVEL = DEBUG
+  recorder:
+    volumes:
+      - ./application/saveData:/app/saveData
+    environment:
+      - LOG_LEVEL = DEBUG
   db:
     ports:
       - "3306:3306"

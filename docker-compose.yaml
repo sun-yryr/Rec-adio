@@ -13,11 +13,11 @@ x-shared_environment: &shared_environment
   REDIS_URL: redis://redis:6379
 
 services:
-  main:
+  scheduler:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    # command: ['queues', '--scheduled', '--log', 'info']
+    command: ['queues', '--scheduled']
     environment:
       <<: *shared_environment
     depends_on:
@@ -32,7 +32,7 @@ services:
     depends_on:
       - db
       - redis
-    command: ['queues', '--log', 'info']
+    command: ['queues']
   migrate:
     build:
       context: .

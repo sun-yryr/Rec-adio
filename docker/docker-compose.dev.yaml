@@ -1,12 +1,14 @@
 version: '3'
 
 services:
-  main:
+  scheduler:
     entrypoint: "/bin/sh -c \"while :; do sleep 10; done\""
     volumes:
       - ./application:/app
   recorder:
     entrypoint: "/bin/sh -c \"while :; do sleep 10; done\""
+    profiles:
+      - extra
   db:
     ports:
       - "3306:3306"
