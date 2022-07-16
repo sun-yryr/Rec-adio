@@ -23,7 +23,7 @@ struct BilibiliRecorder: Recorder {
         process.arguments = [
             "--hls-use-mpegts",
             "-o",
-            outputPath.absoluteString,
+            outputPath.path,
             schedule.extraField!, // url
         ]
         do {
@@ -37,6 +37,6 @@ struct BilibiliRecorder: Recorder {
             let stdErr = String(data: stdErrData ?? Data(), encoding: .utf8) ?? "nil"
             return .failure(.processError(stdErr))
         }
-        return .success(Record(schedule: schedule, path: outputPath.absoluteString, recordDatetime: Date()))
+        return .success(Record(schedule: schedule, path: outputPath.path, recordDatetime: Date()))
     }
 }

@@ -3,7 +3,9 @@ FROM swift:5.6-focal
 WORKDIR /app
 
 RUN apt update \
-    && apt install -y ffmpeg curl
+    && apt install -y ffmpeg curl language-pack-ja
+
+ENV LANG ja_JP.UTF-8
 
 RUN curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
     && apt install -y nodejs \

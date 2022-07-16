@@ -28,7 +28,7 @@ struct AgqrRecorder: Recorder {
             self.streamingUrl,
             "-t",
             String(schedule.duration * 60),
-            outputPath.absoluteString,
+            outputPath.path,
         ]
         do {
             try process.run()
@@ -41,6 +41,6 @@ struct AgqrRecorder: Recorder {
             let stdErr = String(data: stdErrData ?? Data(), encoding: .utf8) ?? "nil"
             return .failure(.processError(stdErr))
         }
-        return .success(Record(schedule: schedule, path: outputPath.absoluteString, recordDatetime: Date()))
+        return .success(Record(schedule: schedule, path: outputPath.path, recordDatetime: Date()))
     }
 }

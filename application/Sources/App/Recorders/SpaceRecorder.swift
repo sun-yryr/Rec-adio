@@ -24,7 +24,7 @@ struct SpaceRecorder: Recorder {
             "-i",
             schedule.extraField!, // space_id
             "-o",
-            outputPath.absoluteString,
+            outputPath.path,
         ]
         do {
             try process.run()
@@ -37,6 +37,6 @@ struct SpaceRecorder: Recorder {
             let stdErr = String(data: stdErrData ?? Data(), encoding: .utf8) ?? "nil"
             return .failure(.processError(stdErr))
         }
-        return .success(Record(schedule: schedule, path: outputPath.absoluteString, recordDatetime: Date()))
+        return .success(Record(schedule: schedule, path: outputPath.path, recordDatetime: Date()))
     }
 }
