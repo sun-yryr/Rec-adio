@@ -1,11 +1,14 @@
 import Vapor
 import Queues
 import FluentKit
-import TwitterAPIKit
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 struct SearchSpaceScheduleJob: AsyncScheduledJob {
-    let client: TwitterAPIKit // MEMO: 0.2.0だとTwitterAPIClientに変更
+    let bearerToken: String 
     let calendar = Calendar(identifier: .gregorian)
+    let decoder = JSONDecoder()
 
     func run(context: QueueContext) async throws {
         context.logger.info("Search space job - start. \(Date())")
@@ -19,14 +22,18 @@ struct SearchSpaceScheduleJob: AsyncScheduledJob {
             .filter(\.$programInfo.$id !~ recordingSpaces)
             .all()
         let userIds = twitterUsers.map { $0.userId }
-        let response = await self.client.v2.getSpacesByCreators(
-            .init(userIDs: userIds, spaceFields: [.title, .creatorID])
-        ).responseDecodable(type: GetSpacesByCreatorResponse.self)
-        guard let response = response.success else {
+
+        let url = URL(string: "https://api.twitter.com/2/spaces/by/creator_ids?user_ids=\(userIds.joined(separator: ","))&space.fields=creator_id,title")!
+        var request = URLRequest(url: url)
+        request.addValue("Bearer \(self.bearerToken)", forHTTPHeaderField: "Authorization")
+        let result = try await URLSession.shared.asyncData(from: request)
+        guard let response = result.1 as? HTTPURLResponse,
+            response.statusCode == 200 else {
+            context.logger.notice("twitterAPIへのアクセスに失敗しました", metadata: ["response": .string(String(data: result.0, encoding: .utf8) ?? "empty")])
             return
         }
-        
-        let activeSpaces = response.data.filter { $0.state == " live" }
+        let jsonResponse = try! self.decoder.decode(GetSpacesByCreatorResponse.self, from: result.0)
+        let activeSpaces = jsonResponse.data.filter { $0.state == "live" }
         for activeSpace in activeSpaces {
             guard let twitterUser = twitterUsers.filter({ $0.userId == activeSpace.creator_id }).first else {
                 context.logger.notice("userIdとcreatorIdの紐付けができませんでした", metadata: ["user_id": .string(activeSpace.creator_id), "title": .string(activeSpace.title)])
