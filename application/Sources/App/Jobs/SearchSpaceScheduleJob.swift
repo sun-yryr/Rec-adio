@@ -1,5 +1,6 @@
 import Vapor
 import Queues
+import FluentKit
 import TwitterAPIKit
 
 struct SearchSpaceScheduleJob: AsyncScheduledJob {
@@ -7,9 +8,16 @@ struct SearchSpaceScheduleJob: AsyncScheduledJob {
     let calendar = Calendar(identifier: .gregorian)
 
     func run(context: QueueContext) async throws {
-        context.logger.debug("Search space job - start. \(Date())")
+        context.logger.info("Search space job - start. \(Date())")
         let startDatetime = self.calendar.date(byAdding: .minute, value: 1, to: Date())!
-        let twitterUsers = try await TwitterUser.query(on: context.application.db).all()
+        // 録音キューに積まれてるユーザーを除く処理
+        let recordingSpaces = try await Schedule.query(on: context.application.db)
+            .filter(\.$platform, .equal, "space")
+            .all()
+            .map { $0.$programInfo.id }
+        let twitterUsers = try await TwitterUser.query(on: context.application.db)
+            .filter(\.$programInfo.$id !~ recordingSpaces)
+            .all()
         let userIds = twitterUsers.map { $0.userId }
         let response = await self.client.v2.getSpacesByCreators(
             .init(userIDs: userIds, spaceFields: [.title, .creatorID])
@@ -20,16 +28,8 @@ struct SearchSpaceScheduleJob: AsyncScheduledJob {
         
         let activeSpaces = response.data.filter { $0.state == " live" }
         for activeSpace in activeSpaces {
-            let isProcessingSchedule = try? await Schedule.query(on: context.application.db)
-                .filter(\.$extraField, .equal, activeSpace.id)
-                .filter(\.$platform, .equal, "space")
-                .first()
-            if (isProcessingSchedule != nil) {
-                // 存在する場合はスキップ
-                continue
-            }
-
             guard let twitterUser = twitterUsers.filter({ $0.userId == activeSpace.creator_id }).first else {
+                context.logger.notice("userIdとcreatorIdの紐付けができませんでした", metadata: ["user_id": .string(activeSpace.creator_id), "title": .string(activeSpace.title)])
                 continue
             }
 
@@ -43,12 +43,9 @@ struct SearchSpaceScheduleJob: AsyncScheduledJob {
             )
             do {
                 try await schedule.create(on: context.application.db)
-                try await context.queue.dispatch(RecordingJob.self, schedule, delayUntil: schedule.startDatetime)
-                schedule.isProcessing = true
-                try await schedule.save(on: context.application.db)
             } catch {
                 // エラーが発生しても後続は通す
-                context.logger.error("RecordingJobの登録に失敗しました。 schedule_id[\(schedule.id ?? -1)]")
+                context.logger.error("Scheduleの登録に失敗しました。", metadata: ["job": .string(self.name)])
             }
         }
     }

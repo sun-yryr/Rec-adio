@@ -9,8 +9,9 @@ struct SearchBilibiliScheduleJob: AsyncScheduledJob {
     let calendar = Calendar(identifier: .gregorian)
 
     func run(context: QueueContext) async throws {
-        context.logger.debug("Search bilibili job - start. \(Date())")
-        let startDatetime = self.calendar.date(byAdding: .minute, value: 1, to: Date())!
+        context.logger.info("Search bilibili job - start. \(Date())")
+        let startDatetime = self.calendar.date(byAdding: .minute, value: 3, to: Date())!
+        // 録音キューに積まれてるユーザーを除く処理
         let recordingBilis = try await Schedule.query(on: context.application.db)
             .filter(\.$platform, .equal, "bilibili")
             .all()
@@ -39,12 +40,9 @@ struct SearchBilibiliScheduleJob: AsyncScheduledJob {
             )
             do {
                 try await schedule.create(on: context.application.db)
-                try await context.queue.dispatch(RecordingJob.self, schedule, delayUntil: schedule.startDatetime)
-                schedule.isProcessing = true
-                try await schedule.save(on: context.application.db)
             } catch {
                 // エラーが発生しても後続は通す
-                context.logger.error("RecordingJobの登録に失敗しました。 schedule_id[\(schedule.id ?? -1)]")
+                context.logger.error("Scheduleの登録に失敗しました。", metadata: ["job": .string(self.name)])
             }
         }
     }
