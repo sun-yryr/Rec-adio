@@ -28,6 +28,9 @@ final class Schedule: Model {
 
     @OptionalField(key: "extra_field")
     var extraField: String?
+
+    @Timestamp(key: "deleted_at", on: .delete)
+    var deletedAt: Date?
     
     init(id: Int? = nil, title: String, startDatetime: Date, duration: Int, isProcessing: Bool = false, platform: String, programInfoId: ProgramInfo.IDValue, extraField: String? = nil) {
         self.id = id

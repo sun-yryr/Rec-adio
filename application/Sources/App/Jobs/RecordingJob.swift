@@ -14,7 +14,7 @@ struct RecordingJob: AsyncJob {
         case .success(let record):
             do {
                 try await record.create(on: context.application.db)
-                try await payload.delete(force: true, on: context.application.db)
+                try await payload.delete(on: context.application.db)
                 context.logger.info("recording complete. title[\(record.title)]")
             } catch {
                 context.logger.error("録音後のDB書き込みに失敗しました。schedule_id[\(payload.id!)]")
@@ -29,6 +29,11 @@ struct RecordingJob: AsyncJob {
                     fatalError()
             }
             context.logger.error(.init(stringLiteral: error.localizedDescription))
+            do {
+                try await payload.delete(on: context.application.db)
+            } catch {
+                context.logger.error("録音後のDB書き込みに失敗しました。schedule_id[\(payload.id!)]")
+            }
         }
     }
     

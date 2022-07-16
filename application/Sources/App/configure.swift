@@ -24,6 +24,7 @@ public func configure(_ app: Application) throws {
     app.migrations.add(CreateRecord())
     app.migrations.add(CreateTwitterUsers())
     app.migrations.add(CreateBilibiliUsers())
+    app.migrations.add(AddDeletedAtScheduleModel())
 
     // commands
     app.commands.use(SampleCommand(), as: "sample")
@@ -42,7 +43,7 @@ public func configure(_ app: Application) throws {
     app.queues.schedule(RecordingScheduleJob())
         .minutely()
         .at(0)
-    app.queues.schedule(SearchSpaceScheduleJob(client: .init(.bearer(Environment.get("TWITTER_BEARER_TOKEN")!))))
+    app.queues.schedule(SearchSpaceScheduleJob(bearerToken: Environment.get("TWITTER_BEARER_TOKEN")!))
         .minutely()
         .at(0)
     app.queues.schedule(SearchBilibiliScheduleJob())
