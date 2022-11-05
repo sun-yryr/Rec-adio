@@ -1,58 +1,30 @@
-![agqr url check](https://github.com/sun-yryr/Rec-adio/workflows/agqr%20url%20check/badge.svg?branch=release)
-![main-ci](https://github.com/sun-yryr/Rec-adio/workflows/main-ci/badge.svg)
+# Overview
+Recorder for radiko and any platform. etc. agqr, twitter space, bilibili live
 
-# radio
-オタク！ラジオを聞き逃すな！ってことで作るradio録音
+# Feature
 
-## 録音対応プラットフォーム
-- Radiko
+- 手動入力での録音予約
+- will)番組表から選択して録音予約
+- ライブの自動録音
+- will)録音リストを表示
+
+# Support platform
+
+- will）Radiko
 - 超A&G+
-- 音泉
-- 響
+    - 手動予約
+    - will）番組表から予約
+    - will）定期予約
+- Twitter space
+    - ユーザーを指定して自動録音
+- BiliBili live
+    - ユーザーを指定して自動録音
+- will) Youtube live
 
-## できること
-- 設定ファイルの作成と読み込み
-- 番組表の取得，キーワード録音
-- 複数番組の同時録音
-- systemctlでの自動起動，再起動
-- 保存先の選択
-    - DropBox
-    - Object-Storage(Swift)
-    - ローカル
-    - rcloneによる同期
-- 録音番組情報をMysqlに登録
-- 録音完了をLINE Notifyで通知
+# Usage
 
-# 設定方法
+WIP
 
-**編集中**
+# Contribute new platform
 
-Pipenvが必要です
-```
-pip install pipenv --user
-```
-
-Pipenvインストール済みの人
-```
-sudo apt install -y ffmpeg rtmpdump
-git clone https://github.com/sun-yryr/Rec-adio.git
-cd Rec-adio
-pipenv install
-pipenv run python Setup.py
-nano ./conf/config.json
-キーワードの設定を好みに合わせてください。正規表現なので .+ とかやると全部取れるはずです。
-
-nano ./rec_adio.service
-ユーザー名，パスを環境に合わせて下さい（下記参照）
-
-sudo mv ./rec_adio.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable rec_adio.service
-sudo systemctl start rec_adio.service
-```
-
-### Systemd serviceファイル
-変更する箇所
-- User ユーザー名
-- WorkingDirectory `hogehoge/Rec-adio`になるように絶対パスで書く
-- ExecStart `which pipenv`で出力されたパス + `run start`にする
+WIP
