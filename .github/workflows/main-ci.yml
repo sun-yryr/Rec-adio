@@ -17,20 +17,13 @@ jobs:
     -
       uses: actions/checkout@v2
     -
-      name: Set up Python 3.6
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.6
-    -
-      name: Install ffmpeg & rtmpdump
+      name: Check version ffmpeg & rtmpdump
       run: |
-        sudo apt update
-        sudo apt install -y ffmpeg rtmpdump
+        ffmpeg -version
+        rtmpdump -h 2>&1 | sed -n '1,2p'
     -
       name: Install Pipenv
-      run: |
-        python -m pip install --upgrade pip
-        pip install pipenv
+      run: pip install pipenv
     -
       name: Install dependencies
       run: |
