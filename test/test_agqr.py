@@ -39,7 +39,7 @@ class TestAGQR(unittest.TestCase):
         self.Agqr.rec([dummy_data, 0, str(savePath)])
         sleep(2)
         # check file
-        fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
+        fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".mp3"
         path = savePath / dummy_title / fileName
         self.assertTrue(path.is_file())
         # remove file
