@@ -1,5 +1,5 @@
-![agqr url check](https://github.com/sun-yryr/Rec-adio/workflows/agqr%20url%20check/badge.svg?branch=release)
-![main-ci](https://github.com/sun-yryr/Rec-adio/workflows/main-ci/badge.svg)
+[![agqr url check](https://github.com/sun-yryr/Rec-adio/actions/workflows/agqr-check.yml/badge.svg)](https://github.com/sun-yryr/Rec-adio/actions/workflows/agqr-check.yml)
+[![main-ci](https://github.com/sun-yryr/Rec-adio/actions/workflows/main-ci.yml/badge.svg)](https://github.com/sun-yryr/Rec-adio/actions/workflows/main-ci.yml)
 
 # radio
 オタク！ラジオを聞き逃すな！ってことで作るradio録音
