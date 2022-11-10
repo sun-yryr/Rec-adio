@@ -1,6 +1,9 @@
 [![agqr url check](https://github.com/sun-yryr/Rec-adio/actions/workflows/agqr-check.yml/badge.svg)](https://github.com/sun-yryr/Rec-adio/actions/workflows/agqr-check.yml)
 [![main-ci](https://github.com/sun-yryr/Rec-adio/actions/workflows/main-ci.yml/badge.svg)](https://github.com/sun-yryr/Rec-adio/actions/workflows/main-ci.yml)
 
+> 録音中に予約の変更等が行えるjob方式を採用した新バージョン開発中  
+https://github.com/sun-yryr/Rec-adio/tree/v4
+
 # radio
 オタク！ラジオを聞き逃すな！ってことで作るradio録音
 
