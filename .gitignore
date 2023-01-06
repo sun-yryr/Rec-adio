@@ -1,5 +1,8 @@
 __pycache__
 .vscode
+.git
+.github
+.venv
 savefile/*
 .DS_Store
 conf/config.json
