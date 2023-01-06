@@ -1,7 +1,6 @@
 __pycache__
 .vscode
 .git
-.github
 .venv
 savefile/*
 .DS_Store
