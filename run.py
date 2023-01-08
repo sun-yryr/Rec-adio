@@ -89,7 +89,7 @@ if __name__ == "__main__":
     ps = [
         Process(target=main_radiko),
         Process(target=main_agqr),
-        Process(target=main_onsen_hibiki)
+#        Process(target=main_onsen_hibiki)
     ]
     signal.signal(signal.SIGINT,  signalHandler)
     signal.signal(signal.SIGTERM, signalHandler)

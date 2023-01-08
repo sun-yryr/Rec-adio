@@ -148,7 +148,7 @@ class radiko:
             # fs.close()
 
             #rclone
-            f.Rclone.upload(file_path + ".m4a", dir_name)
+            f.Rclone.upload(dir_path, dir_name)
             #object storage
             url = f.Swift.upload_file(filePath=file_path + ".m4a")
             f.Mysql.insert(
