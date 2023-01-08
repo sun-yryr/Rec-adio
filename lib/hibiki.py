@@ -11,6 +11,7 @@ class hibiki:
     def __init__(self, keywords, SAVEROOT):
         self.change_keywords(keywords)
         self.SAVEROOT = SAVEROOT
+        self.reload_date = DT.date.today()
 
     def change_keywords(self, keywords):
         if bool(keywords):
@@ -26,6 +27,7 @@ class hibiki:
             self.isKeyword = False
 
     def rec(self):
+        self.reload_date = DT.date.today()
         api_base = "https://vcms-api.hibiki-radio.jp/api/v1/"
         headers = {"X-Requested-With": "XMLHttpRequest"}
         # 番組の取得

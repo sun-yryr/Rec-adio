@@ -63,12 +63,12 @@ def main_agqr():
 
 
 def main_onsen_hibiki():
-    Onsen = onsen.onsen(keywords, SAVEROOT)
+#    Onsen = onsen.onsen(keywords, SAVEROOT)
     Hibiki = hibiki.hibiki(keywords, SAVEROOT)
     while(True):
         now = DT.datetime.now()
-        if (now.hour == 7 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
-            titles = Onsen.rec()
+        if (now.hour == 7 and now.minute <= 5 and Hibiki.reload_date != DT.date.today()):
+#            titles = Onsen.rec()
             titles.extend(Hibiki.rec())
             if (bool(titles)):
                 f.LINE.recording_successful_toline("、".join(titles))
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     ps = [
         Process(target=main_radiko),
         Process(target=main_agqr),
-#        Process(target=main_onsen_hibiki)
+        Process(target=main_onsen_hibiki)
     ]
     signal.signal(signal.SIGINT,  signalHandler)
     signal.signal(signal.SIGTERM, signalHandler)
