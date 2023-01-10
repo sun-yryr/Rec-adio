@@ -28,12 +28,12 @@ class onsen:
 
     def rec(self):
         self.reload_date = DT.date.today()
-        res = requests.get("http://www.onsen.ag/api/shownMovie/shownMovie.json")
+        res = requests.get("https://app.onsen.ag/api/programs")
         res.encoding = "utf-8"
         programs = json.loads(res.text)
         returnData = []
         for program in programs["result"]:
-            url = "http://www.onsen.ag/data/api/getMovieInfo/%s" % program
+            url = "https://app.onsen.ag/api/programs/:%s" % program
             res2 = requests.get(url)
             prog = json.loads(res2.text[9:len(res2.text)-3])
             title = prog.get("title")
