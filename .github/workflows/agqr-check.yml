@@ -16,10 +16,9 @@ jobs:
       with:
         ref: 'v3'
     -
-      name: Check version ffmpeg & rtmpdump
+      name: Check version ffmpeg
       run: |
         ffmpeg -version
-        rtmpdump -h 2>&1 | sed -n '1,2p'
     -
       name: Install Pipenv
       run: pip install pipenv
