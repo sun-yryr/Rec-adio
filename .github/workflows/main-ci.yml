@@ -17,10 +17,11 @@ jobs:
     -
       uses: actions/checkout@v2
     -
-      name: Check version ffmpeg & rtmpdump
+      name: install ffmpeg
       run: |
+        sudo apt update
+        sudo apt install -y ffmpeg
         ffmpeg -version
-        rtmpdump -h 2>&1 | sed -n '1,2p'
     -
       name: Install Pipenv
       run: pip install pipenv

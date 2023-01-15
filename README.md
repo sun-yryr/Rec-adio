@@ -30,7 +30,6 @@ https://github.com/sun-yryr/Rec-adio/tree/v4
 
 - pipenv
 - ffmpeg
-- rtmpdump
 
 # 実行方法(録音ツール)
 
