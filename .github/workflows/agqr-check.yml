@@ -6,6 +6,7 @@ name: agqr url check
 on:
   schedule:
     - cron: '0 22 * * *'
+  workflow_dispatch:
 
 jobs:
   check:
@@ -16,8 +17,10 @@ jobs:
       with:
         ref: 'v3'
     -
-      name: Check version ffmpeg
+      name: install ffmpeg
       run: |
+        sudo apt update
+        sudo apt install -y ffmpeg
         ffmpeg -version
     -
       name: Install Pipenv
