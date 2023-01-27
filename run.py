@@ -71,22 +71,19 @@ def main_hibiki():
             if (bool(titles)):
                 f.LINE.recording_successful_toline("、".join(titles))
             else:
-                print("in onsen, hibiki. there aren't new title.")
+                print("hibiki. there aren't new title.")
         time.sleep(300)
 
-def main_onsen_hibiki():
-#    Onsen = onsen.onsen(keywords, SAVEROOT)
-    Hibiki = hibiki.hibiki(keywords, SAVEROOT)
+def main_onsen():
+    Onsen = onsen.onsen(keywords, SAVEROOT)
     while(True):
         now = DT.datetime.now()
         if (now.hour == 7 and now.minute <= 5 and Onsen.reload_date != DT.date.today()):
-#            titles = Onsen.rec()
-#            titles.extend(Hibiki.rec())
-            titles = Hibiki.rec()
+            titles = Onsen.rec()
             if (bool(titles)):
                 f.LINE.recording_successful_toline("、".join(titles))
             else:
-                print("in onsen, hibiki. there aren't new title.")
+                print("in onsen. there aren't new title.")
         time.sleep(300)
 
 def signalHandler(signal, handler) :
