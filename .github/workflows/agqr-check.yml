@@ -6,6 +6,7 @@ name: agqr url check
 on:
   schedule:
     - cron: '0 22 * * *'
+  workflow_dispatch:
 
 jobs:
   check:
@@ -16,10 +17,11 @@ jobs:
       with:
         ref: 'v3'
     -
-      name: Check version ffmpeg & rtmpdump
+      name: install ffmpeg
       run: |
+        sudo apt update
+        sudo apt install -y ffmpeg
         ffmpeg -version
-        rtmpdump -h 2>&1 | sed -n '1,2p'
     -
       name: Install Pipenv
       run: pip install pipenv
