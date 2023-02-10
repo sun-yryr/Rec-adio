@@ -123,10 +123,9 @@ class radiko:
         print(program_data["title"])
         #ディレクトリの作成
         dir_name = f.delete_serial(program_data["title"].replace(" ", "_").replace("　","_"))
-        dir_path = SAVEROOT + "/" + dir_name
-        f.createSaveDir(dir_path)
+        f.createSaveDir(dir_name)
         #保存先パスの作成
-        file_path = dir_path + "/" + program_data["title"]+"_"+program_data["ft"][:12]
+        file_path = dir_name + "/" + " radiko_" +program_data["title"]+"_"+program_data["ft"][:12]
         file_path = file_path.replace(" ", "_")
         #stream urlの取得
         url = 'http://f-radiko.smartstream.ne.jp/%s/_definst_/simul-stream.stream/playlist.m3u8' % program_data["station"]
@@ -148,7 +147,7 @@ class radiko:
             # fs.close()
 
             #rclone
-            f.Rclone.upload(dir_path, dir_name)
+            f.Rclone.upload(file_path, dir_name)
             #object storage
             url = f.Swift.upload_file(filePath=file_path + ".m4a")
             f.Mysql.insert(
