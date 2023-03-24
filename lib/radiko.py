@@ -20,6 +20,7 @@ class radiko:
             self.RADIKO_URL = tmpconf["all"].get("Radiko_URL")
         self.reload_program()
         self.isKeyword = False
+        self.username = tmpconf["all"].get("username")
 
     def reload_program(self):
         res = requests.get(self.RADIKO_URL)
@@ -85,7 +86,7 @@ class radiko:
         headers = {
             "X-Radiko-App": "pc_html5",
             "X-Radiko-App-Version": "0.0.1",
-            "X-Radiko-User": "sunyryr",
+            "X-Radiko-User": self.username,
             "X-Radiko-Device": "pc"
         }
         res = requests.get(auth1_url, headers=headers)
@@ -102,13 +103,13 @@ class radiko:
         headers = {
             "X-Radiko-AuthToken": AuthToken,
             "X-Radiko-PartialKey": AuthKey,
-            "X-Radiko-User": "sunyryr",
+            "X-Radiko-User": self.username,
             "X-Radiko-Device": "pc"
         }
         res = requests.get(auth2_url, headers=headers)
         if (res.status_code == 200):
             #print("----------")
-            #print(res.headers)
+            print(res.text)
             return AuthToken
         else:
             print("Authorization2 Failed")
