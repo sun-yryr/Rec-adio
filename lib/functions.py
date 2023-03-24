@@ -90,6 +90,7 @@ def did_record_prog(filePath, title, timestamp):
 def delete_serial(Path):
 	drm_regex = re.compile(r'（.*?）|［.*?］|第.*?回')
 	rtn_message = drm_regex.sub("", Path)
+	rtn_message = rtn_message.replace(r"?","")
 	return rtn_message.rstrip("_ ")
 #
 

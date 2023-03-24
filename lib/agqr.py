@@ -76,7 +76,7 @@ class agqr:
         # TODO: 度々変更されるので環境変数から読み込む
         url = "https://fms2.uniqueradio.jp/agqr10/aandg1.m3u8"
         duration = int(program_data["dur"]) * 60
-        cwd = ('ffmpeg -loglevel error -i "%s" -movflags faststart -t %s  "%s.mp3"' % (url, duration, file_path))
+        cwd = ('ffmpeg -loglevel error -i "%s" -movflags faststart -t %s  "%s.m4a"' % (url, duration, file_path))
         time.sleep(wait_start_time)
         print("Agqr: recording start")
         subprocess.run(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
