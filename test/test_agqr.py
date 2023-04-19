@@ -7,6 +7,8 @@ from time import sleep
 class TestAGQR(unittest.TestCase):
     def setUp(self):
         self.Agqr = agqr()
+        self.testdir = Path().resolve() / "tmp"
+        self.testdir.mkdir(parents=True, exist_ok=True)
     
     def tearDown(self):
         self.Agqr = None
@@ -34,12 +36,12 @@ class TestAGQR(unittest.TestCase):
             "dur": 0.09,
             "pfm": "test"
         }
-        savePath = Path().resolve() / "save_a"
-        savePath.mkdir(parents=True)
+        savePath = self.testdir / "save_a"
+        savePath.mkdir(parents=True, exist_ok=True)
         self.Agqr.rec([dummy_data, 0, str(savePath)])
         sleep(2)
         # check file
-        fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".mp3"
+        fileName = dummy_title + "_" + dummy_data["ft"][:12] + ".m4a"
         path = savePath / dummy_title / fileName
         self.assertTrue(path.is_file())
         # remove file

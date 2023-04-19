@@ -7,6 +7,8 @@ from time import sleep
 class TestRadiko(unittest.TestCase):
     def setUp(self):
         self.Radiko = radiko()
+        self.testdir = Path().resolve() / "tmp"
+        self.testdir.mkdir(parents=True, exist_ok=True)
     
     def tearDown(self):
         self.Radiko = None
@@ -42,8 +44,8 @@ class TestRadiko(unittest.TestCase):
             "info": "test"
         }
         token = self.Radiko.authorization()
-        savePath = Path().resolve() / "save_r"
-        savePath.mkdir(parents=True)
+        savePath = self.testdir / "save_r"
+        savePath.mkdir(parents=True, exist_ok=True)
         self.Radiko.rec([dummy_data, 0, token, str(savePath)])
         sleep(2)
         # check file
