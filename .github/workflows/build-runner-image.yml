@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
+        name: Generate lowercase repository name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+      -
         uses: actions/checkout@v3
       -
         name: Login to GitHub Container Registry
@@ -25,5 +28,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ghcr.io/${{ github.repository }}-runner:${{ github.event.inputs.tag }}
+          tags: ghcr.io/${{ env.REPO }}-runner:${{ github.event.inputs.tag }}
           context: .github/self-host-runner
