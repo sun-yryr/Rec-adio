@@ -8,3 +8,5 @@ spec:
   template:
     spec:
       repository: sun-yryr/Rec-adio
+      image: ghcr.io/sun-yryr/rec-adio-runner:0.1.0-v2.304.0
+      dockerdWithinRunnerContainer: true
