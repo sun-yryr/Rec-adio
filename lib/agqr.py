@@ -74,18 +74,14 @@ class agqr:
 
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
 
-	    # recording....
+        # recording....
         url = "https://agcdn02.cdnext.stream.ne.jp/hls1/basic/data/prog_index.m3u8" # TODO: 度々変更されるので環境変数から読み込む
         duration = int(program_data["dur"]) * 60
         cwd = ('ffmpeg -loglevel error -i "%s" -movflags faststart -t %s  "%s.m4a"' % (url, duration, file_path))
         time.sleep(wait_start_time)
-        p1 = subprocess.Popen(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
-        print("Agqr: sleep for " + str(program_data["dur"] * 60))
-        time.sleep(program_data["dur"] * 60)
-        print("STOP SIGNAL......")
-        p1.communicate(b'q')
-        time.sleep(10)
-        print("agqr: finished!")
+        print("Agqr: recording start")
+        subprocess.run(cwd, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, shell=True)
+        print("Agqr: finished!")
         time.sleep(10)
 
         if (f.is_recording_succeeded(file_path)):
