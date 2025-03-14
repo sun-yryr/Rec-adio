@@ -9,6 +9,8 @@ import time
 import subprocess
 from signal import SIGINT
 from . import functions as f
+import asyncio
+from .discord_controller import DiscordController
 
 class radiko:
     RADIKO_URL = "http://radiko.jp/v3/program/today/JP13.xml"
@@ -20,6 +22,7 @@ class radiko:
             self.RADIKO_URL = tmpconf["all"].get("Radiko_URL")
         self.reload_program()
         self.isKeyword = False
+        self.discord_controller = DiscordController()
 
     def reload_program(self):
         res = requests.get(self.RADIKO_URL)
@@ -142,6 +145,7 @@ class radiko:
         time.sleep(10)
         if (f.is_recording_succeeded(file_path)):
             f.LINE.recording_successful_toline(program_data["title"])
+            asyncio.run(self.discord_controller.recording_successful_todiscord(program_data["title"]))
             # dropbox
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
@@ -164,6 +168,7 @@ class radiko:
                 subprocess.run(cmd, shell=True)
         else:
             f.LINE.recording_failure_toline(program_data["title"])
+            asyncio.run(self.discord_controller.recording_failure_todiscord(program_data["title"]))
 
     def gen_temp_chunk_m3u8_url(self, url, AuthToken ):
         headers =  {

@@ -4,6 +4,8 @@
         "Radiko_URL": "http://radiko.jp/v3/program/today/JP13.xml",
         "keywords": [
             "夏川椎菜"
-        ]
+        ],
+        "discord_token": "YOUR_DISCORD_BOT_TOKEN",
+        "discord_channel_id": 1234567890
     }
 }

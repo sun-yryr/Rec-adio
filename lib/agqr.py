@@ -7,13 +7,15 @@ import time
 import subprocess
 import os
 from . import functions as f
-
+import asyncio
+from .discord_controller import DiscordController
 
 class agqr:
     AGQR_URL = "https://agqr.sun-yryr.com/api/today"
     def __init__(self):
         self.reload_program()
         self.isKeyword = False
+        self.discord_controller = DiscordController()
 
     def reload_program(self):
         res = requests.get(self.AGQR_URL)
@@ -73,9 +75,7 @@ class agqr:
         file_path = dir_path + "/" + program_data["title"].replace(" ", "_") + "_" + program_data["ft"][:12]
 
         # recording....
-        # TODO: 度々変更されるので環境変数から読み込む
-        # url = "https://fms2.uniqueradio.jp/agqr10/aandg1.m3u8"
-        url = "https://agcdn02.cdnext.stream.ne.jp/hls1/basic/data/prog_index.m3u8"
+        url = "https://agcdn02.cdnext.stream.ne.jp/hls1/basic/data/prog_index.m3u8" # TODO: 度々変更されるので環境変数から読み込む
         duration = int(program_data["dur"]) * 60
         cwd = ('ffmpeg -loglevel error -i "%s" -movflags faststart -t %s  "%s.m4a"' % (url, duration, file_path))
         time.sleep(wait_start_time)
@@ -86,6 +86,7 @@ class agqr:
 
         if (f.is_recording_succeeded(file_path)):
             f.LINE.recording_successful_toline(program_data["title"])
+            asyncio.run(self.discord_controller.recording_successful_todiscord(program_data["title"]))
             # dropbox
             # fs = open(file_path+".m4a", "rb")
             # f.DropBox.upload(program_data["title"], program_data["ft"], fs.read())
@@ -107,3 +108,4 @@ class agqr:
                 subprocess.run(cmd, shell=True)
         else:
             f.LINE.recording_failure_toline(program_data["title"])
+            asyncio.run(self.discord_controller.recording_failure_todiscord(program_data["title"]))

@@ -11,10 +11,8 @@ import time
 import re
 
 def load_configurations():
-	ROOT = (__file__.replace("/lib/functions.py", ""))
-	if (ROOT == __file__):
-		ROOT = ROOT.replace("functions.py", "..")
-	Path = ROOT + "/conf/config.json"
+	ROOT = os.path.dirname(__file__)
+	Path = os.path.join(ROOT, '../conf/config.json')
 	if (os.path.isfile(Path) is False):
 		print("config file is not found")
 		exit(1)
@@ -24,11 +22,9 @@ def load_configurations():
 	return tmp
 
 def createSaveDirPath(path = ""):
-	ROOT = (__file__.replace("/lib/functions.py", ""))
-	if (ROOT == __file__):
-		ROOT = ROOT.replace("functions.py", ".")
+	ROOT = os.path.dirname(__file__)
 	if path == "":
-		Path = ROOT + "/savefile"
+		Path = os.path.join(ROOT, "savefile")
 	else:
 		Path = path
 	if not os.path.isdir(Path):
