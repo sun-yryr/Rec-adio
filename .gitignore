@@ -1,7 +1,43 @@
-__pycache__
-.vscode
-savefile/*
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (remove the comment below to include it)
+# vendor/
+
+# Go workspace file
+go.work
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
 .DS_Store
-conf/config.json
-pem/
+
+# Application specific files
+/data/
+/logs/
+/tmp/
+/configs/*.toml
+!/configs/*.example.toml
+
+# Python related files (legacy)
+__pycache__/
+*.py[cod]
+*$py.class
 Pipfile.lock
+
+# Private files
+pem/
+conf/config.json
