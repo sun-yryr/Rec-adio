@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[scripts]
+start = "python run.py"
+test = "bash -c \"cp 'conf/example_config.json' 'conf/config.json'; python -m unittest discover\""
+
+[dev-packages]
+pylint = "*"
+
+[packages]
+beautifulsoup4 = "*"
+requests = "*"
+mysql-connector-python = "*"
+dropbox = "*"
+"discord.py" = "*"
+
+[requires]
+python_version = "3.12"
