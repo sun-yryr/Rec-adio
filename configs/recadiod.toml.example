@@ -1,0 +1,199 @@
+# Rec-adio デーモン設定ファイル
+
+# アプリケーション基本設定
+[app]
+# アプリケーション名
+name = "Rec-adio Daemon"
+
+# 環境（development, production）
+environment = "development"
+
+# ログレベル（debug, info, warn, error）
+log_level = "info"
+
+# データディレクトリ
+data_dir = "./data"
+
+# 一時ディレクトリ
+temp_dir = "./data/temp"
+
+# 録音ファイル保存ディレクトリ
+recordings_dir = "./data/recordings"
+
+# データベース設定
+[database]
+# データベースの種類（sqlite, mysql, postgres）
+type = "sqlite"
+
+# データベースファイルのパス（SQLite用）
+path = "./data/recadio.db"
+
+# ホスト（MySQL, PostgreSQL用）
+# host = "localhost"
+
+# ポート（MySQL, PostgreSQL用）
+# port = 3306
+
+# データベース名（MySQL, PostgreSQL用）
+# name = "recadio"
+
+# ユーザー名（MySQL, PostgreSQL用）
+# user = "recadio"
+
+# パスワード（MySQL, PostgreSQL用）
+# password = "password"
+
+# 最大接続数
+max_open_conns = 10
+
+# 最大アイドル接続数
+max_idle_conns = 5
+
+# 接続の最大生存時間（秒）
+conn_max_lifetime = 3600
+
+# デーモン設定
+[daemon]
+# スケジュール更新間隔（秒）
+schedule_update_interval = 300
+
+# 録音チェック間隔（秒）
+recording_check_interval = 60
+
+# 録音クリーンアップ間隔（秒）
+cleanup_interval = 86400
+
+# 録音設定
+[recording]
+# 録音前の準備時間（秒）
+prepare_seconds = 30
+
+# 録音後の余裕時間（秒）
+extra_seconds = 30
+
+# 同時録音の最大数
+max_concurrent_recordings = 3
+
+# 録音ファイルの形式（mp3, aac, wav）
+format = "mp3"
+
+# 録音ファイルのビットレート
+bitrate = 192
+
+# 録音ファイルのサンプルレート
+sample_rate = 44100
+
+# 録音ファイルのチャンネル数
+channels = 2
+
+# 録音ファイルの命名パターン
+# 利用可能な変数: {date}, {time}, {title}, {platform}, {performer}
+file_name_pattern = "{date}_{time}_{title}_{platform}"
+
+# 録音ファイルの保存期間（日）
+retention_days = 30
+
+# 通知設定
+[notification]
+# 通知を有効にするかどうか
+enabled = true
+
+# 録音開始時に通知するかどうか
+notify_on_start = true
+
+# 録音完了時に通知するかどうか
+notify_on_complete = true
+
+# 録音失敗時に通知するかどうか
+notify_on_error = true
+
+# LINE通知設定
+[notification.line]
+# 有効かどうか
+enabled = false
+
+# アクセストークン
+access_token = ""
+
+# Webhook通知設定
+[notification.webhook]
+# 有効かどうか
+enabled = false
+
+# WebhookのURL
+url = ""
+
+# 認証トークン
+auth_token = ""
+
+# プラットフォーム設定
+[platforms]
+
+# A&G+ (AGQR) 設定
+[platforms.agqr]
+# 有効かどうか
+enabled = true
+
+# ストリームURL
+stream_url = "https://fms2.uniqueradio.jp/agqr10/aandg1.m3u8"
+
+# Radiko設定
+[platforms.radiko]
+# 有効かどうか
+enabled = true
+
+# ユーザーエージェント
+user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36"
+
+# プレミアム会員かどうか
+is_premium = false
+
+# メールアドレス（プレミアム会員用）
+email = ""
+
+# パスワード（プレミアム会員用）
+password = ""
+
+# 音泉設定
+[platforms.onsen]
+# 有効かどうか
+enabled = true
+
+# 響設定
+[platforms.hibiki]
+# 有効かどうか
+enabled = true
+
+# Twitter Space設定
+[platforms.twitter_space]
+# 有効かどうか
+enabled = true
+
+# APIキー
+api_key = ""
+
+# APIシークレット
+api_secret = ""
+
+# アクセストークン
+access_token = ""
+
+# アクセストークンシークレット
+access_token_secret = ""
+
+# ベアラートークン
+bearer_token = ""
+
+# BiliBili設定
+[platforms.bilibili]
+# 有効かどうか
+enabled = true
+
+# セッションID（SESSDATA）
+session_data = ""
+
+# ビリジェクト（bili_jct）
+bili_jct = ""
+
+# ユーザーID（DedeUserID）
+dede_user_id = ""
