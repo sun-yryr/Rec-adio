@@ -14,3 +14,5 @@ jobs:
     steps:
       - name: Assign
         run: gh pr edit ${{ github.event.number }} --add-assignee ${{ github.actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
