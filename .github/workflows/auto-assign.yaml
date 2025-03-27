@@ -13,6 +13,6 @@ jobs:
     if: endsWith(github.actor, '[bot]') == false && github.event.pull_request.assignee == null
     steps:
       - name: Assign
-        run: gh pr edit ${{ github.event.number }} --add-assignee ${{ github.actor }}
+        run: gh pr edit ${{ github.event.number }} --add-assignee ${{ github.actor }} --repo ${{ github.repository }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
