@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/sun-yryr/Rec-adio/internal/api"
 	"github.com/sun-yryr/Rec-adio/internal/config"
 	"github.com/sun-yryr/Rec-adio/internal/db/models"
 
@@ -162,7 +163,11 @@ func runDaemon() error {
 
 	// APIサーバーを起動
 	wg.Add(1)
-	go runApiServer()
+	go func() {
+		defer wg.Done()
+		log.Println("APIサーバーを起動しています...")
+		api.New(ctx)
+	}()
 
 	// スケジュール更新ワーカーを起動
 	wg.Add(1)
@@ -181,12 +186,6 @@ func runDaemon() error {
 
 	log.Println("Rec-adio Daemon を終了しました")
 	return nil
-}
-
-// runApiServer は、APIサーバーを実行します
-func runApiServer() {
-	defer wg.Done()
-	log.Println("APIサーバーを起動しています...")
 }
 
 // runScheduleUpdateWorker は、スケジュール更新ワーカーを実行します
