@@ -7,14 +7,14 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/sun-yryr/recoto/internal/broker"
-	"github.com/sun-yryr/recoto/internal/event"
+	"github.com/sun-yryr/recoto/internal/event/common"
 	"go.uber.org/zap"
 )
 
 var FinishedSubject = "recoto.recording.finished.v1"
 
 type FinishedEvent struct {
-	event.CommonEvent
+	common.CommonEvent
 	RecordingID string `json:"recording_id"`
 }
 
@@ -32,7 +32,7 @@ func NewFinishedService(broker broker.Broker, logger *zap.Logger) *FinishedServi
 
 func (s *FinishedService) Publish(ctx context.Context, recordingID string) error {
 	e := FinishedEvent{
-		CommonEvent: event.CommonEvent{
+		CommonEvent: common.CommonEvent{
 			Timestamp: time.Now(),
 		},
 		RecordingID: recordingID,
