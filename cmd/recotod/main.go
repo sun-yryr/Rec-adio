@@ -7,6 +7,7 @@ import (
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
 	"github.com/sun-yryr/recoto/internal/event/recording"
+	"github.com/sun-yryr/recoto/internal/logger"
 	"go.uber.org/zap"
 )
 
@@ -19,17 +20,9 @@ func main() {
 	}
 
 	// ロガーの設定
-	var logger *zap.Logger
-	if cfg.Env == "production" {
-		logger, err = zap.NewProduction()
-		if err != nil {
-			log.Fatalf("failed to create logger: %v", err)
-		}
-	} else {
-		logger, err = zap.NewDevelopment()
-		if err != nil {
-			log.Fatalf("failed to create logger: %v", err)
-		}
+	logger, err := logger.NewLogger(cfg)
+	if err != nil {
+		log.Fatalf("failed to create logger: %v", err)
 	}
 	defer logger.Sync()
 
