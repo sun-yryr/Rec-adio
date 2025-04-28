@@ -17,7 +17,7 @@ var StartedSubject = "recoto.recording.started.v1"
 // StartedEvent represents an event that is published when recording has started.
 type StartedEvent struct {
 	common.CommonEvent
-	RecordingID string `json:"recording_id"`
+	RecordingID string `json:"recordingId"`
 }
 
 // StartedService handles publishing and subscribing to recording started events.

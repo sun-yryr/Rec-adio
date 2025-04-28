@@ -17,7 +17,7 @@ var FinishedSubject = "recoto.recording.finished.v1"
 // FinishedEvent represents an event that is published when recording has finished.
 type FinishedEvent struct {
 	common.CommonEvent
-	RecordingID string `json:"recording_id"`
+	RecordingID string `json:"recordingId"`
 }
 
 // FinishedService handles publishing and subscribing to recording finished events.
