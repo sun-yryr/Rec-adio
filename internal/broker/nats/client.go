@@ -32,11 +32,11 @@ func NewEmbeddedBroker() (broker.Broker, error) {
 	}, nil
 }
 
-func (b *natsBroker) Publish(ctx context.Context, subject string, message []byte) error {
+func (b *natsBroker) Publish(_ context.Context, subject string, message []byte) error {
 	return b.nc.Publish(subject, message)
 }
 
-func (b *natsBroker) Subscribe(ctx context.Context, subject string, handler func(message []byte)) (broker.UnsubscribeFunc, error) {
+func (b *natsBroker) Subscribe(_ context.Context, subject string, handler func(message []byte)) (broker.UnsubscribeFunc, error) {
 	subscription, err := b.nc.Subscribe(subject, func(msg *nats.Msg) {
 		handler(msg.Data)
 	})
