@@ -26,4 +26,5 @@
     "cSpell.words": [
         "recoto"
     ],
+    "go.lintOnSave": "workspace",
 }
