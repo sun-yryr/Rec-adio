@@ -1,12 +1,13 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log"
 
+	"github.com/sun-yryr/recoto/api/server"
+	"github.com/sun-yryr/recoto/api/server/router/health"
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
-	"github.com/sun-yryr/recoto/internal/event/recording"
 	"github.com/sun-yryr/recoto/internal/logger"
 	"go.uber.org/zap"
 )
@@ -33,29 +34,9 @@ func main() {
 		logger.Fatal("failed to create broker", zap.Error(err))
 	}
 
-	ctx := context.Background()
+	server := server.NewServer(
+		health.NewHealthRouter(broker, logger),
+	)
 
-	startedService := recording.NewStartedService(broker, logger)
-	finishedService := recording.NewFinishedService(broker, logger)
-
-	unsub, err := startedService.Subscribe(ctx, func(ctx context.Context, event *recording.StartedEvent) {
-		logger.Info("Received started event", zap.String("recordingID", event.RecordingID), zap.Time("timestamp", event.Timestamp))
-	})
-	if err != nil {
-		logger.Fatal("failed to subscribe to started events", zap.Error(err))
-	}
-	defer unsub()
-
-	unsub2, err := finishedService.Subscribe(ctx, func(ctx context.Context, event *recording.FinishedEvent) {
-		logger.Info("Received finished event", zap.String("recordingID", event.RecordingID), zap.Time("timestamp", event.Timestamp))
-	})
-	if err != nil {
-		logger.Fatal("failed to subscribe to finished events", zap.Error(err))
-	}
-	defer unsub2()
-
-	startedService.Publish(ctx, "sample uuid")
-
-	// TODO: signalを処理する
-	select {}
+	server.Run(fmt.Sprintf(":%d", cfg.Server.Port))
 }

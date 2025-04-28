@@ -8,9 +8,14 @@ type logConfig struct {
 	Level string `env:"LEVEL" envDefault:"info"`
 }
 
+type serverConfig struct {
+	Port int `env:"PORT" envDefault:"8080"`
+}
+
 type Config struct {
-	Env string    `env:"APP_ENV" envDefault:"development"`
-	Log logConfig `envPrefix:"LOG_"`
+	Env    string       `env:"APP_ENV" envDefault:"development"`
+	Log    logConfig    `envPrefix:"LOG_"`
+	Server serverConfig `envPrefix:"SERVER_"`
 }
 
 func Load() (*Config, error) {
