@@ -11,18 +11,22 @@ import (
 	"go.uber.org/zap"
 )
 
+// StartedSubject is the NATS subject for recording started events.
 var StartedSubject = "recoto.recording.started.v1"
 
+// StartedEvent represents an event that is published when recording has started.
 type StartedEvent struct {
 	common.CommonEvent
 	RecordingID string `json:"recording_id"`
 }
 
+// StartedService handles publishing and subscribing to recording started events.
 type StartedService struct {
 	broker broker.Broker
 	logger *zap.Logger
 }
 
+// NewStartedService creates a new instance of StartedService.
 func NewStartedService(broker broker.Broker, logger *zap.Logger) *StartedService {
 	return &StartedService{
 		broker: broker,
@@ -30,6 +34,7 @@ func NewStartedService(broker broker.Broker, logger *zap.Logger) *StartedService
 	}
 }
 
+// Publish publishes a recording started event to the broker.
 func (s *StartedService) Publish(ctx context.Context, recordingID string) error {
 	e := StartedEvent{
 		CommonEvent: common.CommonEvent{
@@ -44,6 +49,7 @@ func (s *StartedService) Publish(ctx context.Context, recordingID string) error 
 	return s.broker.Publish(ctx, StartedSubject, message)
 }
 
+// Subscribe registers a handler for recording started events.
 func (s *StartedService) Subscribe(ctx context.Context, handler func(context.Context, *StartedEvent)) (broker.UnsubscribeFunc, error) {
 	return s.broker.Subscribe(ctx, StartedSubject, func(msg []byte) {
 		var event StartedEvent

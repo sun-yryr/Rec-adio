@@ -11,18 +11,22 @@ import (
 	"go.uber.org/zap"
 )
 
+// FinishedSubject is the NATS subject for recording finished events.
 var FinishedSubject = "recoto.recording.finished.v1"
 
+// FinishedEvent represents an event that is published when recording has finished.
 type FinishedEvent struct {
 	common.CommonEvent
 	RecordingID string `json:"recording_id"`
 }
 
+// FinishedService handles publishing and subscribing to recording finished events.
 type FinishedService struct {
 	broker broker.Broker
 	logger *zap.Logger
 }
 
+// NewFinishedService creates a new instance of FinishedService.
 func NewFinishedService(broker broker.Broker, logger *zap.Logger) *FinishedService {
 	return &FinishedService{
 		broker: broker,
@@ -30,6 +34,7 @@ func NewFinishedService(broker broker.Broker, logger *zap.Logger) *FinishedServi
 	}
 }
 
+// Publish publishes a recording finished event to the broker.
 func (s *FinishedService) Publish(ctx context.Context, recordingID string) error {
 	e := FinishedEvent{
 		CommonEvent: common.CommonEvent{
@@ -44,6 +49,7 @@ func (s *FinishedService) Publish(ctx context.Context, recordingID string) error
 	return s.broker.Publish(ctx, FinishedSubject, message)
 }
 
+// Subscribe registers a handler for recording finished events.
 func (s *FinishedService) Subscribe(ctx context.Context, handler func(context.Context, *FinishedEvent)) (broker.UnsubscribeFunc, error) {
 	return s.broker.Subscribe(ctx, FinishedSubject, func(msg []byte) {
 		var event FinishedEvent
