@@ -13,3 +13,6 @@ indent_style = tab
 
 [*.md]
 trim_trailing_whitespace = false
+
+[.vscode/settings.json]
+indent_size = 4

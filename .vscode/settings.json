@@ -1,0 +1,29 @@
+{
+    "[go]": {
+        "editor.insertSpaces": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "golang.go",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        },
+    },
+    "go.lintTool": "golangci-lint",
+    "go.lintFlags": [
+        "--path-mode=abs",
+        "--fast-only",
+    ],
+    "go.formatTool": "custom",
+    "go.alternateTools": {
+        "customFormatter": "golangci-lint",
+    },
+    "go.formatFlags": [
+        "fmt",
+        "--stdin",
+    ],
+    "yaml.schemas": {
+        "https://coderabbit.ai/integrations/schema.v2.json": "file:///Users/t_minagawa/develop/sun-yryr/Rec-adio/.coderabbit.yaml"
+    },
+    "cSpell.words": [
+        "recoto"
+    ],
+}
