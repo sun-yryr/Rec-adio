@@ -36,13 +36,13 @@ func NewFinishedService(broker broker.Broker, logger *zap.Logger) *FinishedServi
 
 // Publish publishes a recording finished event to the broker.
 func (s *FinishedService) Publish(ctx context.Context, recordingID string) error {
-	e := FinishedEvent{
+	event := FinishedEvent{
 		CommonEvent: common.CommonEvent{
 			Timestamp: time.Now(),
 		},
 		RecordingID: recordingID,
 	}
-	message, err := json.Marshal(e)
+	message, err := json.Marshal(event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to marshal %s event", FinishedSubject)
 	}

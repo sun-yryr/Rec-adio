@@ -16,19 +16,19 @@ type natsBroker struct {
 
 // NewEmbeddedBroker creates a new NATS broker with an embedded server.
 func NewEmbeddedBroker() (broker.Broker, error) {
-	ns, err := startEmbeddedServer()
+	server, err := startEmbeddedServer()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start embedded nats server")
 	}
-	nc, err := nats.Connect(ns.ClientURL())
+	conn, err := nats.Connect(server.ClientURL())
 	if err != nil {
-		ns.Shutdown()
+		server.Shutdown()
 		return nil, errors.Wrap(err, "failed to connect to nats server")
 	}
 
 	return &natsBroker{
-		nc: nc,
-		ns: ns,
+		nc: conn,
+		ns: server,
 	}, nil
 }
 

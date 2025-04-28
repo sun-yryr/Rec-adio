@@ -36,13 +36,13 @@ func NewStartedService(broker broker.Broker, logger *zap.Logger) *StartedService
 
 // Publish publishes a recording started event to the broker.
 func (s *StartedService) Publish(ctx context.Context, recordingID string) error {
-	e := StartedEvent{
+	event := StartedEvent{
 		CommonEvent: common.CommonEvent{
 			Timestamp: time.Now(),
 		},
 		RecordingID: recordingID,
 	}
-	message, err := json.Marshal(e)
+	message, err := json.Marshal(event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to marshal %s event", StartedSubject)
 	}
