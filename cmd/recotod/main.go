@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 
 	"github.com/sun-yryr/recoto/api/server"
@@ -14,30 +14,26 @@ import (
 )
 
 func main() {
-	// 設定の読み込み
-	// TODO: .envの取り扱い
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("failed to load config: %v", err)
-	}
+	// Load configuration
+	cfg := lo.Must(config.Load())
 
-	// ロガーの設定
-	logger, err := logger.NewLogger(cfg)
-	if err != nil {
-		log.Fatalf("failed to create logger: %v", err)
-	}
+	// Initialize logger
+	logger := lo.Must(logger.NewLogger(cfg))
 	defer logger.Sync()
 
 	logger.Info("Starting server...")
 
+	// Initialize NATS broker
 	broker, err := nats.NewEmbeddedBroker()
 	if err != nil {
 		logger.Fatal("failed to create broker", zap.Error(err))
 	}
 
+	// Initialize server
 	server := server.NewServer(
 		health.NewHealthRouter(broker, logger),
 	)
 
+	// Start server
 	server.Run(fmt.Sprintf(":%d", cfg.Server.Port))
 }
