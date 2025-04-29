@@ -8,6 +8,7 @@ import (
 
 	"github.com/sun-yryr/recoto/api/server"
 	"github.com/sun-yryr/recoto/api/server/router/health"
+	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
 	"github.com/sun-yryr/recoto/internal/logger"
@@ -24,14 +25,14 @@ func main() {
 	logger.Info("Starting server...")
 
 	// Initialize NATS broker
-	broker, err := nats.NewEmbeddedBroker()
+	embBroker, err := nats.NewEmbeddedBroker()
 	if err != nil {
 		logger.Fatal("failed to create broker", zap.Error(err))
 	}
 
 	// Initialize server
 	server := server.NewServer(
-		health.NewHealthRouter(broker, logger),
+		health.NewHealthRouter(embBroker, logger, broker.NewBrokerHealthCheck(embBroker)),
 	)
 
 	// Start server
