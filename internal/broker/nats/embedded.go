@@ -11,6 +11,7 @@ const defaultTimeout = 5 * time.Second
 
 func startEmbeddedServer() (*server.Server, error) {
 	opts := &server.Options{}
+
 	natsServer, err := server.NewServer(opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to setup embedded nats server")

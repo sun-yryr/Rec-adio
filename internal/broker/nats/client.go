@@ -20,6 +20,7 @@ func NewEmbeddedBroker() (broker.Broker, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start embedded nats server")
 	}
+
 	conn, err := nats.Connect(server.ClientURL())
 	if err != nil {
 		server.Shutdown()

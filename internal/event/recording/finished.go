@@ -42,6 +42,7 @@ func (s *FinishedService) Publish(ctx context.Context, recordingID string) error
 		},
 		RecordingID: recordingID,
 	}
+
 	message, err := json.Marshal(event)
 	if err != nil {
 		return errors.Wrapf(err, "failed to marshal %s event", FinishedSubject)
@@ -57,6 +58,7 @@ func (s *FinishedService) Subscribe(ctx context.Context, handler func(context.Co
 			s.logger.Error("failed to unmarshal message", zap.Error(err), zap.String("subject", FinishedSubject))
 			return
 		}
+
 		handler(ctx, &event)
 	})
 }
