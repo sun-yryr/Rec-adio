@@ -47,6 +47,7 @@ func (s *FinishedService) Publish(ctx context.Context, recordingID string) error
 	if err != nil {
 		return errors.Wrapf(err, "failed to marshal %s event", FinishedSubject)
 	}
+
 	return s.broker.Publish(ctx, FinishedSubject, message)
 }
 
@@ -56,6 +57,7 @@ func (s *FinishedService) Subscribe(ctx context.Context, handler func(context.Co
 		var event FinishedEvent
 		if err := json.Unmarshal(msg, &event); err != nil {
 			s.logger.Error("failed to unmarshal message", zap.Error(err), zap.String("subject", FinishedSubject))
+
 			return
 		}
 

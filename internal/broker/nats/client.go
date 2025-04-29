@@ -24,6 +24,7 @@ func NewEmbeddedBroker() (broker.Broker, error) {
 	conn, err := nats.Connect(server.ClientURL())
 	if err != nil {
 		server.Shutdown()
+
 		return nil, errors.Wrap(err, "failed to connect to nats server")
 	}
 
@@ -44,6 +45,7 @@ func (b *natsBroker) Subscribe(_ context.Context, subject string, handler func(m
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to subscribe to subject")
 	}
+
 	return subscription.Unsubscribe, nil
 }
 
