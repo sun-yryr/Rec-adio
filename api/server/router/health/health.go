@@ -1,6 +1,8 @@
 package health
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sun-yryr/recoto/api/server/router"
 	"github.com/sun-yryr/recoto/internal/broker"
@@ -34,7 +36,7 @@ func (r *HealthRouter) initRoutes() {
 }
 
 func (r *HealthRouter) healthCheck(ctx *gin.Context) {
-	ctx.JSON(200, gin.H{
+	ctx.JSON(http.StatusOK, gin.H{
 		"status": "ok",
 	})
 }

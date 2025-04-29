@@ -7,6 +7,8 @@ import (
 	"github.com/nats-io/nats-server/v2/server"
 )
 
+const defaultTimeout = 5 * time.Second
+
 func startEmbeddedServer() (*server.Server, error) {
 	opts := &server.Options{}
 	natsServer, err := server.NewServer(opts)
@@ -16,7 +18,7 @@ func startEmbeddedServer() (*server.Server, error) {
 
 	go natsServer.Start()
 
-	if !natsServer.ReadyForConnections(5 * time.Second) {
+	if !natsServer.ReadyForConnections(defaultTimeout) {
 		return nil, errors.New("nats server not ready for connections in 5 seconds")
 	}
 
