@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"log"
 
+	"go.uber.org/zap"
+
 	"github.com/sun-yryr/recoto/api/server"
 	"github.com/sun-yryr/recoto/api/server/router/health"
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
 	"github.com/sun-yryr/recoto/internal/logger"
-	"go.uber.org/zap"
 )
 
 func main() {

@@ -14,9 +14,9 @@ type serverConfig struct {
 
 // Config represents the application configuration.
 type Config struct {
-	Env    string       `env:"APP_ENV"       envDefault:"development"`
-	Log    logConfig    `envPrefix:"LOG_"`
-	Server serverConfig `envPrefix:"SERVER_"`
+	Env    string       `env:"APP_ENV" envDefault:"development"`
+	Log    logConfig    `                                       envPrefix:"LOG_"`
+	Server serverConfig `                                       envPrefix:"SERVER_"`
 }
 
 // Load loads the application configuration from environment variables.

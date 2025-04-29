@@ -6,6 +6,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats.go"
+
 	"github.com/sun-yryr/recoto/internal/broker"
 )
 
@@ -38,7 +39,11 @@ func (b *natsBroker) Publish(_ context.Context, subject string, message []byte) 
 	return b.nc.Publish(subject, message)
 }
 
-func (b *natsBroker) Subscribe(_ context.Context, subject string, handler func(message []byte)) (broker.UnsubscribeFunc, error) {
+func (b *natsBroker) Subscribe(
+	_ context.Context,
+	subject string,
+	handler func(message []byte),
+) (broker.UnsubscribeFunc, error) {
 	subscription, err := b.nc.Subscribe(subject, func(msg *nats.Msg) {
 		handler(msg.Data)
 	})

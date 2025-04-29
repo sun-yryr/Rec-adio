@@ -3,3 +3,15 @@ linters:
   default: all
   disable:
     - depguard
+    - tagalign # golinesのreformat-tagsと競合するため
+formatters:
+  enable:
+    - gofumpt
+    - gci
+    - golines
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - localmodule

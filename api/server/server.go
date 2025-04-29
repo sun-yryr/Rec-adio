@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/sun-yryr/recoto/api/server/router"
 )
 

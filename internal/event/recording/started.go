@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/cockroachdb/errors"
+	"go.uber.org/zap"
+
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/event/common"
-	"go.uber.org/zap"
 )
 
 // StartedSubject is the NATS subject for recording started events.
@@ -52,11 +53,18 @@ func (s *StartedService) Publish(ctx context.Context, recordingID string) error 
 }
 
 // Subscribe registers a handler for recording started events.
-func (s *StartedService) Subscribe(ctx context.Context, handler func(context.Context, *StartedEvent)) (broker.UnsubscribeFunc, error) {
+func (s *StartedService) Subscribe(
+	ctx context.Context,
+	handler func(context.Context, *StartedEvent),
+) (broker.UnsubscribeFunc, error) {
 	return s.broker.Subscribe(ctx, StartedSubject, func(msg []byte) {
 		var event StartedEvent
 		if err := json.Unmarshal(msg, &event); err != nil {
-			s.logger.Error("failed to unmarshal message", zap.Error(err), zap.String("subject", StartedSubject))
+			s.logger.Error(
+				"failed to unmarshal message",
+				zap.Error(err),
+				zap.String("subject", StartedSubject),
+			)
 
 			return
 		}

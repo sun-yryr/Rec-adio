@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"github.com/sun-yryr/recoto/internal/config"
 	"go.uber.org/zap"
+
+	"github.com/sun-yryr/recoto/internal/config"
 )
 
 // NewLogger provides a zap.Logger based on the application environment.

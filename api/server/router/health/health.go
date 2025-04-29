@@ -4,9 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+
 	"github.com/sun-yryr/recoto/api/server/router"
 	"github.com/sun-yryr/recoto/internal/broker"
-	"go.uber.org/zap"
 )
 
 type HealthRouter struct {
