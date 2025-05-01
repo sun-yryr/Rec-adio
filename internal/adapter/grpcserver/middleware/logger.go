@@ -12,7 +12,7 @@ import (
 
 // NewLoggerInterceptor は、ctxにLoggerを追加するUnaryServerInterceptorを返す.
 func NewLoggerInterceptor(zapLogger *zap.Logger) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		ctx = logger.WithLogger(ctx, zapLogger)
 
 		return handler(ctx, req)
