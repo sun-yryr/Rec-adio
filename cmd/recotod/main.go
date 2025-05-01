@@ -1,3 +1,4 @@
+// Package main は、Recotodのエントリーポイントです.
 package main
 
 import (
@@ -9,7 +10,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	mygrpc "github.com/sun-yryr/recoto/internal/adapter/grpc"
+	"github.com/sun-yryr/recoto/internal/adapter/grpcserver"
+	"github.com/sun-yryr/recoto/internal/adapter/grpcserver/middleware"
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
@@ -23,7 +25,11 @@ func main() {
 
 	// Initialize logger
 	logger := lo.Must(logger.NewLogger(cfg))
-	defer logger.Sync()
+	defer func() {
+		if err := logger.Sync(); err != nil {
+			logger.Error("failed to sync logger", zap.Error(err))
+		}
+	}()
 
 	logger.Info("Starting server...")
 
@@ -39,15 +45,17 @@ func main() {
 		logger.Fatal("failed to listen", zap.Error(err))
 	}
 
-	grpcServer := grpc.NewServer()
-	healthv1.RegisterHealthServiceServer(
-		grpcServer,
-		mygrpc.NewHealthService(embBroker, logger, broker.NewBrokerHealthCheck(embBroker)),
+	srv := grpc.NewServer(
+		grpc.UnaryInterceptor(middleware.NewLoggerInterceptor(logger)),
 	)
-	reflection.Register(grpcServer)
+	healthv1.RegisterHealthServiceServer(
+		srv,
+		grpcserver.NewHealthService(embBroker, logger, broker.NewHealthCheck(embBroker)),
+	)
+	reflection.Register(srv)
 
 	// Start server
-	if err := grpcServer.Serve(lis); err != nil {
+	if err := srv.Serve(lis); err != nil {
 		logger.Fatal("failed to serve", zap.Error(err))
 	}
 }

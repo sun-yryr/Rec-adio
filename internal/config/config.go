@@ -1,7 +1,9 @@
+// Package config は、アプリケーションの設定を管理します.
 package config
 
 import (
 	"github.com/caarlos0/env/v11"
+	"github.com/cockroachdb/errors"
 )
 
 type logConfig struct {
@@ -23,7 +25,7 @@ type Config struct {
 func Load() (*Config, error) {
 	var cfg Config
 	if err := env.Parse(&cfg); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to parse config")
 	}
 
 	return &cfg, nil

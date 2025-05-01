@@ -1,3 +1,4 @@
+// Package nats は、NATSを使用したブローカーの実装を提供します.
 package nats
 
 import (
@@ -10,13 +11,14 @@ import (
 	"github.com/sun-yryr/recoto/internal/broker"
 )
 
-type natsBroker struct {
+// Broker は、NATSのブローカーを表す構造体.
+type Broker struct {
 	nc *nats.Conn
 	ns *server.Server
 }
 
-// NewEmbeddedBroker creates a new NATS broker with an embedded server.
-func NewEmbeddedBroker() (broker.Broker, error) {
+// NewEmbeddedBroker は、NATSのブローカーを作成する.
+func NewEmbeddedBroker() (*Broker, error) {
 	server, err := startEmbeddedServer()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to start embedded nats server")
@@ -29,17 +31,23 @@ func NewEmbeddedBroker() (broker.Broker, error) {
 		return nil, errors.Wrap(err, "failed to connect to nats server")
 	}
 
-	return &natsBroker{
+	return &Broker{
 		nc: conn,
 		ns: server,
 	}, nil
 }
 
-func (b *natsBroker) Publish(_ context.Context, subject string, message []byte) error {
-	return b.nc.Publish(subject, message)
+// Publish は、NATSのブローカーにメッセージを送信する.
+func (b *Broker) Publish(_ context.Context, subject string, message []byte) error {
+	if err := b.nc.Publish(subject, message); err != nil {
+		return errors.Wrap(err, "failed to publish message")
+	}
+
+	return nil
 }
 
-func (b *natsBroker) Subscribe(
+// Subscribe は、NATSのブローカーにメッセージを受信するサブスクリプションを作成する.
+func (b *Broker) Subscribe(
 	_ context.Context,
 	subject string,
 	handler func(message []byte),
@@ -54,7 +62,8 @@ func (b *natsBroker) Subscribe(
 	return subscription.Unsubscribe, nil
 }
 
-func (b *natsBroker) Close() error {
+// Close は、NATSのブローカーを閉じる.
+func (b *Broker) Close() error {
 	var closeErr error
 
 	if err := b.nc.Drain(); err != nil {

@@ -1,11 +1,12 @@
+// Package broker は、メッセージブローカーのインターフェースを定義します。
 package broker
 
 import "context"
 
-// UnsubscribeFunc is a function to unsubscribe from a subscription.
+// UnsubscribeFunc は、サブスクリプションを解除する関数です。
 type UnsubscribeFunc func() error
 
-// Broker defines the interface for message brokers in the application.
+// Broker は、アプリケーションのメッセージブローカーのインターフェースを定義します。
 type Broker interface {
 	Publish(ctx context.Context, subject string, message []byte) error
 	Subscribe(

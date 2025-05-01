@@ -3,27 +3,34 @@ package broker
 import (
 	"context"
 	"time"
+
+	"github.com/cockroachdb/errors"
+	"go.uber.org/zap"
+
+	"github.com/sun-yryr/recoto/internal/logger"
 )
 
 const timeout = 3 * time.Second
 
-type BrokerHealthCheck struct {
+// HealthCheck は、Brokerの健康状態を確認するための構造体.
+type HealthCheck struct {
 	Broker Broker
 }
 
-// BrokerHealthCheck は、Brokerの健康状態を確認するための構造体.
-func NewBrokerHealthCheck(broker Broker) *BrokerHealthCheck {
-	return &BrokerHealthCheck{
+// NewHealthCheck は、HealthCheckのコンストラクタ.
+func NewHealthCheck(broker Broker) *HealthCheck {
+	return &HealthCheck{
 		Broker: broker,
 	}
 }
 
-func (h *BrokerHealthCheck) GetName() string {
+// GetName は、HealthCheckの名前を返す関数.
+func (h *HealthCheck) GetName() string {
 	return "BrokerHealthCheck"
 }
 
 // Check は、BrokerのPublish, Subscribeが正常に動作することを確認する関数.
-func (h *BrokerHealthCheck) Check(ctx context.Context) error {
+func (h *HealthCheck) Check(ctx context.Context) error {
 	cctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -32,28 +39,31 @@ func (h *BrokerHealthCheck) Check(ctx context.Context) error {
 	resultCh := make(chan struct{}, 1)
 	defer close(resultCh)
 
-	unsubscribe, err := h.Broker.Subscribe(cctx, healthCheckSubject, func(message []byte) {
+	unsubscribe, err := h.Broker.Subscribe(cctx, healthCheckSubject, func(_ []byte) {
 		resultCh <- struct{}{}
 	})
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to subscribe health check message")
 	}
 
 	defer func() {
 		if unsubscribe != nil {
-			unsubscribe()
+			if err := unsubscribe(); err != nil {
+				logger := logger.FromContext(cctx)
+				logger.Error("failed to unsubscribe health check message", zap.Error(err))
+			}
 		}
 	}()
 
 	err = h.Broker.Publish(cctx, healthCheckSubject, []byte("ping"))
 	if err != nil {
-		return err
+		return errors.Wrap(err, "failed to publish health check message")
 	}
 
 	select {
 	case <-resultCh:
 		return nil
 	case <-cctx.Done():
-		return cctx.Err()
+		return errors.Wrap(cctx.Err(), "health check timeout")
 	}
 }

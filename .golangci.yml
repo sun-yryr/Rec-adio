@@ -4,6 +4,7 @@ linters:
   disable:
     - depguard
     - tagalign # golinesのreformat-tagsと競合するため
+    - exhaustruct
 formatters:
   enable:
     - gofumpt

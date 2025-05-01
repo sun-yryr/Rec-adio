@@ -1,4 +1,5 @@
-package grpc
+// Package grpcserver は、gRPCサーバーの実装を提供します.
+package grpcserver
 
 import (
 	"context"
@@ -14,24 +15,31 @@ type healthChecker interface {
 	Check(ctx context.Context) error
 }
 
-type healthService struct {
+// HealthService は、HealthService Interfaceを実装した構造体.
+type HealthService struct {
 	pb.UnimplementedHealthServiceServer
 	broker         broker.Broker
 	logger         *zap.Logger
 	healthCheckers []healthChecker
 }
 
+// NewHealthService は、HealthServiceのコンストラクタ.
 func NewHealthService(
 	broker broker.Broker,
 	logger *zap.Logger,
 	healthCheckers ...healthChecker,
-) pb.HealthServiceServer {
-	return &healthService{broker: broker, logger: logger, healthCheckers: healthCheckers}
+) *HealthService {
+	return &HealthService{
+		broker:         broker,
+		logger:         logger,
+		healthCheckers: healthCheckers,
+	}
 }
 
-func (s *healthService) Check(
+// Check は、Brokerのヘルスチェックを行う.
+func (s *HealthService) Check(
 	ctx context.Context,
-	req *pb.HealthCheckRequest,
+	_ *pb.HealthCheckRequest,
 ) (*pb.HealthCheckResponse, error) {
 	results := make([]*pb.CheckResult, 0, len(s.healthCheckers))
 
@@ -40,18 +48,18 @@ func (s *healthService) Check(
 
 	// 全てのヘルスチェックを非同期で実行
 	for _, checker := range s.healthCheckers {
-		go func(c healthChecker) {
+		go func(checker healthChecker) {
 			result := &pb.CheckResult{
-				Name: c.GetName(),
+				Name: checker.GetName(),
 				Ok:   true,
 			}
 
-			if err := c.Check(ctx); err != nil {
+			if err := checker.Check(ctx); err != nil {
 				result.Ok = false
 				result.Error = err.Error()
 				s.logger.Error(
 					"Health check failed",
-					zap.String("checker", c.GetName()),
+					zap.String("checker", checker.GetName()),
 					zap.Error(err),
 				)
 			}
