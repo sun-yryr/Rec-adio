@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/sun-yryr/recoto/internal/broker"
+	"github.com/sun-yryr/recoto/internal/logger"
 	pb "github.com/sun-yryr/recoto/pkg/api/health/v1"
 )
 
@@ -19,19 +20,16 @@ type healthChecker interface {
 type HealthService struct {
 	pb.UnimplementedHealthServiceServer
 	broker         broker.Broker
-	logger         *zap.Logger
 	healthCheckers []healthChecker
 }
 
 // NewHealthService は、HealthServiceのコンストラクタ.
 func NewHealthService(
 	broker broker.Broker,
-	logger *zap.Logger,
 	healthCheckers ...healthChecker,
 ) *HealthService {
 	return &HealthService{
 		broker:         broker,
-		logger:         logger,
 		healthCheckers: healthCheckers,
 	}
 }
@@ -41,6 +39,7 @@ func (s *HealthService) Check(
 	ctx context.Context,
 	_ *pb.HealthCheckRequest,
 ) (*pb.HealthCheckResponse, error) {
+	logger := logger.FromContext(ctx)
 	results := make([]*pb.CheckResult, 0, len(s.healthCheckers))
 
 	resultCh := make(chan *pb.CheckResult, len(s.healthCheckers))
@@ -57,7 +56,7 @@ func (s *HealthService) Check(
 			if err := checker.Check(ctx); err != nil {
 				result.Ok = false
 				result.Error = err.Error()
-				s.logger.Error(
+				logger.Error(
 					"Health check failed",
 					zap.String("checker", checker.GetName()),
 					zap.Error(err),

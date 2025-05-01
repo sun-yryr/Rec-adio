@@ -50,7 +50,7 @@ func main() {
 	)
 	healthv1.RegisterHealthServiceServer(
 		srv,
-		grpcserver.NewHealthService(embBroker, logger, broker.NewHealthCheck(embBroker)),
+		grpcserver.NewHealthService(embBroker, broker.NewHealthCheck(embBroker)),
 	)
 	reflection.Register(srv)
 
