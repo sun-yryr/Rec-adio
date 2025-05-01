@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package recoto.health.v1;
+
+option go_package = "github.com/sun-yryr/recoto/pkg/api/health/v1;healthv1";
+
+service HealthService {
+  rpc Check(HealthCheckRequest) returns (HealthCheckResponse) {}
+}
+
+message HealthCheckRequest {}
+
+message HealthCheckResponse {
+  string status = 1;
+  repeated CheckResult results = 2;
+}
+
+message CheckResult {
+  string name = 1;
+  string error = 2;
+  bool ok = 3;
+}

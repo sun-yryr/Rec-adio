@@ -2,16 +2,19 @@ package main
 
 import (
 	"fmt"
+	"net"
 
 	"github.com/samber/lo"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
-	"github.com/sun-yryr/recoto/api/server"
-	"github.com/sun-yryr/recoto/api/server/router/health"
+	mygrpc "github.com/sun-yryr/recoto/internal/adapter/grpc"
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
 	"github.com/sun-yryr/recoto/internal/logger"
+	healthv1 "github.com/sun-yryr/recoto/pkg/api/health/v1"
 )
 
 func main() {
@@ -31,10 +34,20 @@ func main() {
 	}
 
 	// Initialize server
-	server := server.NewServer(
-		health.NewHealthRouter(embBroker, logger, broker.NewBrokerHealthCheck(embBroker)),
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Server.Port))
+	if err != nil {
+		logger.Fatal("failed to listen", zap.Error(err))
+	}
+
+	grpcServer := grpc.NewServer()
+	healthv1.RegisterHealthServiceServer(
+		grpcServer,
+		mygrpc.NewHealthService(embBroker, logger, broker.NewBrokerHealthCheck(embBroker)),
 	)
+	reflection.Register(grpcServer)
 
 	// Start server
-	server.Run(fmt.Sprintf(":%d", cfg.Server.Port))
+	if err := grpcServer.Serve(lis); err != nil {
+		logger.Fatal("failed to serve", zap.Error(err))
+	}
 }
