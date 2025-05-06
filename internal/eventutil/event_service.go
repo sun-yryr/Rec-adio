@@ -38,6 +38,12 @@ func (s *EventService[T]) Publish(ctx context.Context, event T) error {
 		return errors.Wrapf(err, "failed to publish %s event", s.subject)
 	}
 
+	s.logger.Debug(
+		"published event",
+		zap.String("subject", s.subject),
+		zap.String("event", string(message)),
+	)
+
 	return nil
 }
 
@@ -47,6 +53,12 @@ func (s *EventService[T]) Subscribe(
 	handler func(context.Context, *T),
 ) (broker.UnsubscribeFunc, error) {
 	subscribeHandler := func(msg []byte) {
+		s.logger.Debug(
+			"received message",
+			zap.String("subject", s.subject),
+			zap.String("message", string(msg)),
+		)
+
 		var event T
 		if err := json.Unmarshal(msg, &event); err != nil {
 			s.logger.Error(
