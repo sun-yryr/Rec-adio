@@ -60,6 +60,11 @@ func (b *Broker) Subscribe(
 	handler func(message []byte),
 ) (broker.UnsubscribeFunc, error) {
 	subscription, err := b.nc.Subscribe(subject, func(msg *nats.Msg) {
+		b.logger.Debug(
+			"received message",
+			zap.String("subject", msg.Subject),
+			zap.String("data", string(msg.Data)),
+		)
 		handler(msg.Data)
 	})
 	if err != nil {

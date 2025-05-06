@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"os"
@@ -18,12 +19,14 @@ import (
 	"github.com/sun-yryr/recoto/internal/config"
 	"github.com/sun-yryr/recoto/internal/event/recording"
 	"github.com/sun-yryr/recoto/internal/logger"
+	"github.com/sun-yryr/recoto/internal/recorder"
 	healthv1 "github.com/sun-yryr/recoto/pkg/api/recoto/health/v1"
 	recordingv1 "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1"
 )
 
 const saveDirPerm = 0o750
 
+//nolint:funlen // main関数は許して
 func main() {
 	// Load configuration
 	cfg := lo.Must(config.Load())
@@ -51,8 +54,25 @@ func main() {
 
 	// イベント
 	recordingRequestedService := recording.NewRequestedService(embBroker, appLogger)
-	// recordingStartedService := recording.NewStartedService(embBroker, appLogger)
-	// recordingFinishedService := recording.NewFinishedService(embBroker, appLogger)
+	recordingStartedService := recording.NewStartedService(embBroker, appLogger)
+	recordingFinishedService := recording.NewFinishedService(embBroker, appLogger)
+
+	// Initialize recorder
+	urlRecorder := recorder.NewURLRecorder(appLogger)
+	recordingManager := recorder.NewRecordingManager(
+		recordingRequestedService,
+		recordingStartedService,
+		recordingFinishedService,
+		appLogger,
+		[]recorder.Recorder{urlRecorder},
+	)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if err := recordingManager.Start(ctx); err != nil {
+		appLogger.Fatal("failed to start recording manager", zap.Error(err))
+	}
 
 	// Initialize server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Server.Port))
