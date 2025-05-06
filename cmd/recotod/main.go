@@ -1,4 +1,4 @@
-// Package main は、Recotodのエントリーポイントです.
+// Package main は、Recotodのエントリーポイント
 package main
 
 import (

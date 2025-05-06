@@ -1,4 +1,4 @@
-// Package main は、Recotoのエントリーポイントです.
+// Package main は、Recotoのエントリーポイント
 package main
 
 import "fmt"

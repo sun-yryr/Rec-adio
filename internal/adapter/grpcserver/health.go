@@ -1,4 +1,4 @@
-// Package grpcserver は、gRPCサーバーの実装を提供します.
+// Package grpcserver は、gRPCサーバーの実装を提供する
 package grpcserver
 
 import (
@@ -16,14 +16,14 @@ type healthChecker interface {
 	Check(ctx context.Context) error
 }
 
-// HealthService は、HealthService Interfaceを実装した構造体.
+// HealthService は、HealthService Interfaceを実装した構造体。
 type HealthService struct {
 	pb.UnimplementedHealthServiceServer
 	broker         broker.Broker
 	healthCheckers []healthChecker
 }
 
-// NewHealthService は、HealthServiceのコンストラクタ.
+// NewHealthService は、HealthServiceのコンストラクタ。
 func NewHealthService(
 	broker broker.Broker,
 	healthCheckers ...healthChecker,
@@ -34,7 +34,7 @@ func NewHealthService(
 	}
 }
 
-// Check は、Brokerのヘルスチェックを行う.
+// Check は、Brokerのヘルスチェックを行う。
 func (s *HealthService) Check(
 	ctx context.Context,
 	_ *pb.CheckRequest,
