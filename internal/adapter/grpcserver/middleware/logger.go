@@ -1,4 +1,4 @@
-// Package middleware は、gRPCサーバーのミドルウェアを提供します.
+// Package middleware は、gRPCサーバーのミドルウェアを提供する
 package middleware
 
 import (
@@ -10,9 +10,14 @@ import (
 	"github.com/sun-yryr/recoto/internal/logger"
 )
 
-// NewLoggerInterceptor は、ctxにLoggerを追加するUnaryServerInterceptorを返す.
+// NewLoggerInterceptor は、ctxにLoggerを追加するUnaryServerInterceptorを返す。
 func NewLoggerInterceptor(zapLogger *zap.Logger) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(
+		ctx context.Context,
+		req interface{},
+		_ *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
 		ctx = logger.WithLogger(ctx, zapLogger)
 
 		return handler(ctx, req)

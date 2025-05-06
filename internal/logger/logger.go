@@ -1,4 +1,4 @@
-// Package logger は、アプリケーションロガーを提供します.
+// Package logger は、アプリケーションロガーを提供する
 package logger
 
 import (
@@ -8,7 +8,7 @@ import (
 	"github.com/sun-yryr/recoto/internal/config"
 )
 
-// NewLogger は、アプリケーション環境に基づいてzap.Loggerを作成します.
+// NewLogger は、アプリケーション環境に基づいてzap.Loggerを作成する。
 func NewLogger(cfg *config.Config) (*zap.Logger, error) {
 	if cfg.Env == "production" {
 		logger, err := zap.NewProduction()

@@ -1,4 +1,4 @@
-// Package grpcserver は、gRPCサーバーの実装を提供します.
+// Package grpcserver は、gRPCサーバーの実装を提供する
 package grpcserver
 
 import (
@@ -8,7 +8,7 @@ import (
 
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/logger"
-	pb "github.com/sun-yryr/recoto/pkg/api/health/v1"
+	pb "github.com/sun-yryr/recoto/pkg/api/recoto/health/v1"
 )
 
 type healthChecker interface {
@@ -16,14 +16,14 @@ type healthChecker interface {
 	Check(ctx context.Context) error
 }
 
-// HealthService は、HealthService Interfaceを実装した構造体.
+// HealthService は、HealthService Interfaceを実装した構造体。
 type HealthService struct {
 	pb.UnimplementedHealthServiceServer
 	broker         broker.Broker
 	healthCheckers []healthChecker
 }
 
-// NewHealthService は、HealthServiceのコンストラクタ.
+// NewHealthService は、HealthServiceのコンストラクタ。
 func NewHealthService(
 	broker broker.Broker,
 	healthCheckers ...healthChecker,
@@ -34,11 +34,11 @@ func NewHealthService(
 	}
 }
 
-// Check は、Brokerのヘルスチェックを行う.
+// Check は、Brokerのヘルスチェックを行う。
 func (s *HealthService) Check(
 	ctx context.Context,
-	_ *pb.HealthCheckRequest,
-) (*pb.HealthCheckResponse, error) {
+	_ *pb.CheckRequest,
+) (*pb.CheckResponse, error) {
 	logger := logger.FromContext(ctx)
 	results := make([]*pb.CheckResult, 0, len(s.healthCheckers))
 
@@ -88,7 +88,7 @@ func (s *HealthService) Check(
 		status = "error"
 	}
 
-	return &pb.HealthCheckResponse{
+	return &pb.CheckResponse{
 		Status:  status,
 		Results: results,
 	}, nil

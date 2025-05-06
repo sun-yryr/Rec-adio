@@ -1,4 +1,4 @@
-// Package config は、アプリケーションの設定を管理します.
+// Package config は、アプリケーションの設定を管理する
 package config
 
 import (
@@ -14,14 +14,14 @@ type serverConfig struct {
 	Port int `env:"PORT" envDefault:"8080"`
 }
 
-// Config represents the application configuration.
+// Config は、アプリケーションの設定を管理する。
 type Config struct {
 	Env    string       `env:"APP_ENV" envDefault:"development"`
 	Log    logConfig    `                                       envPrefix:"LOG_"`
 	Server serverConfig `                                       envPrefix:"SERVER_"`
 }
 
-// Load loads the application configuration from environment variables.
+// Load は、環境変数からアプリケーションの設定を読み込む。
 func Load() (*Config, error) {
 	var cfg Config
 	if err := env.Parse(&cfg); err != nil {

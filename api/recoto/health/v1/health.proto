@@ -2,15 +2,15 @@ syntax = "proto3";
 
 package recoto.health.v1;
 
-option go_package = "github.com/sun-yryr/recoto/pkg/api/health/v1;healthv1";
+option go_package = "github.com/sun-yryr/recoto/pkg/api/recoto/health/v1";
 
 service HealthService {
-  rpc Check(HealthCheckRequest) returns (HealthCheckResponse) {}
+  rpc Check(CheckRequest) returns (CheckResponse) {}
 }
 
-message HealthCheckRequest {}
+message CheckRequest {}
 
-message HealthCheckResponse {
+message CheckResponse {
   string status = 1;
   repeated CheckResult results = 2;
 }
