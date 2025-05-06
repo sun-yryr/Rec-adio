@@ -46,8 +46,13 @@ func main() {
         }
 
         srv := grpc.NewServer(
-                grpc.UnaryInterceptor(middleware.NewLoggerInterceptor(logger)),
-                grpc.StreamInterceptor(middleware.NewStreamLoggerInterceptor(logger)),
+                grpc.UnaryInterceptor(middleware.ChainUnaryInterceptors(
+                        middleware.NewLoggerInterceptor(logger),
+                        middleware.NewRequestLoggerInterceptor(logger),
+                )),
+                grpc.StreamInterceptor(middleware.ChainStreamInterceptors(
+                        middleware.NewStreamRequestLoggerInterceptor(logger),
+                )),
         )
         healthv1.RegisterHealthServiceServer(
                 srv,
