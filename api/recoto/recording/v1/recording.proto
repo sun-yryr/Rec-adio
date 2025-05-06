@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package recoto.recording.v1;
+
+option go_package = "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1";
+
+service RecordingService {
+  rpc StartFromURL(StartFromURLRequest) returns (StartFromURLResponse) {}
+}
+
+message StartFromURLRequest {
+  string url = 1;
+  string title = 2;
+  int64 duration = 3;
+}
+
+message StartFromURLResponse {
+  string recording_id = 1;
+}
