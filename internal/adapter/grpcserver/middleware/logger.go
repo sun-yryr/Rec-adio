@@ -1,4 +1,4 @@
-// Package middleware は、gRPCサーバーのミドルウェアを提供
+// Package middleware は、gRPCサーバーのミドルウェアを提供する
 package middleware
 
 import (

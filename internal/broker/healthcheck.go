@@ -12,24 +12,24 @@ import (
 
 const timeout = 3 * time.Second
 
-// HealthCheck は、Brokerの健康状態を確認するための構造体.
+// HealthCheck は、Brokerの健康状態を確認するための構造体。
 type HealthCheck struct {
 	Broker Broker
 }
 
-// NewHealthCheck は、HealthCheckのコンストラクタ.
+// NewHealthCheck は、HealthCheckのコンストラクタ。
 func NewHealthCheck(broker Broker) *HealthCheck {
 	return &HealthCheck{
 		Broker: broker,
 	}
 }
 
-// GetName は、HealthCheckの名前を返す関数.
+// GetName は、HealthCheckの名前を返す関数。
 func (h *HealthCheck) GetName() string {
 	return "BrokerHealthCheck"
 }
 
-// Check は、BrokerのPublish, Subscribeが正常に動作することを確認する関数.
+// Check は、BrokerのPublish, Subscribeが正常に動作することを確認する関数。
 func (h *HealthCheck) Check(ctx context.Context) error {
 	cctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
