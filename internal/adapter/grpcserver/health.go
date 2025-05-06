@@ -37,8 +37,8 @@ func NewHealthService(
 // Check は、Brokerのヘルスチェックを行う.
 func (s *HealthService) Check(
 	ctx context.Context,
-	_ *pb.HealthCheckRequest,
-) (*pb.HealthCheckResponse, error) {
+	_ *pb.CheckRequest,
+) (*pb.CheckResponse, error) {
 	logger := logger.FromContext(ctx)
 	results := make([]*pb.CheckResult, 0, len(s.healthCheckers))
 
@@ -88,7 +88,7 @@ func (s *HealthService) Check(
 		status = "error"
 	}
 
-	return &pb.HealthCheckResponse{
+	return &pb.CheckResponse{
 		Status:  status,
 		Results: results,
 	}, nil
