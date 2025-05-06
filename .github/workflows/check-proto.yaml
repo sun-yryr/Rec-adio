@@ -7,6 +7,12 @@ on:
   pull_request:
     branches:
       - v4
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
 
 permissions:
   contents: read
