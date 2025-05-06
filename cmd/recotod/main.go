@@ -23,30 +23,30 @@ func main() {
 	// Load configuration
 	cfg := lo.Must(config.Load())
 
-	// Initialize logger
-	logger := lo.Must(logger.NewLogger(cfg))
+	// Initialize appLogger
+	appLogger := lo.Must(logger.NewLogger(cfg))
 	defer func() {
-		if err := logger.Sync(); err != nil {
-			logger.Error("failed to sync logger", zap.Error(err))
+		if err := appLogger.Sync(); err != nil {
+			appLogger.Error("failed to sync logger", zap.Error(err))
 		}
 	}()
 
-	logger.Info("Starting server...")
+	appLogger.Info("Starting server...")
 
 	// Initialize NATS broker
-	embBroker, err := nats.NewEmbeddedBroker()
+	embBroker, err := nats.NewEmbeddedBroker(appLogger)
 	if err != nil {
-		logger.Fatal("failed to create broker", zap.Error(err))
+		appLogger.Fatal("failed to create broker", zap.Error(err))
 	}
 
 	// Initialize server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Server.Port))
 	if err != nil {
-		logger.Fatal("failed to listen", zap.Error(err))
+		appLogger.Fatal("failed to listen", zap.Error(err))
 	}
 
 	srv := grpc.NewServer(
-		grpc.UnaryInterceptor(middleware.NewLoggerInterceptor(logger)),
+		grpc.UnaryInterceptor(middleware.NewLoggerInterceptor(appLogger)),
 	)
 	healthv1.RegisterHealthServiceServer(
 		srv,
@@ -56,6 +56,6 @@ func main() {
 
 	// Start server
 	if err := srv.Serve(lis); err != nil {
-		logger.Fatal("failed to serve", zap.Error(err))
+		appLogger.Fatal("failed to serve", zap.Error(err))
 	}
 }
