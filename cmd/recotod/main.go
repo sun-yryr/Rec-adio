@@ -16,7 +16,7 @@ import (
 	"github.com/sun-yryr/recoto/internal/broker/nats"
 	"github.com/sun-yryr/recoto/internal/config"
 	"github.com/sun-yryr/recoto/internal/logger"
-	healthv1 "github.com/sun-yryr/recoto/pkg/api/health/v1"
+	healthv1 "github.com/sun-yryr/recoto/pkg/api/recoto/health/v1"
 )
 
 func main() {

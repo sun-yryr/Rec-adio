@@ -11,5 +11,3 @@ plugins:
   - remote: buf.build/grpc/go
     out: pkg/api
     opt: paths=source_relative
-inputs:
-  - directory: api/recoto

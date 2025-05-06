@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: health/v1/health.proto
+// source: recoto/health/v1/health.proto
 
 package healthv1
 
@@ -117,5 +117,5 @@ var HealthService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "health/v1/health.proto",
+	Metadata: "recoto/health/v1/health.proto",
 }

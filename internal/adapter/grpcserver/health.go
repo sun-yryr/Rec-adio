@@ -8,7 +8,7 @@ import (
 
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/logger"
-	pb "github.com/sun-yryr/recoto/pkg/api/health/v1"
+	pb "github.com/sun-yryr/recoto/pkg/api/recoto/health/v1"
 )
 
 type healthChecker interface {

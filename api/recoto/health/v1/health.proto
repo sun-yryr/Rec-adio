@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package recoto.health.v1;
 
-option go_package = "github.com/sun-yryr/recoto/pkg/api/health/v1;healthv1";
+option go_package = "github.com/sun-yryr/recoto/pkg/api/health/v1";
 
 service HealthService {
   rpc Check(CheckRequest) returns (CheckResponse) {}
