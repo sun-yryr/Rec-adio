@@ -38,12 +38,12 @@ func (s *RecordingService) StartFromURL(
 	ctx context.Context,
 	req *recordingv1.StartFromURLRequest,
 ) (*recordingv1.StartFromURLResponse, error) {
-	filename := filepath.Join(s.saveDir, req.GetTitle()+".mp3")
+	filename := filepath.Join(s.saveDir, req.GetTitle()+".m4a")
 	// すでに存在する場合はunixtimeを付与
 	if _, err := os.Stat(filename); err == nil {
 		filename = filepath.Join(
 			s.saveDir,
-			req.GetTitle()+"_"+time.Now().Format("20060102150405")+".mp3",
+			req.GetTitle()+"_"+time.Now().Format("20060102150405")+".m4a",
 		)
 	}
 

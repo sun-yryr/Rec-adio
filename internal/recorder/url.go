@@ -2,8 +2,11 @@ package recorder
 
 import (
 	"context"
+	"strconv"
 	"time"
 
+	"github.com/cockroachdb/errors"
+	ffmpeg_go "github.com/u2takey/ffmpeg-go"
 	"go.uber.org/zap"
 
 	"github.com/sun-yryr/recoto/internal/domain"
@@ -29,10 +32,31 @@ func (r *URLRecorder) GetSupportSource() []domain.SourceKind {
 
 // Rec はURLをソースとして録音を行う。
 func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) error {
-	r.logger.Info("start recording", zap.String("url", event.Source.ID))
-	// TODO: 録音を行う
-	time.Sleep(10 * time.Second)
-	r.logger.Info("finish recording", zap.String("url", event.Source.ID))
+	cmd := ffmpeg_go.
+		Input(event.Source.ID, ffmpeg_go.KwArgs{"t": strconv.FormatInt(event.Duration, 10)}).
+		Audio().
+		Output(event.Output, ffmpeg_go.KwArgs{"acodec": "aac"})
+
+	// キャンセル付きのcontextを設定する
+	cmd.Context = ctx
+	// 処理の猶予時間を追加
+	const gracePeriod = 10 * time.Second
+	cmd = cmd.WithTimeout(time.Duration(event.Duration)*time.Second + gracePeriod)
+
+	r.logger.Debug(
+		"start recording",
+		zap.String("recordingId", event.RecordingID),
+		zap.String("cmd", cmd.String()),
+	)
+
+	if err := cmd.Run(); err != nil {
+		return errors.Wrap(err, "failed to run ffmpeg")
+	}
+
+	r.logger.Debug(
+		"finish recording",
+		zap.String("recordingId", event.RecordingID),
+	)
 
 	return nil
 }

@@ -8,10 +8,16 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/nats-io/nats-server/v2 v2.11.2
 	github.com/nats-io/nats.go v1.41.2
+	github.com/u2takey/ffmpeg-go v0.5.0
 	go.uber.org/zap v1.27.0
 )
 
-require google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34 // indirect
+require (
+	github.com/aws/aws-sdk-go v1.55.7 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/u2takey/go-utils v0.3.1 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34 // indirect
+)
 
 require (
 	github.com/cockroachdb/logtags v0.0.0-20230118201751-21c54148d20b // indirect
