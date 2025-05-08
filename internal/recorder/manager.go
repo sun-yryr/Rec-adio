@@ -105,27 +105,25 @@ func (m *RecordingManager) handleRequestedEvent(
 			m.cancels[event.RecordingID] = cancel
 			m.mu.Unlock()
 
-			if err := m.startedService.Publish(recCtx, recording.StartedEvent{
-				RecordingID: event.RecordingID,
-				Timestamp:   time.Now(),
-			}); err != nil {
-				m.logger.Error("failed to publish started event", zap.Error(err))
+			defer func() {
+				m.mu.Lock()
+				delete(m.cancels, event.RecordingID)
+				m.mu.Unlock()
+			}()
+
+			if err := m.beforeRec(recCtx, event); err != nil {
+				m.logger.Error("failed to process before recording", zap.Error(err))
+
+				return
 			}
 
 			if err := recorder.Rec(recCtx, event); err != nil {
 				m.logger.Error("failed to record", zap.Error(err))
 			}
 
-			if err := m.finishedService.Publish(recCtx, recording.FinishedEvent{
-				RecordingID: event.RecordingID,
-				Timestamp:   time.Now(),
-			}); err != nil {
-				m.logger.Error("failed to publish finished event", zap.Error(err))
+			if err := m.afterRec(recCtx, event); err != nil {
+				m.logger.Error("failed to process after recording", zap.Error(err))
 			}
-
-			m.mu.Lock()
-			delete(m.cancels, event.RecordingID)
-			m.mu.Unlock()
 		}()
 
 		return
@@ -138,4 +136,26 @@ func (m *RecordingManager) handleRequestedEvent(
 		zap.String("source", string(event.Source.Kind)),
 		zap.String("sourceId", event.Source.ID),
 	)
+}
+
+func (m *RecordingManager) beforeRec(ctx context.Context, event *recording.RequestedEvent) error {
+	if err := m.startedService.Publish(ctx, recording.StartedEvent{
+		RecordingID: event.RecordingID,
+		Timestamp:   time.Now(),
+	}); err != nil {
+		return errors.Wrap(err, "failed to publish started event")
+	}
+
+	return nil
+}
+
+func (m *RecordingManager) afterRec(ctx context.Context, event *recording.RequestedEvent) error {
+	if err := m.finishedService.Publish(ctx, recording.FinishedEvent{
+		RecordingID: event.RecordingID,
+		Timestamp:   time.Now(),
+	}); err != nil {
+		return errors.Wrap(err, "failed to publish finished event")
+	}
+
+	return nil
 }
