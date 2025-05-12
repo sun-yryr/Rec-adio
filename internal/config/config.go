@@ -15,7 +15,7 @@ type serverConfig struct {
 }
 
 type recordingConfig struct {
-	SaveDir string `env:"SAVE_DIR"`
+	SaveDir string `env:"SAVE_DIR" envDefault:"./data/output"`
 }
 
 // Config は、アプリケーションの設定を管理する。
