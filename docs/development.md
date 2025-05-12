@@ -25,6 +25,12 @@ go run ./cmd/recotod/main.go
 
 以下のコマンドを実行し、gRPCサーバーにリクエストを送信します。
 
+それぞれのパラメータの意味は以下の通りです。
+
+- `YOUR_URL`: m3u8形式のデータを取得できるURL
+- `YOUR_TITLE`: 録音タイトル（保存名）
+- `duration`: 録音時間(秒)
+
 ```sh
 grpcurl -plaintext \
   -d '{"url": "YOUR_URL", "title": "YOUR_TITLE", "duration": 3600}' \
