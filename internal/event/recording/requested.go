@@ -19,7 +19,7 @@ type RequestedEvent struct {
 	Status      domain.RecordingStatus `json:"status"`
 	Source      domain.Source          `json:"source"`
 	Output      string                 `json:"output"`
-	Duration    int64                  `json:"duration"`
+	Duration    time.Duration          `json:"duration"`
 	Timestamp   time.Time              `json:"timestamp"`
 }
 

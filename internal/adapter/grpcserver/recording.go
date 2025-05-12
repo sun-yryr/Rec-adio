@@ -50,7 +50,7 @@ func (s *RecordingService) StartFromURL(
 	newRecording := domain.NewRecording(
 		domain.NewURLSource(req.GetUrl()),
 		filename,
-		req.GetDuration(),
+		req.GetDuration().AsDuration(),
 	)
 
 	if err := s.requestedService.Publish(ctx, *recording.NewRequestedEvent(*newRecording)); err != nil {

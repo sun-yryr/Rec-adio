@@ -1,7 +1,11 @@
 // Package domain は、アプリケーションのドメイン層を定義します.
 package domain
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 // RecordingID は、録音のIDを表す型.
 type RecordingID string
@@ -49,11 +53,11 @@ type Recording struct {
 	Source   Source          `json:"source"`
 	Status   RecordingStatus `json:"status"`
 	Output   string          `json:"output"`
-	Duration int64           `json:"duration"`
+	Duration time.Duration   `json:"duration"`
 }
 
 // NewRecording は、新しい録音を作成する.
-func NewRecording(source Source, output string, duration int64) *Recording {
+func NewRecording(source Source, output string, duration time.Duration) *Recording {
 	return &Recording{
 		ID:       RecordingID(uuid.New().String()),
 		Source:   source,

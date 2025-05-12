@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package recoto.recording.v1;
 
+import "google/protobuf/duration.proto";
+
 option go_package = "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1";
 
 service RecordingService {
@@ -11,7 +13,7 @@ service RecordingService {
 message StartFromURLRequest {
   string url = 1;
   string title = 2;
-  int64 duration = 3;
+  google.protobuf.Duration duration = 3;
 }
 
 message StartFromURLResponse {

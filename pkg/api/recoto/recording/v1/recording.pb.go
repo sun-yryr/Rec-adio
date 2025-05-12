@@ -9,6 +9,7 @@ package recordingv1
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -25,7 +26,7 @@ type StartFromURLRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Duration      int64                  `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	Duration      *durationpb.Duration   `protobuf:"bytes,3,opt,name=duration,proto3" json:"duration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,11 +75,11 @@ func (x *StartFromURLRequest) GetTitle() string {
 	return ""
 }
 
-func (x *StartFromURLRequest) GetDuration() int64 {
+func (x *StartFromURLRequest) GetDuration() *durationpb.Duration {
 	if x != nil {
 		return x.Duration
 	}
-	return 0
+	return nil
 }
 
 type StartFromURLResponse struct {
@@ -129,11 +130,11 @@ var File_recoto_recording_v1_recording_proto protoreflect.FileDescriptor
 
 const file_recoto_recording_v1_recording_proto_rawDesc = "" +
 	"\n" +
-	"#recoto/recording/v1/recording.proto\x12\x13recoto.recording.v1\"Y\n" +
+	"#recoto/recording/v1/recording.proto\x12\x13recoto.recording.v1\x1a\x1egoogle/protobuf/duration.proto\"t\n" +
 	"\x13StartFromURLRequest\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1a\n" +
-	"\bduration\x18\x03 \x01(\x03R\bduration\"9\n" +
+	"\x05title\x18\x02 \x01(\tR\x05title\x125\n" +
+	"\bduration\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\bduration\"9\n" +
 	"\x14StartFromURLResponse\x12!\n" +
 	"\frecording_id\x18\x01 \x01(\tR\vrecordingId2y\n" +
 	"\x10RecordingService\x12e\n" +
@@ -156,15 +157,17 @@ var file_recoto_recording_v1_recording_proto_msgTypes = make([]protoimpl.Message
 var file_recoto_recording_v1_recording_proto_goTypes = []any{
 	(*StartFromURLRequest)(nil),  // 0: recoto.recording.v1.StartFromURLRequest
 	(*StartFromURLResponse)(nil), // 1: recoto.recording.v1.StartFromURLResponse
+	(*durationpb.Duration)(nil),  // 2: google.protobuf.Duration
 }
 var file_recoto_recording_v1_recording_proto_depIdxs = []int32{
-	0, // 0: recoto.recording.v1.RecordingService.StartFromURL:input_type -> recoto.recording.v1.StartFromURLRequest
-	1, // 1: recoto.recording.v1.RecordingService.StartFromURL:output_type -> recoto.recording.v1.StartFromURLResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	2, // 0: recoto.recording.v1.StartFromURLRequest.duration:type_name -> google.protobuf.Duration
+	0, // 1: recoto.recording.v1.RecordingService.StartFromURL:input_type -> recoto.recording.v1.StartFromURLRequest
+	1, // 2: recoto.recording.v1.RecordingService.StartFromURL:output_type -> recoto.recording.v1.StartFromURLResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_recoto_recording_v1_recording_proto_init() }

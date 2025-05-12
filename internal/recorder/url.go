@@ -2,6 +2,7 @@ package recorder
 
 import (
 	"context"
+	"math"
 	"strconv"
 	"time"
 
@@ -33,7 +34,12 @@ func (r *URLRecorder) GetSupportSource() []domain.SourceKind {
 // Rec はURLをソースとして録音を行う。
 func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) error {
 	cmd := ffmpeg_go.
-		Input(event.Source.ID, ffmpeg_go.KwArgs{"t": strconv.FormatInt(event.Duration, 10)}).
+		Input(
+			event.Source.ID,
+			ffmpeg_go.KwArgs{
+				"t": strconv.FormatInt(int64(math.Ceil(event.Duration.Seconds())), 10),
+			},
+		).
 		Audio().
 		Output(event.Output, ffmpeg_go.KwArgs{"acodec": "aac"})
 
@@ -41,7 +47,7 @@ func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) 
 	cmd.Context = ctx
 	// 処理の猶予時間を追加
 	const gracePeriod = 10 * time.Second
-	cmd = cmd.WithTimeout(time.Duration(event.Duration)*time.Second + gracePeriod)
+	cmd = cmd.WithTimeout(event.Duration + gracePeriod)
 
 	r.logger.Debug(
 		"start recording",
