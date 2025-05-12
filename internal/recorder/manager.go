@@ -22,6 +22,14 @@ type Recorder interface {
 		ctx context.Context,
 		event *recording.RequestedEvent,
 	) error
+	GetName() string
+	CheckAvailable() error
+}
+
+type recorderWithStatus struct {
+	recorder  Recorder
+	available bool
+	error     error
 }
 
 // RecordingManager は録音の管理を行うマネージャー。
@@ -31,7 +39,7 @@ type RecordingManager struct {
 	finishedService  *eventutil.EventService[recording.FinishedEvent]
 	logger           *zap.Logger
 	mu               sync.Mutex
-	recorders        []Recorder
+	recorders        []recorderWithStatus
 	cancels          map[string]context.CancelFunc
 }
 
@@ -41,7 +49,6 @@ func NewRecordingManager(
 	startedService *eventutil.EventService[recording.StartedEvent],
 	finishedService *eventutil.EventService[recording.FinishedEvent],
 	logger *zap.Logger,
-	recorders []Recorder,
 ) *RecordingManager {
 	return &RecordingManager{
 		requestedService: requestedService,
@@ -49,9 +56,31 @@ func NewRecordingManager(
 		finishedService:  finishedService,
 		logger:           logger,
 		mu:               sync.Mutex{},
-		recorders:        recorders,
+		recorders:        []recorderWithStatus{},
 		cancels:          make(map[string]context.CancelFunc),
 	}
+}
+
+// AddRecorder はRecorderに状態を付与してRecordingManagerに追加する。
+func (m *RecordingManager) AddRecorder(recorder Recorder) error {
+	rws := recorderWithStatus{
+		recorder:  recorder,
+		available: true,
+		error:     nil,
+	}
+
+	// 有効でない場合はエラーを格納し、無効な状態にする
+	if err := recorder.CheckAvailable(); err != nil {
+		rws.available = false
+		rws.error = err
+	}
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.recorders = append(m.recorders, rws)
+
+	return rws.error
 }
 
 // Start は録音マネージャーを起動し、イベント駆動で録音を管理する。
@@ -88,7 +117,12 @@ func (m *RecordingManager) handleRequestedEvent(
 	event *recording.RequestedEvent,
 ) {
 	// サポートしているrecorderを探す
-	for _, recorder := range m.recorders {
+	for _, recorderWithStatus := range m.recorders {
+		if !recorderWithStatus.available {
+			continue
+		}
+
+		recorder := recorderWithStatus.recorder
 		if len(recorder.GetSupportSource()) == 0 {
 			continue
 		}

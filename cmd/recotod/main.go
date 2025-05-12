@@ -70,8 +70,13 @@ func main() {
 		recordingStartedService,
 		recordingFinishedService,
 		appLogger,
-		[]recorder.Recorder{urlRecorder},
 	)
+
+	// URLRecorderを追加
+	if err := recordingManager.AddRecorder(urlRecorder); err != nil {
+		// エラーログを出力するだけで、サーバー自体は起動する
+		appLogger.Warn("failed to add URL recorder", zap.Error(err))
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

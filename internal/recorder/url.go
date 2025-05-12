@@ -3,6 +3,7 @@ package recorder
 import (
 	"context"
 	"math"
+	"os/exec"
 	"strconv"
 	"time"
 
@@ -29,6 +30,22 @@ func NewURLRecorder(logger *zap.Logger) *URLRecorder {
 // GetSupportSource はURLRecorderがサポートするソースを返す。
 func (r *URLRecorder) GetSupportSource() []domain.SourceKind {
 	return []domain.SourceKind{domain.SourceKindURL}
+}
+
+// CheckAvailable はURLRecorderの有効性をチェックする。
+func (r *URLRecorder) CheckAvailable() error {
+	// ffmpegの存在を確認
+	_, err := exec.LookPath("ffmpeg")
+	if err != nil {
+		return errors.Wrap(err, "ffmpeg is not installed")
+	}
+
+	return nil
+}
+
+// GetName はURLRecorderの名前を返す。
+func (r *URLRecorder) GetName() string {
+	return "URLRecorder"
 }
 
 // Rec はURLをソースとして録音を行う。
