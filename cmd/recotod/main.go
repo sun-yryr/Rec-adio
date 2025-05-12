@@ -52,6 +52,12 @@ func main() {
 		appLogger.Fatal("failed to create broker", zap.Error(err))
 	}
 
+	defer func() {
+		if err := embBroker.Close(); err != nil {
+			appLogger.Error("failed to close broker", zap.Error(err))
+		}
+	}()
+
 	// イベント
 	recordingRequestedService := recording.NewRequestedService(embBroker, appLogger)
 	recordingStartedService := recording.NewStartedService(embBroker, appLogger)
