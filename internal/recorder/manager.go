@@ -176,15 +176,15 @@ func (m *RecordingManager) processRecording(
 		m.mu.Unlock()
 	}()
 
-	if err := m.beforeRec(recCtx, event); err != nil {
-		m.logger.Error("failed to process before recording", zap.Error(err))
-
-		return
-	}
-
-	recErr := recorder.Rec(recCtx, event)
+	// 前処理・録音でエラーが起きたら後続の処理を飛ばして後処理を実行する
+	recErr := m.beforeRec(recCtx, event)
 	if recErr != nil {
-		m.logger.Error("failed to record", zap.Error(recErr))
+		m.logger.Error("failed to process before recording", zap.Error(recErr))
+	} else {
+		recErr = recorder.Rec(recCtx, event)
+		if recErr != nil {
+			m.logger.Error("failed to record", zap.Error(recErr))
+		}
 	}
 
 	if err := m.afterRec(recCtx, event, recErr); err != nil {
