@@ -6,16 +6,22 @@ import "google/protobuf/duration.proto";
 
 option go_package = "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1";
 
+// 録音に関するRPCメソッドを提供する。
 service RecordingService {
+  // 指定されたURLで即時録音を開始する。
   rpc StartFromURL(StartFromURLRequest) returns (StartFromURLResponse) {}
 }
 
 message StartFromURLRequest {
+  // 録音するコンテンツのURL。m3u8などffmpegで取得可能なURLの必要がある。
   string url = 1;
+  // 録音するコンテンツのタイトル。保存する際のファイル名になる。
   string title = 2;
+  // 録音するコンテンツの長さ。
   google.protobuf.Duration duration = 3;
 }
 
 message StartFromURLResponse {
+  // 録音ID。
   string recording_id = 1;
 }
