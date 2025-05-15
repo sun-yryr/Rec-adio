@@ -86,10 +86,17 @@ func NewRecording(source *Source, output string, duration time.Duration) (*Recor
 	}, nil
 }
 
-// Start は録音の状態を実行中に変更する
+// ErrInvalidRecordingStatus は録音ステータスが無効な場合のエラー。
+var ErrInvalidRecordingStatus = errors.New("invalid recording status")
+
+// Start は録音の状態を実行中に変更する。
 func (r *Recording) Start() error {
 	if r.Status != RecordingStatusRequested {
-		return errors.Newf("cannot start recording with status: %s", r.Status)
+		return errors.Wrapf(
+			ErrInvalidRecordingStatus,
+			"cannot start recording with status: %s",
+			r.Status,
+		)
 	}
 
 	r.Status = RecordingStatusRunning
@@ -97,10 +104,14 @@ func (r *Recording) Start() error {
 	return nil
 }
 
-// Finish は録音の状態を完了に変更する
+// Finish は録音の状態を完了に変更する。
 func (r *Recording) Finish() error {
 	if r.Status != RecordingStatusRunning {
-		return errors.Newf("cannot finish recording with status: %s", r.Status)
+		return errors.Wrapf(
+			ErrInvalidRecordingStatus,
+			"cannot finish recording with status: %s",
+			r.Status,
+		)
 	}
 
 	r.Status = RecordingStatusFinished
@@ -108,7 +119,7 @@ func (r *Recording) Finish() error {
 	return nil
 }
 
-// Fail は録音の状態を失敗に変更する
+// Fail は録音の状態を失敗に変更する。
 func (r *Recording) Fail() error {
 	r.Status = RecordingStatusFailed
 
