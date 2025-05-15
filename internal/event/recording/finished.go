@@ -16,6 +16,8 @@ const FinishedSubject = "recoto.recording.finished.v1"
 // FinishedEvent は録画終了イベントを表すイベント。
 type FinishedEvent struct {
 	RecordingID string    `json:"recordingId"`
+	Success     bool      `json:"success"`
+	Error       *string   `json:"error,omitempty"`
 	Timestamp   time.Time `json:"timestamp"`
 }
 

@@ -151,11 +151,12 @@ func (m *RecordingManager) handleRequestedEvent(
 				return
 			}
 
-			if err := recorder.Rec(recCtx, event); err != nil {
-				m.logger.Error("failed to record", zap.Error(err))
+			recErr := recorder.Rec(recCtx, event)
+			if recErr != nil {
+				m.logger.Error("failed to record", zap.Error(recErr))
 			}
 
-			if err := m.afterRec(recCtx, event); err != nil {
+			if err := m.afterRec(recCtx, event, recErr); err != nil {
 				m.logger.Error("failed to process after recording", zap.Error(err))
 			}
 		}()
@@ -183,9 +184,22 @@ func (m *RecordingManager) beforeRec(ctx context.Context, event *recording.Reque
 	return nil
 }
 
-func (m *RecordingManager) afterRec(ctx context.Context, event *recording.RequestedEvent) error {
+func (m *RecordingManager) afterRec(
+	ctx context.Context,
+	event *recording.RequestedEvent,
+	recErr error,
+) error {
+	var errorMsg *string
+
+	if recErr != nil {
+		errStr := recErr.Error()
+		errorMsg = &errStr
+	}
+
 	if err := m.finishedService.Publish(ctx, recording.FinishedEvent{
 		RecordingID: event.RecordingID,
+		Success:     recErr == nil,
+		Error:       errorMsg,
 		Timestamp:   time.Now(),
 	}); err != nil {
 		return errors.Wrap(err, "failed to publish finished event")
