@@ -97,10 +97,16 @@ func (m *RecordingManager) Start(ctx context.Context) error {
 	go func() {
 		<-ctx.Done()
 		m.logger.Info("recording manager is stopped")
-		m.mu.Lock()
-		defer m.mu.Unlock()
 
-		for _, cancel := range m.cancels {
+		m.mu.Lock()
+		cancels := make([]context.CancelFunc, 0, len(m.cancels))
+
+		for _, c := range m.cancels {
+			cancels = append(cancels, c)
+		}
+		m.mu.Unlock()
+
+		for _, cancel := range cancels {
 			cancel()
 		}
 
@@ -116,50 +122,30 @@ func (m *RecordingManager) handleRequestedEvent(
 	ctx context.Context,
 	event *recording.RequestedEvent,
 ) {
-	// サポートしているrecorderを探す
-	for _, recorderWithStatus := range m.recorders {
+	// スナップショットを取得してからサポートしているrecorderを探す
+	m.mu.Lock()
+	recorders := make([]recorderWithStatus, len(m.recorders))
+	copy(recorders, m.recorders)
+	m.mu.Unlock()
+
+	for _, recorderWithStatus := range recorders {
 		if !recorderWithStatus.available {
 			continue
 		}
 
 		recorder := recorderWithStatus.recorder
-		if len(recorder.GetSupportSource()) == 0 {
+
+		supportSource := recorder.GetSupportSource()
+		if len(supportSource) == 0 {
 			continue
 		}
 
-		if !slices.Contains(recorder.GetSupportSource(), event.Source.Kind) {
+		if !slices.Contains(supportSource, event.Source.Kind) {
 			continue
 		}
 
 		// 録音処理は別のgoroutineで行う
-		go func() {
-			recCtx, cancel := context.WithCancel(ctx)
-
-			m.mu.Lock()
-			m.cancels[event.RecordingID] = cancel
-			m.mu.Unlock()
-
-			defer func() {
-				m.mu.Lock()
-				delete(m.cancels, event.RecordingID)
-				m.mu.Unlock()
-			}()
-
-			if err := m.beforeRec(recCtx, event); err != nil {
-				m.logger.Error("failed to process before recording", zap.Error(err))
-
-				return
-			}
-
-			recErr := recorder.Rec(recCtx, event)
-			if recErr != nil {
-				m.logger.Error("failed to record", zap.Error(recErr))
-			}
-
-			if err := m.afterRec(recCtx, event, recErr); err != nil {
-				m.logger.Error("failed to process after recording", zap.Error(err))
-			}
-		}()
+		go m.processRecording(ctx, event, recorder)
 
 		return
 	}
@@ -171,6 +157,39 @@ func (m *RecordingManager) handleRequestedEvent(
 		zap.String("source", string(event.Source.Kind)),
 		zap.String("sourceId", event.Source.ID),
 	)
+}
+
+func (m *RecordingManager) processRecording(
+	ctx context.Context,
+	event *recording.RequestedEvent,
+	recorder Recorder,
+) {
+	recCtx, cancel := context.WithCancel(ctx)
+
+	m.mu.Lock()
+	m.cancels[event.RecordingID] = cancel
+	m.mu.Unlock()
+
+	defer func() {
+		m.mu.Lock()
+		delete(m.cancels, event.RecordingID)
+		m.mu.Unlock()
+	}()
+
+	if err := m.beforeRec(recCtx, event); err != nil {
+		m.logger.Error("failed to process before recording", zap.Error(err))
+
+		return
+	}
+
+	recErr := recorder.Rec(recCtx, event)
+	if recErr != nil {
+		m.logger.Error("failed to record", zap.Error(recErr))
+	}
+
+	if err := m.afterRec(recCtx, event, recErr); err != nil {
+		m.logger.Error("failed to process after recording", zap.Error(err))
+	}
 }
 
 func (m *RecordingManager) beforeRec(ctx context.Context, event *recording.RequestedEvent) error {
