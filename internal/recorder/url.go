@@ -1,8 +1,10 @@
 package recorder
 
 import (
+	"bytes"
 	"context"
 	"math"
+	"net/url"
 	"os/exec"
 	"strconv"
 	"time"
@@ -50,6 +52,12 @@ func (r *URLRecorder) GetName() string {
 
 // Rec はURLをソースとして録音を行う。
 func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) error {
+	if _, err := url.Parse(event.Source.ID); err != nil {
+		return errors.Wrap(err, "invalid URL")
+	}
+
+	var stdErrBuf bytes.Buffer
+
 	cmd := ffmpeg_go.
 		Input(
 			event.Source.ID,
@@ -58,12 +66,19 @@ func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) 
 			},
 		).
 		Audio().
-		Output(event.Output, ffmpeg_go.KwArgs{"acodec": "aac"})
+		Output(event.Output, ffmpeg_go.KwArgs{"acodec": "aac"}).
+		WithErrorOutput(&stdErrBuf)
 
 	// キャンセル付きのcontextを設定する
 	cmd.Context = ctx
 	// 処理の猶予時間を追加
 	const gracePeriod = 10 * time.Second
+	// int64を超える（290年を超える）録音時間に対する保護
+	maxDuration := time.Duration(math.MaxInt64) - gracePeriod
+	if event.Duration > maxDuration {
+		return errors.New("recording duration is too long")
+	}
+
 	cmd = cmd.WithTimeout(event.Duration + gracePeriod)
 
 	r.logger.Debug(
@@ -73,6 +88,12 @@ func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) 
 	)
 
 	if err := cmd.Run(); err != nil {
+		r.logger.Debug(
+			"failed to run ffmpeg",
+			zap.String("stderr", stdErrBuf.String()),
+			zap.Error(err),
+		)
+
 		return errors.Wrap(err, "failed to run ffmpeg")
 	}
 
