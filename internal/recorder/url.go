@@ -52,7 +52,8 @@ func (r *URLRecorder) GetName() string {
 
 // Rec はURLをソースとして録音を行う。
 func (r *URLRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) error {
-	if _, err := url.Parse(event.Source.ID); err != nil {
+	u, err := url.Parse(event.Source.ID)
+	if err != nil || u.Scheme == "" {
 		return errors.Wrap(err, "invalid URL")
 	}
 

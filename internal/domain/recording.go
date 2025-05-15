@@ -43,7 +43,8 @@ type Source struct {
 
 // NewURLSource は、URLのソースを作成する.
 func NewURLSource(url string) (*Source, error) {
-	if _, err := stdurl.Parse(url); err != nil {
+	u, err := stdurl.Parse(url)
+	if err != nil || u.Scheme == "" {
 		return nil, errors.Wrap(err, "invalid url")
 	}
 
