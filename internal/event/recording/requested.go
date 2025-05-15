@@ -17,7 +17,7 @@ const RequestedSubject = "recoto.recording.requested.v1"
 type RequestedEvent struct {
 	RecordingID string                 `json:"recordingId"`
 	Status      domain.RecordingStatus `json:"status"`
-	Source      domain.Source          `json:"source"`
+	Source      *domain.Source         `json:"source"`
 	Output      string                 `json:"output"`
 	Duration    time.Duration          `json:"duration"`
 	Timestamp   time.Time              `json:"timestamp"`
