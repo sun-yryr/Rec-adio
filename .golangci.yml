@@ -5,6 +5,7 @@ linters:
     - depguard
     - tagalign # golinesのreformat-tagsと競合するため
     - exhaustruct
+    - cyclop
 formatters:
   enable:
     - gofumpt
