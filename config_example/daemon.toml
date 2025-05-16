@@ -1,0 +1,13 @@
+# Recoto デーモンの設定ファイル
+
+# ログ設定
+[log]
+level = "info"  # debug, info, warn, error のいずれか
+
+# サーバー設定
+[server]
+port = 8080
+
+# 録音設定
+[recording]
+save_dir = "./data/output"

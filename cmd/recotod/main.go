@@ -3,11 +3,12 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
+	"log"
 	"net"
 	"os"
 
-	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -16,23 +17,45 @@ import (
 	"github.com/sun-yryr/recoto/internal/adapter/grpcserver/middleware"
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/broker/nats"
-	"github.com/sun-yryr/recoto/internal/config"
+	config "github.com/sun-yryr/recoto/internal/config/server"
 	"github.com/sun-yryr/recoto/internal/event/recording"
+	"github.com/sun-yryr/recoto/internal/fileutil"
 	"github.com/sun-yryr/recoto/internal/logger"
 	"github.com/sun-yryr/recoto/internal/recorder"
 	healthv1 "github.com/sun-yryr/recoto/pkg/api/recoto/health/v1"
 	recordingv1 "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1"
 )
 
-const saveDirPerm = 0o750
-
 //nolint:funlen // main関数は許して
 func main() {
-	// Load configuration
-	cfg := lo.Must(config.Load())
+	// コマンドライン引数の解析
+	var configPath string
+
+	flag.StringVar(
+		&configPath,
+		"config",
+		"",
+		"Path to config file (default: $HOME/.config/recoto/daemon.toml)",
+	)
+	flag.Parse()
+
+	// 設定を読み込む
+	cfg, err := config.LoadConfig(configPath)
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
+
+	// 設定のバリデーション
+	if err := config.ValidateConfig(cfg); err != nil {
+		log.Fatalf("Invalid config: %v", err)
+	}
 
 	// Initialize appLogger
-	appLogger := lo.Must(logger.NewLogger(cfg))
+	appLogger, err := logger.NewLogger(cfg)
+	if err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
+
 	defer func() {
 		if err := appLogger.Sync(); err != nil {
 			appLogger.Error("failed to sync logger", zap.Error(err))
@@ -40,11 +63,9 @@ func main() {
 	}()
 
 	// saveDirを作成
-	if err := os.MkdirAll(cfg.Recording.SaveDir, saveDirPerm); err != nil {
+	if err := os.MkdirAll(cfg.Recording.SaveDir, fileutil.DefaultDirPerm); err != nil {
 		appLogger.Fatal("failed to create saveDir", zap.Error(err))
 	}
-
-	appLogger.Info("Starting server...")
 
 	// Initialize NATS broker
 	embBroker, err := nats.NewEmbeddedBroker(appLogger)
@@ -104,7 +125,8 @@ func main() {
 	)
 	reflection.Register(srv)
 
-	// Start server
+	appLogger.Info("Server is listening on port", zap.Int("port", cfg.Server.Port))
+
 	if err := srv.Serve(lis); err != nil {
 		appLogger.Fatal("failed to serve", zap.Error(err))
 	}

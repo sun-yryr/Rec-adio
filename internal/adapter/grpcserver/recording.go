@@ -8,7 +8,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 
-	"github.com/sun-yryr/recoto/internal/config"
+	config "github.com/sun-yryr/recoto/internal/config/server"
 	"github.com/sun-yryr/recoto/internal/domain"
 	"github.com/sun-yryr/recoto/internal/event/recording"
 	"github.com/sun-yryr/recoto/internal/eventutil"
