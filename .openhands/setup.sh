@@ -9,8 +9,9 @@ rm -rf /usr/local/go
 wget https://go.dev/dl/go1.24.2.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.24.2.linux-amd64.tar.gz
 echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
-echo "export PATH=\$PATH:$(go env GOPATH)/bin" >> ~/.bashrc
 source ~/.bashrc
+
+echo "export PATH=\$PATH:$(go env GOPATH)/bin" >> ~/.bashrc
 
 curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
   | sh -s -- -b $(go env GOPATH)/bin v2.1.6
