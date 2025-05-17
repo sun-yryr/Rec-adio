@@ -6,6 +6,17 @@ linters:
     - tagalign # golinesのreformat-tagsと競合するため
     - exhaustruct
     - cyclop
+  settings:
+    varnamelen:
+      ignore-names:
+        - tt
+  exclusions:
+    rules:
+      - path: _test\.go
+        linters:
+          - testpackage
+          - funlen
+          - lll
 formatters:
   enable:
     - gofumpt

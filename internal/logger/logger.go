@@ -4,25 +4,38 @@ package logger
 import (
 	"github.com/cockroachdb/errors"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
-	"github.com/sun-yryr/recoto/internal/config"
+	config "github.com/sun-yryr/recoto/internal/config/server"
 )
 
 // NewLogger は、アプリケーション環境に基づいてzap.Loggerを作成する。
 func NewLogger(cfg *config.Config) (*zap.Logger, error) {
-	if cfg.Env == "production" {
-		logger, err := zap.NewProduction()
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to create production logger")
-		}
+	zapConfig := zapConfig()
 
-		return logger, nil
+	level, err := zapcore.ParseLevel(cfg.Log.Level)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to parse log level")
 	}
 
-	logger, err := zap.NewDevelopment()
+	zapConfig.Level.SetLevel(level)
+
+	logger, err := zapConfig.Build()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create development logger")
+		return nil, errors.Wrap(err, "failed to create logger")
 	}
 
 	return logger, nil
+}
+
+func zapConfig() *zap.Config {
+	cfg := zap.NewProductionConfig()
+
+	cfg.Sampling = nil
+	cfg.OutputPaths = []string{"stdout"}
+	cfg.ErrorOutputPaths = []string{"stderr"}
+	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	cfg.EncoderConfig.EncodeDuration = zapcore.SecondsDurationEncoder
+
+	return &cfg
 }
