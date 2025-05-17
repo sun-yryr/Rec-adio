@@ -23,6 +23,7 @@ triggers:
 ## テストコード作成ルール
 
 ### 基本構造
+
 ```go
 func TestXxx(t *testing.T) {
     t.Parallel() // 可能な限り並列実行を有効に
@@ -40,6 +41,7 @@ func TestXxx(t *testing.T) {
 ```
 
 ### アサーションの使い分け
+
 - `assert.Equal(t, expected, actual)` - 値の一致検証（テスト継続）
 - `assert.True(t, condition)` - 条件が真であることを検証
 - `assert.FileExists(t, path)` - ファイルの存在を検証
@@ -47,6 +49,7 @@ func TestXxx(t *testing.T) {
 - `require.ErrorAs(t, err, &target)` - エラーの型を検証
 
 ### テーブル駆動テスト
+
 ```go
 tests := []struct {
     name     string
@@ -112,13 +115,16 @@ assert.Equal(t, tt.expected, actual)
 ## 従来のテストコードからの移行方針
 
 ### if文によるエラー検証の代替
+
 - 古い: `if err != nil { t.Fatalf("error: %v", err) }`
 - 新しい: `require.NoError(t, err)`
 
 ### 値の比較の代替
+
 - 古い: `if actual != expected { t.Errorf("expected %v, got %v", expected, actual) }`
 - 新しい: `assert.Equal(t, expected, actual)`
 
 ### ファイル存在確認の代替
+
 - 古い: `if _, err := os.Stat(path); os.IsNotExist(err) { t.Error("file not found") }`
-- 新しい: `assert.FileExists(t, path)` 
+- 新しい: `assert.FileExists(t, path)`
