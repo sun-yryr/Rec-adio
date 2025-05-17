@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -e
+
+echo "Running pre-commit hook..."
+
+# golangci-lintの実行
+echo "Running golangci-lint..."
+golangci-lint run
+
+# bufのlint実行
+echo "Running buf lint..."
+buf lint
+
+# bufのformat実行 (-w: 書き込み, --exit-code: エラー時に終了コードを非ゼロにする)
+echo "Running buf format..."
+buf format -w --exit-code
+
+echo "Pre-commit hook completed successfully!"
