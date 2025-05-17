@@ -29,3 +29,5 @@ BIN="/usr/local/bin" && \
 cd "$CURRENT_DIR" || exit
 
 go build ./...
+
+git config core.hooksPath .githooks
