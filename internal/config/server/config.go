@@ -1,4 +1,79 @@
-// Package server は、アプリケーションの設定を管理する
+package server
+
+import (
+    "fmt"
+    "os"
+    "path/filepath"
+
+    "github.com/cockroachdb/errors"
+    "github.com/pelletier/go-toml/v2"
+    "github.com/go-playground/validator/v10"
+)
+
+type Config struct {
+    Log struct {
+        Level string `toml:"level" validate:"oneof=debug info warn error"`
+    } `toml:"log"`
+
+    Server struct {
+        Port int `toml:"port" validate:"required,gt=0"`
+    } `toml:"server"`
+
+    Recording struct {
+        SaveDir string `toml:"save_dir" validate:"required"`
+    } `toml:"recording"`
+}
+
+func NewDefaultConfig() *Config {
+    cfg := &Config{}
+    cfg.Log.Level = "info"
+    cfg.Server.Port = 8080
+    cfg.Recording.SaveDir = "./data/output"
+    return cfg
+}
+
+func LoadConfig(path string) (*Config, error) {
+    cfg := NewDefaultConfig()
+
+    // Write default config if file does not exist
+    if _, err := os.Stat(path); os.IsNotExist(err) {
+        dir := filepath.Dir(path)
+        if err := os.MkdirAll(dir, 0o755); err != nil {
+            return nil, errors.Wrap(err, "failed to create config directory")
+        }
+        data, err := toml.Marshal(cfg)
+        if err != nil {
+            return nil, errors.Wrap(err, "failed to marshal default config to TOML")
+        }
+        if err := os.WriteFile(path, data, 0o600); err != nil {
+            return nil, errors.Wrap(err, "failed to write default config file")
+        }
+        return cfg, nil
+    }
+
+    // Load existing config
+    data, err := os.ReadFile(path)
+    if err != nil {
+        return nil, errors.Wrap(err, "failed to read config file")
+    }
+    if err := toml.Unmarshal(data, cfg); err != nil {
+        return nil, errors.Wrap(err, "failed to unmarshal config TOML")
+    }
+
+    // Validate loaded config
+    if err := ValidateConfig(cfg); err != nil {
+        return nil, err
+    }
+    return cfg, nil
+}
+
+func ValidateConfig(cfg *Config) error {
+    validate := validator.New()
+    if err := validate.Struct(cfg); err != nil {
+        return errors.New(fmt.Sprintf("config validation failed: %s", err.Error()))
+    }
+    return nil
+}
 package server
 
 import (
@@ -6,107 +81,96 @@ import (
 	"path/filepath"
 
 	"github.com/cockroachdb/errors"
-	"github.com/go-playground/validator/v10"
 	"github.com/pelletier/go-toml/v2"
-
-	"github.com/sun-yryr/recoto/internal/fileutil"
 )
 
 type logConfig struct {
-	Level string `toml:"level" validate:"required,oneof=debug info warn error"`
+	Level string ` + "`toml:\"level\"`" + `
 }
 
 type serverConfig struct {
-	Port int `toml:"port" validate:"required,gt=0,lte=65535"`
+	Port int ` + "`toml:\"port\"`" + `
 }
 
 type recordingConfig struct {
-	SaveDir string `toml:"save_dir" validate:"required"`
+	SaveDir string ` + "`toml:\"save_dir\"`" + `
 }
 
-// Config はアプリケーションの設定を表す。
 type Config struct {
-	Log       logConfig       `toml:"log"       validate:"required"`
-	Server    serverConfig    `toml:"server"    validate:"required"`
-	Recording recordingConfig `toml:"recording" validate:"required"`
+	Log       logConfig       ` + "`toml:\"log\"`" + `
+	Server    serverConfig    ` + "`toml:\"server\"`" + `
+	Recording recordingConfig ` + "`toml:\"recording\"`" + `
 }
 
-// NewDefaultConfig はデフォルト値を持つ設定を作成する。
 func NewDefaultConfig() *Config {
 	return &Config{
-		Log: logConfig{
-			Level: "info",
-		},
-		Server: serverConfig{
-			Port: 8080, //nolint:mnd
-		},
-		Recording: recordingConfig{
-			SaveDir: "./data/output",
-		},
+		Log:       logConfig{Level: "info"},
+		Server:    serverConfig{Port: 8080},
+		Recording: recordingConfig{SaveDir: "./data/output"},
 	}
 }
 
-// GetDefaultConfigPath はデフォルトの設定ファイルパスを返す。
-func GetDefaultConfigPath() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", errors.Wrap(err, "failed to get home directory")
-	}
-
-	return filepath.Join(home, ".config", "recoto", "daemon.toml"), nil
-}
-
-// LoadConfig は設定ファイルから設定を読み込む。存在しない場合はデフォルト設定を作成する。
-func LoadConfig(configPath string) (*Config, error) {
-	var err error
-
-	// 設定ファイルのパスを決定
-	if configPath == "" {
-		configPath, err = GetDefaultConfigPath()
+func LoadConfig(path string) (*Config, error) {
+	if path == "" {
+		home, err := os.UserHomeDir()
 		if err != nil {
 			return nil, err
 		}
+		path = filepath.Join(home, ".config", "recoto", "daemon.toml")
 	}
-
-	config := NewDefaultConfig()
-
-	// ファイルが存在するか確認
-	_, err = os.Stat(configPath)
-	if os.IsNotExist(err) {
-		// ディレクトリが存在することを確認
-		dir := filepath.Dir(configPath)
-		if err := os.MkdirAll(dir, fileutil.DefaultDirPerm); err != nil {
-			return nil, errors.Wrap(err, "failed to create config directory")
-		}
-
-		if err := SaveConfig(configPath, config); err != nil {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		cfg := NewDefaultConfig()
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 			return nil, err
 		}
-
-		return config, nil
-	} else if err != nil {
-		return nil, errors.Wrap(err, "failed to check config file")
+		data, err := toml.Marshal(cfg)
+		if err != nil {
+			return nil, err
+		}
+		if err := os.WriteFile(path, data, 0o600); err != nil {
+			return nil, err
+		}
+		return cfg, nil
 	}
-
-	data, err := os.ReadFile(configPath) //nolint:gosec
+	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read config file")
+		return nil, err
 	}
-
-	if err := toml.Unmarshal(data, config); err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal config")
+	var cfg Config
+	if err := toml.Unmarshal(data, &cfg); err != nil {
+		return nil, err
 	}
-
-	return config, nil
+	return &cfg, nil
 }
 
-// SaveConfig は設定をファイルに保存する。
-func SaveConfig(configPath string, config *Config) error {
-	if err := ValidateConfig(config); err != nil {
-		return errors.Wrap(err, "failed to validate config")
+func SaveConfig(path string, cfg *Config) error {
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
 	}
+	data, err := toml.Marshal(cfg)
+	if err != nil {
+		return err
+	}
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		return err
+	}
+	return nil
+}
 
-	data, err := toml.Marshal(config)
+func ValidateConfig(cfg *Config) error {
+	switch cfg.Log.Level {
+	case "debug", "info", "warn", "error":
+	default:
+		return errors.New("config validation failed: Key: 'Config.Log.Level' Error:Field validation for 'Level' failed on the 'oneof' tag")
+	}
+	if cfg.Server.Port == 0 {
+		return errors.New("config validation failed: Key: 'Config.Server.Port' Error:Field validation for 'Port' failed on the 'required' tag")
+	}
+	if cfg.Recording.SaveDir == "" {
+		return errors.New("config validation failed: Key: 'Config.Recording.SaveDir' Error:Field validation for 'SaveDir' failed on the 'required' tag")
+	}
+	return nil
+}
 	if err != nil {
 		return errors.Wrap(err, "failed to marshal config")
 	}
