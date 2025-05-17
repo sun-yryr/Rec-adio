@@ -1,10 +1,11 @@
 #!/bin/bash
+# shellcheck disable=SC1090
 
-CURRENT_DIR=$(cd $(dirname $0); pwd)
+CURRENT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 
 sudo apt-get update
 mkdir -p /tmp/setup
-cd /tmp/setup
+cd /tmp/setup || exit
 rm -rf /usr/local/go
 wget https://go.dev/dl/go1.24.2.linux-amd64.tar.gz
 tar -C /usr/local -xzf go1.24.2.linux-amd64.tar.gz
@@ -14,7 +15,7 @@ source ~/.bashrc
 echo "export PATH=\$PATH:$(go env GOPATH)/bin" >> ~/.bashrc
 
 curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh \
-  | sh -s -- -b $(go env GOPATH)/bin v2.1.6
+  | sh -s -- -b "$(go env GOPATH)/bin" v2.1.6
 
 go install github.com/nats-io/natscli/nats@latest
 
@@ -25,6 +26,6 @@ BIN="/usr/local/bin" && \
     -o "${BIN}/buf" && \
   chmod +x "${BIN}/buf"
 
-cd $CURRENT_DIR
+cd "$CURRENT_DIR" || exit
 
 go build ./...
