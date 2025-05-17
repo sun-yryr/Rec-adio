@@ -27,6 +27,15 @@ func NewEventService[T any](
 	return &EventService[T]{broker: broker, logger: logger, subject: subject}
 }
 
+// EncodeEvent はイベントをJSON形式にエンコードする（テスト用）。
+func EncodeEvent[T any](event T) ([]byte, error) {
+	data, err := json.Marshal(event)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to marshal event")
+	}
+	return data, nil
+}
+
 // Publish はイベントを発行する。
 func (s *EventService[T]) Publish(ctx context.Context, event T) error {
 	message, err := json.Marshal(event)
