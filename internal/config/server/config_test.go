@@ -20,6 +20,19 @@ func TestNewDefaultConfig(t *testing.T) {
 	assert.Equal(t, "./data/output", cfg.Recording.SaveDir)
 }
 
+func TestGetDefaultConfigPath(t *testing.T) {
+	t.Parallel()
+
+	path, err := GetDefaultConfigPath()
+	require.NoError(t, err)
+
+	homeDir, err := os.UserHomeDir()
+	require.NoError(t, err)
+
+	expectedPath := filepath.Join(homeDir, ".config", "recoto", "daemon.toml")
+	assert.Equal(t, expectedPath, path)
+}
+
 func TestLoadConfig_FileNotExists(t *testing.T) {
 	t.Parallel()
 
@@ -64,6 +77,81 @@ save_dir = "/custom/path"
 	assert.Equal(t, "error", cfg.Log.Level)
 	assert.Equal(t, 9090, cfg.Server.Port)
 	assert.Equal(t, "/custom/path", cfg.Recording.SaveDir)
+}
+
+func TestLoadConfig_DefaultPath(t *testing.T) {
+	t.Parallel()
+
+	// 一時的に環境変数をモックして HOME を設定
+	oldHome := os.Getenv("HOME")
+	t.Cleanup(func() {
+		os.Setenv("HOME", oldHome)
+	})
+	
+	tempDir := t.TempDir()
+	os.Setenv("HOME", tempDir)
+
+	// デフォルトパスに設定ファイルを作成
+	configDir := filepath.Join(tempDir, ".config", "recoto")
+	require.NoError(t, os.MkdirAll(configDir, 0o755))
+	
+	configPath := filepath.Join(configDir, "daemon.toml")
+	configContent := `
+[log]
+level = "debug"
+
+[server]
+port = 7070
+
+[recording]
+save_dir = "/test/dir"
+`
+	require.NoError(t, os.WriteFile(configPath, []byte(configContent), 0o600))
+
+	// 空のパスを指定してデフォルトパスから読み込む
+	cfg, err := LoadConfig("")
+	require.NoError(t, err)
+
+	assert.Equal(t, "debug", cfg.Log.Level)
+	assert.Equal(t, 7070, cfg.Server.Port)
+	assert.Equal(t, "/test/dir", cfg.Recording.SaveDir)
+}
+
+func TestLoadConfig_InvalidTOML(t *testing.T) {
+	t.Parallel()
+
+	tempDir := t.TempDir()
+
+	// 不正なTOML形式の設定ファイルを作成
+	configPath := filepath.Join(tempDir, "config.toml")
+	invalidContent := `
+[log]
+level = "error"
+
+[server]
+port = "not a number" # 整数であるべき
+`
+
+	require.NoError(t, os.WriteFile(configPath, []byte(invalidContent), 0o600))
+
+	// 設定を読み込む
+	_, err := LoadConfig(configPath)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to unmarshal config")
+}
+
+func TestLoadConfig_StatError(t *testing.T) {
+	t.Parallel()
+
+	// ファイルのチェックが失敗するケース
+	// これはOSによって振る舞いが異なるため、全環境で動作するようにはしにくい
+	// 例えば、アクセス権のないディレクトリ内のファイルなど
+	configPath := "/root/.impossible/config.toml" // 通常のユーザーではアクセスできないパス
+
+	// 設定を読み込む試行
+	_, err := LoadConfig(configPath)
+	// エラーが発生することだけ確認
+	require.Error(t, err)
 }
 
 func TestValidateConfig(t *testing.T) {
@@ -187,4 +275,43 @@ func TestSaveConfig(t *testing.T) {
 	assert.Equal(t, cfg.Log.Level, loadedCfg.Log.Level)
 	assert.Equal(t, cfg.Server.Port, loadedCfg.Server.Port)
 	assert.Equal(t, cfg.Recording.SaveDir, loadedCfg.Recording.SaveDir)
+}
+
+func TestSaveConfig_InvalidConfig(t *testing.T) {
+	t.Parallel()
+
+	tempDir := t.TempDir()
+	configPath := filepath.Join(tempDir, "config.toml")
+
+	// 無効な設定
+	invalidCfg := &Config{
+		Log: logConfig{
+			Level: "invalid", // "debug", "info", "warn", "error" のいずれかでなければならない
+		},
+		Server: serverConfig{
+			Port: 8080,
+		},
+		Recording: recordingConfig{
+			SaveDir: "/test/path",
+		},
+	}
+
+	// 無効な設定で保存を試みる
+	err := SaveConfig(configPath, invalidCfg)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to validate config")
+}
+
+func TestSaveConfig_WriteError(t *testing.T) {
+	t.Parallel()
+
+	// 書き込み権限のないパス
+	configPath := "/root/impossible_config.toml"
+
+	cfg := NewDefaultConfig()
+
+	// 書き込み権限のないパスに保存を試みる
+	err := SaveConfig(configPath, cfg)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "failed to write config file")
 }
