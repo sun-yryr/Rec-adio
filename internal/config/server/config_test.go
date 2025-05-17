@@ -5,7 +5,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/cockroachdb/errors"
+	"github.com/go-playground/validator/v10"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewDefaultConfig(t *testing.T) {
@@ -13,17 +15,9 @@ func TestNewDefaultConfig(t *testing.T) {
 
 	cfg := NewDefaultConfig()
 
-	if cfg.Log.Level != "info" {
-		t.Errorf("Expected Log.Level to be 'info', got %s", cfg.Log.Level)
-	}
-
-	if cfg.Server.Port != 8080 {
-		t.Errorf("Expected Server.Port to be 8080, got %d", cfg.Server.Port)
-	}
-
-	if cfg.Recording.SaveDir != "./data/output" {
-		t.Errorf("Expected Recording.SaveDir to be './data/output', got %s", cfg.Recording.SaveDir)
-	}
+	assert.Equal(t, "info", cfg.Log.Level)
+	assert.Equal(t, 8080, cfg.Server.Port)
+	assert.Equal(t, "./data/output", cfg.Recording.SaveDir)
 }
 
 func TestLoadConfig_FileNotExists(t *testing.T) {
@@ -36,19 +30,11 @@ func TestLoadConfig_FileNotExists(t *testing.T) {
 
 	// 設定を読み込む
 	cfg, err := LoadConfig(configPath)
-	if err != nil {
-		t.Fatalf("LoadConfig failed: %v", err)
-	}
+	require.NoError(t, err)
 
 	// デフォルト値が設定されていることを確認
-	if cfg.Log.Level != "info" {
-		t.Errorf("Expected Log.Level to be 'info', got %s", cfg.Log.Level)
-	}
-
-	// 設定ファイルが作成されていることを確認
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		t.Error("Config file was not created")
-	}
+	assert.Equal(t, "info", cfg.Log.Level)
+	assert.FileExists(t, configPath)
 }
 
 func TestLoadConfig_FileExists(t *testing.T) {
@@ -69,27 +55,15 @@ port = 9090
 save_dir = "/custom/path"
 `
 
-	if err := os.WriteFile(configPath, []byte(configContent), 0o600); err != nil {
-		t.Fatalf("Failed to write config file: %v", err)
-	}
+	require.NoError(t, os.WriteFile(configPath, []byte(configContent), 0o600))
 
 	// 設定を読み込む
 	cfg, err := LoadConfig(configPath)
-	if err != nil {
-		t.Fatalf("LoadConfig failed: %v", err)
-	}
+	require.NoError(t, err)
 
-	if cfg.Log.Level != "error" {
-		t.Errorf("Expected Log.Level to be 'error', got %s", cfg.Log.Level)
-	}
-
-	if cfg.Server.Port != 9090 {
-		t.Errorf("Expected Server.Port to be 9090, got %d", cfg.Server.Port)
-	}
-
-	if cfg.Recording.SaveDir != "/custom/path" {
-		t.Errorf("Expected Recording.SaveDir to be '/custom/path', got %s", cfg.Recording.SaveDir)
-	}
+	assert.Equal(t, "error", cfg.Log.Level)
+	assert.Equal(t, 9090, cfg.Server.Port)
+	assert.Equal(t, "/custom/path", cfg.Recording.SaveDir)
 }
 
 func TestValidateConfig(t *testing.T) {
@@ -99,43 +73,42 @@ func TestValidateConfig(t *testing.T) {
 		name          string
 		setCfg        func(*Config)
 		isValid       bool
-		expectedError error
+		expectedField string
+		expectedTag   string
 	}{
 		{
 			name:          "valid config",
 			setCfg:        func(_ *Config) {},
 			isValid:       true,
-			expectedError: nil,
+			expectedField: "",
+			expectedTag:   "",
 		},
 		{
 			name: "invalid Log.Level",
 			setCfg: func(cfg *Config) {
 				cfg.Log.Level = "invalid"
 			},
-			isValid: false,
-			expectedError: errors.New(
-				"config validation failed: Key: 'Config.Log.Level' Error:Field validation for 'Level' failed on the 'oneof' tag",
-			),
+			isValid:       false,
+			expectedField: "Level",
+			expectedTag:   "oneof",
 		},
 		{
 			name: "invalid Server.Port",
 			setCfg: func(cfg *Config) {
 				cfg.Server.Port = 0
 			},
-			isValid: false,
-			expectedError: errors.New(
-				"config validation failed: Key: 'Config.Server.Port' Error:Field validation for 'Port' failed on the 'required' tag",
-			),
+			isValid:       false,
+			expectedField: "Port",
+			expectedTag:   "required",
 		},
 		{
 			name: "empty Recording.SaveDir",
 			setCfg: func(cfg *Config) {
 				cfg.Recording.SaveDir = ""
 			},
-			isValid: false,
-			expectedError: errors.New(
-				"config validation failed: Key: 'Config.Recording.SaveDir' Error:Field validation for 'SaveDir' failed on the 'required' tag",
-			),
+			isValid:       false,
+			expectedField: "SaveDir",
+			expectedTag:   "required",
 		},
 	}
 
@@ -147,14 +120,34 @@ func TestValidateConfig(t *testing.T) {
 			tt.setCfg(cfg)
 
 			err := ValidateConfig(cfg)
+
+			// 正しい設定を想定する場合はNoErrorを確認して終了
 			if tt.isValid {
-				if err != nil {
-					t.Errorf("Expected no error, got %v", err)
+				assert.NoError(t, err)
+
+				return
+			}
+
+			var validationErrors validator.ValidationErrors
+
+			require.ErrorAs(t, err, &validationErrors)
+
+			assert.NotEmpty(t, validationErrors)
+
+			// エラーのフィールド名とタグを検証
+			found := false
+
+			for _, fieldErr := range validationErrors {
+				if fieldErr.Field() == tt.expectedField && fieldErr.Tag() == tt.expectedTag {
+					found = true
+
+					break
 				}
-			} else {
-				if err == nil || err.Error() != tt.expectedError.Error() {
-					t.Errorf("Expected error '%v', got '%v'", tt.expectedError, err)
-				}
+			}
+
+			if !found {
+				t.Errorf("Expected validation error for field '%s' with tag '%s', got %v",
+					tt.expectedField, tt.expectedTag, validationErrors)
 			}
 		})
 	}
@@ -182,35 +175,16 @@ func TestSaveConfig(t *testing.T) {
 	}
 
 	// 設定を保存
-	if err := SaveConfig(configPath, cfg); err != nil {
-		t.Fatalf("SaveConfig failed: %v", err)
-	}
-
+	require.NoError(t, SaveConfig(configPath, cfg))
 	// 設定ファイルが作成されていることを確認
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		t.Error("Config file was not created")
-	}
+	require.FileExists(t, configPath)
 
 	// 設定を読み込む
 	loadedCfg, err := LoadConfig(configPath)
-	if err != nil {
-		t.Fatalf("LoadConfig failed: %v", err)
-	}
+	require.NoError(t, err)
 
 	// 保存した値が正しく読み込まれていることを確認
-	if loadedCfg.Log.Level != cfg.Log.Level {
-		t.Errorf("Expected Log.Level to be '%s', got '%s'", cfg.Log.Level, loadedCfg.Log.Level)
-	}
-
-	if loadedCfg.Server.Port != cfg.Server.Port {
-		t.Errorf("Expected Server.Port to be %d, got %d", cfg.Server.Port, loadedCfg.Server.Port)
-	}
-
-	if loadedCfg.Recording.SaveDir != cfg.Recording.SaveDir {
-		t.Errorf(
-			"Expected Recording.SaveDir to be '%s', got '%s'",
-			cfg.Recording.SaveDir,
-			loadedCfg.Recording.SaveDir,
-		)
-	}
+	assert.Equal(t, cfg.Log.Level, loadedCfg.Log.Level)
+	assert.Equal(t, cfg.Server.Port, loadedCfg.Server.Port)
+	assert.Equal(t, cfg.Recording.SaveDir, loadedCfg.Recording.SaveDir)
 }
