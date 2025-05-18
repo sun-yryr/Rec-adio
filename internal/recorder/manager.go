@@ -231,6 +231,7 @@ func (m *RecordingManager) afterRec(
 // 録音IDが見つかった場合はtrueを返し、見つからなかった場合はfalseを返す。
 func (m *RecordingManager) CancelRecording(recordingID string) bool {
 	m.mu.Lock()
+
 	cancelFunc, exists := m.cancels[recordingID]
 	if exists {
 		delete(m.cancels, recordingID)
@@ -239,8 +240,12 @@ func (m *RecordingManager) CancelRecording(recordingID string) bool {
 
 	if exists {
 		cancelFunc()
+		m.logger.Info("recording is cancelled", zap.String("recordingId", recordingID))
+
 		return true
 	}
-	
+
+	m.logger.Debug("recording is not found", zap.String("recordingId", recordingID))
+
 	return false
 }

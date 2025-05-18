@@ -19,13 +19,13 @@ import (
 
 // mockRecorder はRecorderインターフェースのモック実装。
 type mockRecorder struct {
-	availableErr   error
-	recErr         error
-	supportSource  []domain.SourceKind
-	name           string
-	recCalled      bool
-	calledEvent    *recording.RequestedEvent
-	recFunc        func(ctx context.Context, event *recording.RequestedEvent) error
+	availableErr  error
+	recErr        error
+	supportSource []domain.SourceKind
+	name          string
+	recCalled     bool
+	calledEvent   *recording.RequestedEvent
+	recFunc       func(ctx context.Context, event *recording.RequestedEvent) error
 }
 
 func (m *mockRecorder) GetSupportSource() []domain.SourceKind {
@@ -35,11 +35,11 @@ func (m *mockRecorder) GetSupportSource() []domain.SourceKind {
 func (m *mockRecorder) Rec(ctx context.Context, event *recording.RequestedEvent) error {
 	m.recCalled = true
 	m.calledEvent = event
-	
+
 	if m.recFunc != nil {
 		return m.recFunc(ctx, event)
 	}
-	
+
 	return m.recErr
 }
 
@@ -53,15 +53,15 @@ func (m *mockRecorder) CheckAvailable() error {
 
 // モック用のブローカーを実装
 type mockBroker struct {
-	publishCalled bool
-	publishSubject string
-	publishMsg []byte
-	publishErr error
+	publishCalled    bool
+	publishSubject   string
+	publishMsg       []byte
+	publishErr       error
 	subscribeSubject string
 	subscribeHandler func([]byte)
-	subscribeErr error
-	unsubscribeErr error
-	closeErr error
+	subscribeErr     error
+	unsubscribeErr   error
+	closeErr         error
 }
 
 func (b *mockBroker) Publish(ctx context.Context, subject string, msg []byte) error {
@@ -71,7 +71,11 @@ func (b *mockBroker) Publish(ctx context.Context, subject string, msg []byte) er
 	return b.publishErr
 }
 
-func (b *mockBroker) Subscribe(ctx context.Context, subject string, handler func([]byte)) (broker.UnsubscribeFunc, error) {
+func (b *mockBroker) Subscribe(
+	ctx context.Context,
+	subject string,
+	handler func([]byte),
+) (broker.UnsubscribeFunc, error) {
 	b.subscribeSubject = subject
 	b.subscribeHandler = handler
 	return func() error { return b.unsubscribeErr }, b.subscribeErr
@@ -83,28 +87,42 @@ func (b *mockBroker) Close() error {
 
 // テスト用にManager用のモック実装を作成する
 func setupTestRecordingManager(t *testing.T) (*RecordingManager, *mockBroker) {
+	t.Helper()
+
 	logger := zaptest.NewLogger(t)
 	mockBroker := &mockBroker{}
-	
-	requestedService := eventutil.NewEventService[recording.RequestedEvent](mockBroker, logger, "recording.requested")
-	startedService := eventutil.NewEventService[recording.StartedEvent](mockBroker, logger, "recording.started")
-	finishedService := eventutil.NewEventService[recording.FinishedEvent](mockBroker, logger, "recording.finished")
-	
+
+	requestedService := eventutil.NewEventService[recording.RequestedEvent](
+		mockBroker,
+		logger,
+		"recording.requested",
+	)
+	startedService := eventutil.NewEventService[recording.StartedEvent](
+		mockBroker,
+		logger,
+		"recording.started",
+	)
+	finishedService := eventutil.NewEventService[recording.FinishedEvent](
+		mockBroker,
+		logger,
+		"recording.finished",
+	)
+
 	manager := NewRecordingManager(
 		requestedService,
 		startedService,
 		finishedService,
 		logger,
 	)
-	
+
 	return manager, mockBroker
 }
 
 func TestNewRecordingManager(t *testing.T) {
 	t.Parallel()
-	
+
 	manager, _ := setupTestRecordingManager(t)
-	
+
 	assert.NotNil(t, manager)
 	assert.NotNil(t, manager.requestedService)
 	assert.NotNil(t, manager.startedService)
@@ -115,9 +133,9 @@ func TestNewRecordingManager(t *testing.T) {
 
 func TestRecordingManager_AddRecorder(t *testing.T) {
 	t.Parallel()
-	
+
 	manager, _ := setupTestRecordingManager(t)
-	
+
 	// 正常なレコーダーを追加
 	recorder1 := &mockRecorder{
 		name:          "Recorder1",
@@ -129,7 +147,7 @@ func TestRecordingManager_AddRecorder(t *testing.T) {
 	assert.Equal(t, recorder1, manager.recorders[0].recorder)
 	assert.True(t, manager.recorders[0].available)
 	assert.Nil(t, manager.recorders[0].error)
-	
+
 	// 利用できないレコーダーを追加
 	testErr := errors.New("recorder not available error")
 	recorder2 := &mockRecorder{
@@ -148,80 +166,86 @@ func TestRecordingManager_AddRecorder(t *testing.T) {
 
 func TestRecordingManager_Start(t *testing.T) {
 	t.Parallel()
-	
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	
+
 	manager, broker := setupTestRecordingManager(t)
-	
+
 	// ハンドラがnilにならないよう、デフォルト値を設定
 	broker.subscribeHandler = func([]byte) {}
-	
+
 	// マネージャーの起動
 	err := manager.Start(ctx)
 	assert.NoError(t, err)
-	
+
 	// ブローカーのSubscribeが正しく呼ばれたことを確認
 	assert.Equal(t, "recording.requested", broker.subscribeSubject)
 	assert.NotNil(t, broker.subscribeHandler)
-	
+
 	// エラーケースのテスト
 	errorBroker := &mockBroker{
 		subscribeErr: errors.New("broker subscribe error"),
 	}
 	logger := zaptest.NewLogger(t)
-	
-	requestedService := eventutil.NewEventService[recording.RequestedEvent](errorBroker, logger, "recording.requested")
-	startedService := eventutil.NewEventService[recording.StartedEvent](errorBroker, logger, "recording.started")
-	finishedService := eventutil.NewEventService[recording.FinishedEvent](errorBroker, logger, "recording.finished")
-	
+
+	requestedService := eventutil.NewEventService[recording.RequestedEvent](
+		errorBroker,
+		logger,
+		"recording.requested",
+	)
+	startedService := eventutil.NewEventService[recording.StartedEvent](
+		errorBroker,
+		logger,
+		"recording.started",
+	)
+	finishedService := eventutil.NewEventService[recording.FinishedEvent](
+		errorBroker,
+		logger,
+		"recording.finished",
+	)
+
 	manager2 := NewRecordingManager(
 		requestedService,
 		startedService,
 		finishedService,
 		logger,
 	)
-	
+
 	err = manager2.Start(ctx)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "subscribe error")
 }
 
-// ここでSimulateEventを使わないため、コメントアウト
-// func simulateEvent(t *testing.T, manager *RecordingManager, mockBroker *mockBroker, event *recording.RequestedEvent) *mockRecorder {
-// 	// 実装は後日必要になった時に実装する
-// 	return nil
-// }
-
 func TestRecordingManager_CancelRecording(t *testing.T) {
 	t.Parallel()
-	
+
 	// テスト用のマネージャー
 	manager, _ := setupTestRecordingManager(t)
-	
+
 	// レコーディングIDとダミーのキャンセル関数
 	recordingID := "test-recording-id"
 	cancelCalled := false
 	cancelFunc := func() {
 		cancelCalled = true
 	}
-	
+
 	// キャンセル関数を登録
 	manager.mu.Lock()
 	manager.cancels[recordingID] = cancelFunc
 	manager.mu.Unlock()
-	
+
 	// 存在するIDをキャンセル
 	cancelled := manager.CancelRecording(recordingID)
 	assert.True(t, cancelled, "should return true when cancelling an existing recording")
 	assert.True(t, cancelCalled, "cancel function should be called")
-	
+
 	// キャンセル後にmapからエントリが削除されていることを確認
 	manager.mu.Lock()
 	_, exists := manager.cancels[recordingID]
 	manager.mu.Unlock()
 	assert.False(t, exists, "recording should be removed from cancels map")
-	
+
 	// 存在しないIDをキャンセル
 	cancelled = manager.CancelRecording("non-existent-id")
 	assert.False(t, cancelled, "should return false when cancelling a non-existent recording")
@@ -229,29 +253,29 @@ func TestRecordingManager_CancelRecording(t *testing.T) {
 
 func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 	t.Parallel()
-	
+
 	// テスト用のマネージャー
 	manager, _ := setupTestRecordingManager(t)
-	
+
 	// コンテキストを作成
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	
+
 	// テスト用のイベント
 	source, err := domain.NewURLSource("http://example.com/stream")
 	require.NoError(t, err)
-	
+
 	event := &recording.RequestedEvent{
 		RecordingID: "test-id",
 		Source:      source,
 		Output:      "test-output.m4a",
 		Duration:    30 * time.Second,
 	}
-	
+
 	// このRecは録音中にコンテキストのキャンセルを検出するモック
 	recCalled := false
 	testMutex := sync.Mutex{}
-	
+
 	recorder := &mockRecorder{
 		name:          "TestRecorder",
 		supportSource: []domain.SourceKind{domain.SourceKindURL},
@@ -264,34 +288,35 @@ func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 			return context.Canceled
 		},
 	}
-	
+
 	// キャンセルを登録
 	manager.cancels[event.RecordingID] = cancel
-	
+
 	// 新しいgoroutineで録音プロセスを実行
 	processDone := make(chan struct{})
 	go func() {
 		manager.processRecording(ctx, event, recorder)
 		close(processDone)
 	}()
-	
+
 	// 録音関数が呼ばれるのを待つ - 最大100ミリ秒待機
 	for i := range 10 {
 		testMutex.Lock()
 		called := recCalled
 		testMutex.Unlock()
+
 		if called {
 			break
 		}
-		
+
 		if i < 9 {
 			time.Sleep(10 * time.Millisecond)
 		}
 	}
-	
+
 	// キャンセルする
 	cancel()
-	
+
 	// プロセスが完了するのを待つ
 	select {
 	case <-processDone:
@@ -299,7 +324,7 @@ func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 	case <-time.After(1 * time.Second):
 		t.Fatal("Process did not complete within timeout")
 	}
-	
+
 	// レコーダーが呼ばれたことを確認
 	testMutex.Lock()
 	assert.True(t, recCalled, "Recorder.Rec should have been called")

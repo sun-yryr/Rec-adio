@@ -21,9 +21,6 @@ func TestStartEmbeddedServer(t *testing.T) {
 	// サーバーが正常に稼働していることを確認
 	assert.True(t, server.Running())
 	assert.NotEmpty(t, server.ClientURL())
-
-	// サーバーが空でないポートで待ち受けていることを確認
-	assert.NotEmpty(t, server.ClientURL())
 }
 
 func TestStartEmbeddedServer_ReadyForConnections(t *testing.T) {
