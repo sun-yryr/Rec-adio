@@ -118,6 +118,29 @@ func (m *RecordingManager) Start(ctx context.Context) error {
 	return nil
 }
 
+// CancelRecording は録音を中止する。
+// 録音IDが見つかった場合はtrueを返し、見つからなかった場合はfalseを返す。
+func (m *RecordingManager) CancelRecording(recordingID string) bool {
+	m.mu.Lock()
+
+	cancelFunc, exists := m.cancels[recordingID]
+	if exists {
+		delete(m.cancels, recordingID)
+	}
+	m.mu.Unlock()
+
+	if exists {
+		cancelFunc()
+		m.logger.Info("recording is cancelled", zap.String("recordingId", recordingID))
+
+		return true
+	}
+
+	m.logger.Debug("recording is not found", zap.String("recordingId", recordingID))
+
+	return false
+}
+
 func (m *RecordingManager) handleRequestedEvent(
 	ctx context.Context,
 	event *recording.RequestedEvent,

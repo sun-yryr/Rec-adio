@@ -17,6 +17,9 @@ linters:
           - testpackage
           - funlen
           - lll
+          - gosec
+          - gosmopolitan
+          - varnamelen
 formatters:
   enable:
     - gofumpt
