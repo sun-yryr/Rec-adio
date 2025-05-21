@@ -63,6 +63,7 @@ func TestNewLogger(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 				assert.NotNil(t, logger)
+				assert.Equal(t, tt.logLevel, logger.Level().String())
 			}
 		})
 	}
