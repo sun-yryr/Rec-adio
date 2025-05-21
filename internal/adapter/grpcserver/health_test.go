@@ -39,9 +39,14 @@ var (
 )
 
 // mockBroker はブローカーのモック。
-type mockBroker struct{}
+type mockBroker struct {
+	published  bool
+	subscribed bool
+}
 
 func (m *mockBroker) Publish(_ context.Context, _ string, _ []byte) error {
+	m.published = true
+
 	return nil
 }
 
@@ -50,6 +55,8 @@ func (m *mockBroker) Subscribe(
 	_ string,
 	_ func(message []byte),
 ) (broker.UnsubscribeFunc, error) {
+	m.subscribed = true
+
 	return func() error { return nil }, nil
 }
 

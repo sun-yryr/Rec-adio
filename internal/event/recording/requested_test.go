@@ -76,20 +76,45 @@ func TestNewRequestedService(t *testing.T) {
 	require.NotNil(t, service)
 }
 
-type mockBroker struct{}
+type mockBroker struct {
+	PublishCalledCount   int
+	SubscribeCalledCount int
+	CloseCalledCount     int
 
-func (m *mockBroker) Publish(_ context.Context, _ string, _ []byte) error {
-	return nil
+	PublishTopic   string
+	PublishMessage []byte
+	SubscribeTopic string
+
+	PublishError   error
+	SubscribeError error
+	CloseError     error
+}
+
+func (m *mockBroker) Publish(_ context.Context, topic string, message []byte) error {
+	m.PublishCalledCount++
+	m.PublishTopic = topic
+	m.PublishMessage = message
+
+	return m.PublishError
 }
 
 func (m *mockBroker) Subscribe(
 	_ context.Context,
-	_ string,
+	topic string,
 	_ func(message []byte),
 ) (broker.UnsubscribeFunc, error) {
+	m.SubscribeCalledCount++
+	m.SubscribeTopic = topic
+
+	if m.SubscribeError != nil {
+		return nil, m.SubscribeError
+	}
+
 	return func() error { return nil }, nil
 }
 
 func (m *mockBroker) Close() error {
-	return nil
+	m.CloseCalledCount++
+
+	return m.CloseError
 }

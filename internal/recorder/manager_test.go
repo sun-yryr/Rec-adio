@@ -305,7 +305,12 @@ func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 	}()
 
 	// 録音関数が呼ばれるのを待つ - 最大100ミリ秒待機
-	for i := range 10 {
+	const (
+		maxWaitAttempts = 10
+		waitInterval    = 10 * time.Millisecond
+	)
+
+	for range maxWaitAttempts {
 		testMutex.Lock()
 		called := recCalled
 		testMutex.Unlock()
@@ -314,9 +319,7 @@ func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 			break
 		}
 
-		if i < 9 {
-			time.Sleep(10 * time.Millisecond)
-		}
+		time.Sleep(waitInterval)
 	}
 
 	// キャンセルする

@@ -77,6 +77,7 @@ func TestZapConfig(t *testing.T) {
 	assert.Nil(t, cfg.Sampling)
 	assert.Contains(t, cfg.OutputPaths, "stdout")
 	assert.Contains(t, cfg.ErrorOutputPaths, "stderr")
+	assert.Nil(t, cfg.Sampling)
 	// DurationEncoder関数を直接比較するのは難しいので、型の比較だけを行う
 	assert.NotNil(t, cfg.EncoderConfig.EncodeDuration)
 }

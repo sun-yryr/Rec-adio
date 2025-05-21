@@ -80,8 +80,6 @@ save_dir = "/custom/path"
 }
 
 func TestLoadConfig_DefaultPath(t *testing.T) {
-	t.Parallel()
-
 	// 一時的に環境変数をモックして HOME を設定
 	oldHome := os.Getenv("HOME")
 

@@ -1,9 +1,10 @@
-//nolint:tparallel,paralleltest // 内臓Brokerを使っているので並列にしない
+//nolint:paralleltest // 内臓Brokerを使っているので並列にしない
 package nats
 
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
@@ -12,8 +13,6 @@ import (
 )
 
 func TestBroker_PublishSubscribe(t *testing.T) {
-	t.Parallel()
-
 	if testing.Short() {
 		t.Skip("短いテストモードでは埋め込みNATSサーバーのテストをスキップ")
 	}
@@ -22,6 +21,11 @@ func TestBroker_PublishSubscribe(t *testing.T) {
 		logger := zaptest.NewLogger(tt)
 		broker, err := NewEmbeddedBroker(logger)
 		require.NoError(tt, err)
+
+		// require.Eventuallyで100msごとに5秒間起動を待つ
+		require.Eventually(tt, func() bool {
+			return broker.nc != nil && broker.nc.Status() == nats.CONNECTED
+		}, 5*time.Second, 100*time.Millisecond, "timed out waiting for NATS connection")
 
 		defer func() {
 			err := broker.Close()
@@ -63,6 +67,11 @@ func TestBroker_PublishSubscribe(t *testing.T) {
 		broker, err := NewEmbeddedBroker(logger)
 		require.NoError(tt, err)
 
+		// Wait for NATS server to be ready using require.Eventually
+		require.Eventually(tt, func() bool {
+			return broker.nc != nil && broker.nc.Status() == nats.CONNECTED
+		}, 5*time.Second, 100*time.Millisecond, "timed out waiting for NATS connection")
+
 		// Closeが正常に完了することを確認
 		err = broker.Close()
 		require.NoError(tt, err)
@@ -75,6 +84,11 @@ func TestBroker_PublishSubscribe(t *testing.T) {
 		logger := zaptest.NewLogger(tt)
 		broker, err := NewEmbeddedBroker(logger)
 		require.NoError(tt, err)
+
+		// Wait for NATS server to be ready using require.Eventually
+		require.Eventually(tt, func() bool {
+			return broker.nc != nil && broker.nc.Status() == nats.CONNECTED
+		}, 5*time.Second, 100*time.Millisecond, "timed out waiting for NATS connection")
 
 		// ブローカーを閉じる
 		err = broker.Close()
