@@ -11,3 +11,10 @@ port = 8080
 # 録音設定
 [recording]
 save_dir = "./data/output"
+
+# Radiko設定
+[radiko]
+# Radikoのプログラム情報を取得するURL
+url = "http://radiko.jp/v3/program/today/JP13.xml"
+# エリアID (JP13は東京)
+area_id = "JP13"

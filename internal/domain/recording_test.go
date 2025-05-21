@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -55,10 +56,64 @@ func TestNewURLSource(t *testing.T) {
 	}
 }
 
+func TestNewRadikoSource(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name      string
+		stationID string
+		meta      map[string]string
+		wantErr   bool
+	}{
+		{
+			name:      "valid station id",
+			stationID: "TBS",
+			meta:      map[string]string{"key": "value"},
+			wantErr:   false,
+		},
+		{
+			name:      "empty station id",
+			stationID: "",
+			meta:      nil,
+			wantErr:   true,
+		},
+		{
+			name:      "nil meta",
+			stationID: "TBS",
+			meta:      nil,
+			wantErr:   false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			got, err := NewRadikoSource(tt.stationID, tt.meta)
+
+			if tt.wantErr {
+				require.Error(t, err, "Expected error for station ID: %s", tt.stationID)
+				assert.Nil(t, got)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, SourceKindRadiko, got.Kind)
+				assert.Equal(t, tt.stationID, got.ID)
+				assert.NotNil(t, got.Meta)
+				if tt.meta != nil {
+					assert.Equal(t, tt.meta, got.Meta)
+				}
+			}
+		})
+	}
+}
+
 func TestNewRecording(t *testing.T) {
 	t.Parallel()
 
-	validSource, err := NewURLSource("http://example.com/stream")
+	validURLSource, err := NewURLSource("http://example.com/stream")
+	require.NoError(t, err)
+
+	validRadikoSource, err := NewRadikoSource("TBS", nil)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -69,8 +124,15 @@ func TestNewRecording(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name:     "valid recording",
-			source:   validSource,
+			name:     "valid recording with URL source",
+			source:   validURLSource,
+			output:   "/path/to/output.mp3",
+			duration: 30 * time.Minute,
+			wantErr:  false,
+		},
+		{
+			name:     "valid recording with Radiko source",
+			source:   validRadikoSource,
 			output:   "/path/to/output.mp3",
 			duration: 30 * time.Minute,
 			wantErr:  false,
@@ -84,21 +146,21 @@ func TestNewRecording(t *testing.T) {
 		},
 		{
 			name:     "empty output",
-			source:   validSource,
+			source:   validURLSource,
 			output:   "",
 			duration: 30 * time.Minute,
 			wantErr:  true,
 		},
 		{
 			name:     "zero duration",
-			source:   validSource,
+			source:   validURLSource,
 			output:   "/path/to/output.mp3",
 			duration: 0,
 			wantErr:  true,
 		},
 		{
 			name:     "negative duration",
-			source:   validSource,
+			source:   validURLSource,
 			output:   "/path/to/output.mp3",
 			duration: -1 * time.Minute,
 			wantErr:  true,
@@ -129,26 +191,38 @@ func TestNewRecording(t *testing.T) {
 func TestRecordingStatusTransitions(t *testing.T) {
 	t.Parallel()
 
-	source, err := NewURLSource("http://example.com/stream")
+	urlSource, err := NewURLSource("http://example.com/stream")
 	require.NoError(t, err)
+
+	radikoSource, err := NewRadikoSource("TBS", nil)
+	require.NoError(t, err)
+
+	// URLソースとRadikoソースの両方でテストを実行
+	sources := []*Source{urlSource, radikoSource}
 
 	// 正常なステータス遷移テスト
 	t.Run("valid transitions", func(t *testing.T) {
 		t.Parallel()
 
-		recording, err := NewRecording(source, "/path/to/output.mp3", 30*time.Minute)
-		require.NoError(t, err)
+		for i, source := range sources {
+			t.Run(fmt.Sprintf("source_%d", i), func(t *testing.T) {
+				t.Parallel()
 
-		// 初期状態の確認
-		assert.Equal(t, RecordingStatusRequested, recording.Status)
+				recording, err := NewRecording(source, "/path/to/output.mp3", 30*time.Minute)
+				require.NoError(t, err)
 
-		// Requested -> Running
-		require.NoError(t, recording.Start())
-		assert.Equal(t, RecordingStatusRunning, recording.Status)
+				// 初期状態の確認
+				assert.Equal(t, RecordingStatusRequested, recording.Status)
 
-		// Running -> Finished
-		require.NoError(t, recording.Finish())
-		assert.Equal(t, RecordingStatusFinished, recording.Status)
+				// Requested -> Running
+				require.NoError(t, recording.Start())
+				assert.Equal(t, RecordingStatusRunning, recording.Status)
+
+				// Running -> Finished
+				require.NoError(t, recording.Finish())
+				assert.Equal(t, RecordingStatusFinished, recording.Status)
+			})
+		}
 	})
 
 	// 無効なステータス遷移テスト
@@ -206,29 +280,31 @@ func TestRecordingStatusTransitions(t *testing.T) {
 			},
 		}
 
-		for _, tt := range invalidTransitions {
-			t.Run(tt.name, func(t *testing.T) {
-				t.Parallel()
+		for i, source := range sources {
+			for _, tt := range invalidTransitions {
+				t.Run(fmt.Sprintf("source_%d_%s", i, tt.name), func(t *testing.T) {
+					t.Parallel()
 
-				recording, err := NewRecording(source, "/path/to/output.mp3", 30*time.Minute)
-				require.NoError(t, err)
-
-				// 初期ステータスを設定
-				recording.Status = tt.initialStatus
-
-				// 遷移を試す
-				err = tt.transition(recording)
-
-				if tt.expectError {
-					require.Error(t, err)
-					assert.True(t, errors.Is(err, ErrInvalidRecordingStatus))
-				} else {
+					recording, err := NewRecording(source, "/path/to/output.mp3", 30*time.Minute)
 					require.NoError(t, err)
-				}
 
-				// 期待するステータスを確認
-				assert.Equal(t, tt.expectedStatus, recording.Status)
-			})
+					// 初期ステータスを設定
+					recording.Status = tt.initialStatus
+
+					// 遷移を試す
+					err = tt.transition(recording)
+
+					if tt.expectError {
+						require.Error(t, err)
+						assert.True(t, errors.Is(err, ErrInvalidRecordingStatus))
+					} else {
+						require.NoError(t, err)
+					}
+
+					// 期待するステータスを確認
+					assert.Equal(t, tt.expectedStatus, recording.Status)
+				})
+			}
 		}
 	})
 
@@ -243,17 +319,19 @@ func TestRecordingStatusTransitions(t *testing.T) {
 			RecordingStatusFailed,
 		}
 
-		for _, status := range statuses {
-			t.Run(string(status)+"->failed", func(t *testing.T) {
-				t.Parallel()
+		for i, source := range sources {
+			for _, status := range statuses {
+				t.Run(fmt.Sprintf("source_%d_%s->failed", i, status), func(t *testing.T) {
+					t.Parallel()
 
-				recording, err := NewRecording(source, "/path/to/output.mp3", 30*time.Minute)
-				require.NoError(t, err)
+					recording, err := NewRecording(source, "/path/to/output.mp3", 30*time.Minute)
+					require.NoError(t, err)
 
-				recording.Status = status
-				require.NoError(t, recording.Fail())
-				assert.Equal(t, RecordingStatusFailed, recording.Status)
-			})
+					recording.Status = status
+					require.NoError(t, recording.Fail())
+					assert.Equal(t, RecordingStatusFailed, recording.Status)
+				})
+			}
 		}
 	})
 }

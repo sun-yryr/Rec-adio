@@ -24,11 +24,17 @@ type recordingConfig struct {
 	SaveDir string `toml:"save_dir" validate:"required"`
 }
 
+type radikoConfig struct {
+	URL    string `toml:"url"     validate:"required,url"`
+	AreaID string `toml:"area_id" validate:"required"`
+}
+
 // Config はアプリケーションの設定を表す。
 type Config struct {
 	Log       logConfig       `toml:"log"       validate:"required"`
 	Server    serverConfig    `toml:"server"    validate:"required"`
 	Recording recordingConfig `toml:"recording" validate:"required"`
+	Radiko    radikoConfig    `toml:"radiko"    validate:"required"`
 }
 
 // NewDefaultConfig はデフォルト値を持つ設定を作成する。
@@ -42,6 +48,10 @@ func NewDefaultConfig() *Config {
 		},
 		Recording: recordingConfig{
 			SaveDir: "./data/output",
+		},
+		Radiko: radikoConfig{
+			URL:    "http://radiko.jp/v3/program/today/JP13.xml",
+			AreaID: "JP13",
 		},
 	}
 }

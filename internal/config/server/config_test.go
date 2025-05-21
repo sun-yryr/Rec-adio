@@ -18,6 +18,8 @@ func TestNewDefaultConfig(t *testing.T) {
 	assert.Equal(t, "info", cfg.Log.Level)
 	assert.Equal(t, 8080, cfg.Server.Port)
 	assert.Equal(t, "./data/output", cfg.Recording.SaveDir)
+	assert.Equal(t, "http://radiko.jp/v3/program/today/JP13.xml", cfg.Radiko.URL)
+	assert.Equal(t, "JP13", cfg.Radiko.AreaID)
 }
 
 func TestGetDefaultConfigPath(t *testing.T) {
@@ -66,6 +68,10 @@ port = 9090
 
 [recording]
 save_dir = "/custom/path"
+
+[radiko]
+url = "http://radiko.jp/v3/program/today/JP27.xml"
+area_id = "JP27"
 `
 
 	require.NoError(t, os.WriteFile(configPath, []byte(configContent), 0o600))
@@ -77,6 +83,8 @@ save_dir = "/custom/path"
 	assert.Equal(t, "error", cfg.Log.Level)
 	assert.Equal(t, 9090, cfg.Server.Port)
 	assert.Equal(t, "/custom/path", cfg.Recording.SaveDir)
+	assert.Equal(t, "http://radiko.jp/v3/program/today/JP27.xml", cfg.Radiko.URL)
+	assert.Equal(t, "JP27", cfg.Radiko.AreaID)
 }
 
 func TestLoadConfig_DefaultPath(t *testing.T) {
@@ -104,6 +112,10 @@ port = 7070
 
 [recording]
 save_dir = "/test/dir"
+
+[radiko]
+url = "http://radiko.jp/v3/program/today/JP01.xml"
+area_id = "JP01"
 `
 	require.NoError(t, os.WriteFile(configPath, []byte(configContent), 0o600))
 
@@ -114,6 +126,8 @@ save_dir = "/test/dir"
 	assert.Equal(t, "debug", cfg.Log.Level)
 	assert.Equal(t, 7070, cfg.Server.Port)
 	assert.Equal(t, "/test/dir", cfg.Recording.SaveDir)
+	assert.Equal(t, "http://radiko.jp/v3/program/today/JP01.xml", cfg.Radiko.URL)
+	assert.Equal(t, "JP01", cfg.Radiko.AreaID)
 }
 
 func TestLoadConfig_InvalidTOML(t *testing.T) {
@@ -147,10 +161,15 @@ func TestLoadConfig_StatError(t *testing.T) {
 	// 例えば、アクセス権のないディレクトリ内のファイルなど
 	configPath := "/root/.impossible/config.toml" // 通常のユーザーではアクセスできないパス
 
-	// 設定を読み込む試行
-	_, err := LoadConfig(configPath)
-	// エラーが発生することだけ確認
-	require.Error(t, err)
+	// このテストはCI環境では実行しない
+	if os.Getuid() != 0 {
+		// 設定を読み込む試行
+		_, err := LoadConfig(configPath)
+		// エラーが発生することだけ確認
+		require.Error(t, err)
+	} else {
+		t.Skip("Skipping test when running as root")
+	}
 }
 
 func TestValidateConfig(t *testing.T) {
@@ -195,6 +214,24 @@ func TestValidateConfig(t *testing.T) {
 			},
 			isValid:       false,
 			expectedField: "SaveDir",
+			expectedTag:   "required",
+		},
+		{
+			name: "invalid Radiko.URL",
+			setCfg: func(cfg *Config) {
+				cfg.Radiko.URL = "invalid-url"
+			},
+			isValid:       false,
+			expectedField: "URL",
+			expectedTag:   "url",
+		},
+		{
+			name: "empty Radiko.AreaID",
+			setCfg: func(cfg *Config) {
+				cfg.Radiko.AreaID = ""
+			},
+			isValid:       false,
+			expectedField: "AreaID",
 			expectedTag:   "required",
 		},
 	}
@@ -259,6 +296,10 @@ func TestSaveConfig(t *testing.T) {
 		Recording: recordingConfig{
 			SaveDir: "/test/path",
 		},
+		Radiko: radikoConfig{
+			URL:    "http://radiko.jp/v3/program/today/JP13.xml",
+			AreaID: "JP13",
+		},
 	}
 
 	// 設定を保存
@@ -274,6 +315,8 @@ func TestSaveConfig(t *testing.T) {
 	assert.Equal(t, cfg.Log.Level, loadedCfg.Log.Level)
 	assert.Equal(t, cfg.Server.Port, loadedCfg.Server.Port)
 	assert.Equal(t, cfg.Recording.SaveDir, loadedCfg.Recording.SaveDir)
+	assert.Equal(t, cfg.Radiko.URL, loadedCfg.Radiko.URL)
+	assert.Equal(t, cfg.Radiko.AreaID, loadedCfg.Radiko.AreaID)
 }
 
 func TestSaveConfig_InvalidConfig(t *testing.T) {
@@ -293,6 +336,10 @@ func TestSaveConfig_InvalidConfig(t *testing.T) {
 		Recording: recordingConfig{
 			SaveDir: "/test/path",
 		},
+		Radiko: radikoConfig{
+			URL:    "http://radiko.jp/v3/program/today/JP13.xml",
+			AreaID: "JP13",
+		},
 	}
 
 	// 無効な設定で保存を試みる
@@ -309,8 +356,13 @@ func TestSaveConfig_WriteError(t *testing.T) {
 
 	cfg := NewDefaultConfig()
 
-	// 書き込み権限のないパスに保存を試みる
-	err := SaveConfig(configPath, cfg)
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "failed to write config file")
+	// このテストはCI環境では実行しない
+	if os.Getuid() != 0 {
+		// 書き込み権限のないパスに保存を試みる
+		err := SaveConfig(configPath, cfg)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to write config file")
+	} else {
+		t.Skip("Skipping test when running as root")
+	}
 }

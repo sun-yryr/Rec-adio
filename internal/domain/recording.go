@@ -32,6 +32,8 @@ type SourceKind string
 const (
 	// SourceKindURL は、URLのソースを表す.
 	SourceKindURL SourceKind = "url"
+	// SourceKindRadiko は、radikoのソースを表す.
+	SourceKindRadiko SourceKind = "radiko"
 )
 
 // Source は、録音のソースを表す型.
@@ -52,6 +54,23 @@ func NewURLSource(url string) (*Source, error) {
 		Kind: SourceKindURL,
 		ID:   url,
 		Meta: make(map[string]string),
+	}, nil
+}
+
+// NewRadikoSource は、Radikoのソースを作成する.
+func NewRadikoSource(stationID string, meta map[string]string) (*Source, error) {
+	if stationID == "" {
+		return nil, errors.New("station id is empty")
+	}
+
+	if meta == nil {
+		meta = make(map[string]string)
+	}
+
+	return &Source{
+		Kind: SourceKindRadiko,
+		ID:   stationID,
+		Meta: meta,
 	}, nil
 }
 
