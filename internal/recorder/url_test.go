@@ -34,7 +34,7 @@ func TestURLRecorder_GetSupportSource(t *testing.T) {
 	recorder := NewURLRecorder(logger)
 
 	sources := recorder.GetSupportSource()
-	
+
 	assert.Equal(t, []domain.SourceKind{domain.SourceKindURL}, sources)
 }
 
@@ -83,7 +83,7 @@ func TestURLRecorder_Rec_InvalidURL(t *testing.T) {
 		Duration:    5 * time.Second,
 	}
 
-	err := recorder.Rec(context.Background(), event)
+	err := recorder.Rec(t.Context(), event)
 	require.Error(t, err, "Expected error for invalid URL")
 	assert.Contains(t, err.Error(), "invalid URL")
 }
@@ -107,8 +107,8 @@ func TestURLRecorder_Rec_TooLongDuration(t *testing.T) {
 		Duration:    time.Duration(math.MaxInt64) - 5*time.Second, // 長すぎる時間
 	}
 
-	err := recorder.Rec(context.Background(), event)
-	assert.Error(t, err)
+	err := recorder.Rec(t.Context(), event)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "recording duration is too long")
 }
 
@@ -141,7 +141,7 @@ func TestURLRecorder_Rec_Canceled(t *testing.T) {
 	}
 
 	// ちょっと待ってからキャンセルするコンテキスト
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	go func() {
 		time.Sleep(100 * time.Millisecond)
 		cancel()
@@ -152,8 +152,10 @@ func TestURLRecorder_Rec_Canceled(t *testing.T) {
 	assert.Error(t, err)
 }
 
-// この統合テストは、実際のURLからの録音を試みる
-// 環境変数TEST_INTEGRATION=trueの場合のみ実行する
+// この統合テストは、実際のURLからの録音を試みる。
+// 環境変数TEST_INTEGRATION=trueの場合のみ実行する。
+//
+//nolint:paralleltest // Integrationテストなので並列にしない
 func TestURLRecorder_Rec_Integration(t *testing.T) {
 	if os.Getenv("TEST_INTEGRATION") != "true" {
 		t.Skip("skipping integration test; set TEST_INTEGRATION=true to run")
@@ -185,11 +187,11 @@ func TestURLRecorder_Rec_Integration(t *testing.T) {
 		Duration:    2 * time.Second, // 短い録音時間
 	}
 
-	err := recorder.Rec(context.Background(), event)
-	assert.NoError(t, err)
-	
+	err := recorder.Rec(t.Context(), event)
+	require.NoError(t, err)
+
 	// 出力ファイルが存在するか確認
 	_, err = os.Stat(outputFile)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	require.FileExists(t, outputFile)
 }

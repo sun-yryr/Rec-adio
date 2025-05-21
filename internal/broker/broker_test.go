@@ -1,10 +1,10 @@
 package broker
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestBrokerInterface(t *testing.T) {
@@ -15,18 +15,22 @@ func TestBrokerInterface(t *testing.T) {
 
 	// mockBrokerがBrokerインターフェースを正しく実装していることを確認
 	broker := &mockBroker{}
-	
-	// 各メソッドがエラーなく呼び出せることを確認
-	err := broker.Publish(context.Background(), "test.subject", []byte("test message"))
-	assert.NoError(t, err)
 
-	unsubscribe, err := broker.Subscribe(context.Background(), "test.subject", func(message []byte) {})
-	assert.NoError(t, err)
+	// 各メソッドがエラーなく呼び出せることを確認
+	err := broker.Publish(t.Context(), "test.subject", []byte("test message"))
+	require.NoError(t, err)
+
+	unsubscribe, err := broker.Subscribe(
+		t.Context(),
+		"test.subject",
+		func(_ []byte) {},
+	)
+	require.NoError(t, err)
 	assert.NotNil(t, unsubscribe)
 
 	err = unsubscribe()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	err = broker.Close()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

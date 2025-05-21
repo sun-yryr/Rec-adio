@@ -20,24 +20,18 @@ func TestNewLoggerInterceptor(t *testing.T) {
 
 	// インターセプタを作成
 	interceptor := NewLoggerInterceptor(testLogger)
-	require.NotNil(t, interceptor)
 
 	// テスト用のリクエストとハンドラ
 	testReq := "test-request"
-	var handlerCtx context.Context
-	testHandler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		handlerCtx = ctx
+	testHandler := func(ctx context.Context, _ interface{}) (interface{}, error) {
+		log := logger.FromContext(ctx)
+		assert.NotEmpty(t, log.Core()) // NewNopで生成されていないことを検証
+
 		return "test-response", nil
 	}
 
-	// インターセプタを実行
-	resp, err := interceptor(context.Background(), testReq, &grpc.UnaryServerInfo{}, testHandler)
-
-	// 結果の検証
+	resp, err := interceptor(t.Context(), testReq, &grpc.UnaryServerInfo{}, testHandler)
 	require.NoError(t, err)
-	assert.Equal(t, "test-response", resp)
 
-	// コンテキストにロガーが追加されていることを確認
-	ctxLogger := logger.FromContext(handlerCtx)
-	assert.NotNil(t, ctxLogger)
+	assert.Equal(t, "test-response", resp)
 }

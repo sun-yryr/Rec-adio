@@ -76,7 +76,6 @@ func TestNewRequestedService(t *testing.T) {
 	require.NotNil(t, service)
 }
 
-// mockBroker はテスト用のブローカーモック
 type mockBroker struct{}
 
 func (m *mockBroker) Publish(_ context.Context, _ string, _ []byte) error {

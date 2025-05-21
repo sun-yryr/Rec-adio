@@ -2,11 +2,11 @@ package recorder
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zaptest"
@@ -51,7 +51,11 @@ func (m *mockRecorder) CheckAvailable() error {
 	return m.availableErr
 }
 
-// モック用のブローカーを実装
+var (
+	errRecorderNotAvailable = errors.New("recorder not available error")
+	errBrokerSubscribe      = errors.New("broker subscribe error")
+)
+
 type mockBroker struct {
 	publishCalled    bool
 	publishSubject   string
@@ -64,20 +68,22 @@ type mockBroker struct {
 	closeErr         error
 }
 
-func (b *mockBroker) Publish(ctx context.Context, subject string, msg []byte) error {
+func (b *mockBroker) Publish(_ context.Context, subject string, msg []byte) error {
 	b.publishCalled = true
 	b.publishSubject = subject
 	b.publishMsg = msg
+
 	return b.publishErr
 }
 
 func (b *mockBroker) Subscribe(
-	ctx context.Context,
+	_ context.Context,
 	subject string,
 	handler func([]byte),
 ) (broker.UnsubscribeFunc, error) {
 	b.subscribeSubject = subject
 	b.subscribeHandler = handler
+
 	return func() error { return b.unsubscribeErr }, b.subscribeErr
 }
 
@@ -85,7 +91,6 @@ func (b *mockBroker) Close() error {
 	return b.closeErr
 }
 
-// テスト用にManager用のモック実装を作成する
 func setupTestRecordingManager(t *testing.T) (*RecordingManager, *mockBroker) {
 	t.Helper()
 
@@ -142,33 +147,31 @@ func TestRecordingManager_AddRecorder(t *testing.T) {
 		supportSource: []domain.SourceKind{domain.SourceKindURL},
 	}
 	err := manager.AddRecorder(recorder1)
-	assert.NoError(t, err)
+	require.NoError(t, err)
+
 	assert.Len(t, manager.recorders, 1)
 	assert.Equal(t, recorder1, manager.recorders[0].recorder)
 	assert.True(t, manager.recorders[0].available)
-	assert.Nil(t, manager.recorders[0].error)
+	require.NoError(t, manager.recorders[0].error)
 
 	// 利用できないレコーダーを追加
-	testErr := errors.New("recorder not available error")
 	recorder2 := &mockRecorder{
 		name:          "Recorder2",
 		supportSource: []domain.SourceKind{domain.SourceKindURL},
-		availableErr:  testErr,
+		availableErr:  errRecorderNotAvailable,
 	}
 	err = manager.AddRecorder(recorder2)
-	assert.Error(t, err)
-	assert.Equal(t, testErr, err)
+	require.Error(t, err)
+
+	assert.Equal(t, errRecorderNotAvailable, err)
 	assert.Len(t, manager.recorders, 2)
 	assert.Equal(t, recorder2, manager.recorders[1].recorder)
 	assert.False(t, manager.recorders[1].available)
-	assert.Equal(t, testErr, manager.recorders[1].error)
+	assert.Equal(t, errRecorderNotAvailable, manager.recorders[1].error)
 }
 
 func TestRecordingManager_Start(t *testing.T) {
 	t.Parallel()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	manager, broker := setupTestRecordingManager(t)
 
@@ -176,8 +179,8 @@ func TestRecordingManager_Start(t *testing.T) {
 	broker.subscribeHandler = func([]byte) {}
 
 	// マネージャーの起動
-	err := manager.Start(ctx)
-	assert.NoError(t, err)
+	err := manager.Start(t.Context())
+	require.NoError(t, err)
 
 	// ブローカーのSubscribeが正しく呼ばれたことを確認
 	assert.Equal(t, "recording.requested", broker.subscribeSubject)
@@ -185,7 +188,7 @@ func TestRecordingManager_Start(t *testing.T) {
 
 	// エラーケースのテスト
 	errorBroker := &mockBroker{
-		subscribeErr: errors.New("broker subscribe error"),
+		subscribeErr: errBrokerSubscribe,
 	}
 	logger := zaptest.NewLogger(t)
 
@@ -212,8 +215,9 @@ func TestRecordingManager_Start(t *testing.T) {
 		logger,
 	)
 
-	err = manager2.Start(ctx)
-	assert.Error(t, err)
+	err = manager2.Start(t.Context())
+	require.Error(t, err)
+
 	assert.Contains(t, err.Error(), "subscribe error")
 }
 
@@ -258,7 +262,7 @@ func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 	manager, _ := setupTestRecordingManager(t)
 
 	// コンテキストを作成
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
 	// テスト用のイベント
@@ -279,12 +283,13 @@ func TestRecordingManager_ProcessRecording_Cancellation(t *testing.T) {
 	recorder := &mockRecorder{
 		name:          "TestRecorder",
 		supportSource: []domain.SourceKind{domain.SourceKindURL},
-		recFunc: func(ctx context.Context, event *recording.RequestedEvent) error {
+		recFunc: func(ctx context.Context, _ *recording.RequestedEvent) error {
 			testMutex.Lock()
 			recCalled = true
 			testMutex.Unlock()
 			// 録音中にキャンセルを待つ
 			<-ctx.Done()
+
 			return context.Canceled
 		},
 	}

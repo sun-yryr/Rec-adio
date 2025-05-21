@@ -20,7 +20,7 @@ import (
 	recordingv1 "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1"
 )
 
-// mockRecordingBroker はテスト用のブローカーモック
+// mockRecordingBroker はテスト用のブローカーモック。
 type mockRecordingBroker struct {
 	publishFunc func(ctx context.Context, subject string, message []byte) error
 }
@@ -29,6 +29,7 @@ func (m *mockRecordingBroker) Publish(ctx context.Context, subject string, messa
 	if m.publishFunc != nil {
 		return m.publishFunc(ctx, subject, message)
 	}
+
 	return nil
 }
 
@@ -57,7 +58,11 @@ func TestNewRecordingService(t *testing.T) {
 	}
 	logger := zaptest.NewLogger(t)
 	mockBroker := &mockRecordingBroker{}
-	service := eventutil.NewEventService[recording.RequestedEvent](mockBroker, logger, "test.subject")
+	service := eventutil.NewEventService[recording.RequestedEvent](
+		mockBroker,
+		logger,
+		"test.subject",
+	)
 
 	// サービスの作成
 	recordingService := NewRecordingService(cfg, service)
@@ -75,12 +80,16 @@ func TestRecordingService_StartFromURL_Success(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// publishされたイベントをキャプチャするためのモック
-	var capturedSubject string
-	var capturedMessage []byte
+	var (
+		capturedSubject string
+		capturedMessage []byte
+	)
+
 	mockBroker := &mockRecordingBroker{
-		publishFunc: func(ctx context.Context, subject string, message []byte) error {
+		publishFunc: func(_ context.Context, subject string, message []byte) error {
 			capturedSubject = subject
 			capturedMessage = message
+
 			return nil
 		},
 	}
@@ -94,7 +103,11 @@ func TestRecordingService_StartFromURL_Success(t *testing.T) {
 		},
 	}
 	logger := zaptest.NewLogger(t)
-	requestedService := eventutil.NewEventService[recording.RequestedEvent](mockBroker, logger, "recoto.recording.requested.v1")
+	requestedService := eventutil.NewEventService[recording.RequestedEvent](
+		mockBroker,
+		logger,
+		"recoto.recording.requested.v1",
+	)
 
 	// サービスの作成
 	service := NewRecordingService(cfg, requestedService)
@@ -102,22 +115,22 @@ func TestRecordingService_StartFromURL_Success(t *testing.T) {
 	// リクエストの作成
 	req := &recordingv1.StartFromURLRequest{
 		Url:      "http://example.com/stream",
-		Title:    "Test Title",
+		Title:    "Test_Title",
 		Duration: durationpb.New(30 * time.Minute),
 	}
 
 	// リクエストの実行
-	resp, err := service.StartFromURL(context.Background(), req)
+	resp, err := service.StartFromURL(t.Context(), req)
+	require.NoError(t, err)
 
 	// 結果の検証
-	require.NoError(t, err)
-	assert.NotEmpty(t, resp.RecordingId)
+	assert.NotEmpty(t, resp.GetRecordingId())
 
 	// イベントが正しく発行されたことを確認
 	assert.Equal(t, "recoto.recording.requested.v1", capturedSubject)
 	assert.NotEmpty(t, capturedMessage)
 	// 出力ファイルパスが期待通りであることを確認
-	assert.Contains(t, string(capturedMessage), "Test Title.m4a")
+	assert.Contains(t, string(capturedMessage), "Test_Title.m4a")
 }
 
 func TestRecordingService_StartFromURL_FileExists(t *testing.T) {
@@ -127,17 +140,21 @@ func TestRecordingService_StartFromURL_FileExists(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// テスト用のファイルを作成
-	testFilePath := filepath.Join(tempDir, "Test Title.m4a")
-	err := os.WriteFile(testFilePath, []byte("test"), 0600)
+	testFilePath := filepath.Join(tempDir, "Test_Title.m4a")
+	err := os.WriteFile(testFilePath, []byte("test"), 0o600)
 	require.NoError(t, err)
 
 	// publishされたイベントをキャプチャするためのモック
-	var capturedSubject string
-	var capturedMessage []byte
+	var (
+		capturedSubject string
+		capturedMessage []byte
+	)
+
 	mockBroker := &mockRecordingBroker{
-		publishFunc: func(ctx context.Context, subject string, message []byte) error {
+		publishFunc: func(_ context.Context, subject string, message []byte) error {
 			capturedSubject = subject
 			capturedMessage = message
+
 			return nil
 		},
 	}
@@ -151,7 +168,11 @@ func TestRecordingService_StartFromURL_FileExists(t *testing.T) {
 		},
 	}
 	logger := zaptest.NewLogger(t)
-	requestedService := eventutil.NewEventService[recording.RequestedEvent](mockBroker, logger, "recoto.recording.requested.v1")
+	requestedService := eventutil.NewEventService[recording.RequestedEvent](
+		mockBroker,
+		logger,
+		"recoto.recording.requested.v1",
+	)
 
 	// サービスの作成
 	service := NewRecordingService(cfg, requestedService)
@@ -159,16 +180,16 @@ func TestRecordingService_StartFromURL_FileExists(t *testing.T) {
 	// リクエストの作成
 	req := &recordingv1.StartFromURLRequest{
 		Url:      "http://example.com/stream",
-		Title:    "Test Title",
+		Title:    "Test_Title",
 		Duration: durationpb.New(30 * time.Minute),
 	}
 
 	// リクエストの実行
-	resp, err := service.StartFromURL(context.Background(), req)
+	resp, err := service.StartFromURL(t.Context(), req)
+	require.NoError(t, err)
 
 	// 結果の検証
-	require.NoError(t, err)
-	assert.NotEmpty(t, resp.RecordingId)
+	assert.NotEmpty(t, resp.GetRecordingId())
 
 	// イベントが正しく発行されたことを確認
 	assert.Equal(t, "recoto.recording.requested.v1", capturedSubject)
@@ -176,7 +197,7 @@ func TestRecordingService_StartFromURL_FileExists(t *testing.T) {
 
 	// ファイルパスにタイムスタンプが追加されていることを確認
 	assert.NotContains(t, string(capturedMessage), testFilePath)
-	assert.Contains(t, string(capturedMessage), "Test Title_")
+	assert.Contains(t, string(capturedMessage), "Test_Title_")
 	assert.Contains(t, string(capturedMessage), ".m4a")
 }
 
@@ -189,8 +210,9 @@ func TestRecordingService_StartFromURL_InvalidURL(t *testing.T) {
 	// publishされたイベントをキャプチャするためのモック
 	publishCalled := false
 	mockBroker := &mockRecordingBroker{
-		publishFunc: func(ctx context.Context, subject string, message []byte) error {
+		publishFunc: func(_ context.Context, _ string, _ []byte) error {
 			publishCalled = true
+
 			return nil
 		},
 	}
@@ -204,7 +226,11 @@ func TestRecordingService_StartFromURL_InvalidURL(t *testing.T) {
 		},
 	}
 	logger := zaptest.NewLogger(t)
-	requestedService := eventutil.NewEventService[recording.RequestedEvent](mockBroker, logger, "recoto.recording.requested.v1")
+	requestedService := eventutil.NewEventService[recording.RequestedEvent](
+		mockBroker,
+		logger,
+		"recoto.recording.requested.v1",
+	)
 
 	// サービスの作成
 	service := NewRecordingService(cfg, requestedService)
@@ -217,10 +243,10 @@ func TestRecordingService_StartFromURL_InvalidURL(t *testing.T) {
 	}
 
 	// リクエストの実行
-	resp, err := service.StartFromURL(context.Background(), req)
+	resp, err := service.StartFromURL(t.Context(), req)
+	require.Error(t, err)
 
 	// 結果の検証
-	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "failed to create")
 	assert.False(t, publishCalled)
@@ -235,7 +261,7 @@ func TestRecordingService_StartFromURL_PublishError(t *testing.T) {
 	// パブリッシュ時にエラーを返すモック
 	publishErr := errors.New("publish error")
 	mockBroker := &mockRecordingBroker{
-		publishFunc: func(ctx context.Context, subject string, message []byte) error {
+		publishFunc: func(_ context.Context, _ string, _ []byte) error {
 			return publishErr
 		},
 	}
@@ -249,7 +275,11 @@ func TestRecordingService_StartFromURL_PublishError(t *testing.T) {
 		},
 	}
 	logger := zaptest.NewLogger(t)
-	requestedService := eventutil.NewEventService[recording.RequestedEvent](mockBroker, logger, "recoto.recording.requested.v1")
+	requestedService := eventutil.NewEventService[recording.RequestedEvent](
+		mockBroker,
+		logger,
+		"recoto.recording.requested.v1",
+	)
 
 	// サービスの作成
 	service := NewRecordingService(cfg, requestedService)
@@ -262,10 +292,10 @@ func TestRecordingService_StartFromURL_PublishError(t *testing.T) {
 	}
 
 	// リクエストの実行
-	resp, err := service.StartFromURL(context.Background(), req)
+	resp, err := service.StartFromURL(t.Context(), req)
+	require.Error(t, err)
 
 	// 結果の検証
-	assert.Error(t, err)
 	assert.Nil(t, resp)
 	assert.Contains(t, err.Error(), "failed to publish requested event")
 	assert.True(t, errors.Is(errors.Unwrap(errors.Unwrap(err)), publishErr))

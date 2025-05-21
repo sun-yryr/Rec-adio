@@ -84,17 +84,18 @@ func TestLoadConfig_DefaultPath(t *testing.T) {
 
 	// 一時的に環境変数をモックして HOME を設定
 	oldHome := os.Getenv("HOME")
+
 	t.Cleanup(func() {
-		os.Setenv("HOME", oldHome)
+		t.Setenv("HOME", oldHome)
 	})
-	
+
 	tempDir := t.TempDir()
-	os.Setenv("HOME", tempDir)
+	t.Setenv("HOME", tempDir)
 
 	// デフォルトパスに設定ファイルを作成
 	configDir := filepath.Join(tempDir, ".config", "recoto")
 	require.NoError(t, os.MkdirAll(configDir, 0o755))
-	
+
 	configPath := filepath.Join(configDir, "daemon.toml")
 	configContent := `
 [log]

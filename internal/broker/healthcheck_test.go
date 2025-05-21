@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// mockBroker はテスト用のブローカーモック
 type mockBroker struct {
 	publishFunc    func(ctx context.Context, subject string, message []byte) error
 	subscribeFunc  func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error)
@@ -23,9 +22,11 @@ func (m *mockBroker) Publish(ctx context.Context, subject string, message []byte
 	m.publishCalled = true
 	m.publishSubject = subject
 	m.publishMessage = message
+
 	if m.publishFunc != nil {
 		return m.publishFunc(ctx, subject, message)
 	}
+
 	return nil
 }
 
@@ -37,6 +38,7 @@ func (m *mockBroker) Subscribe(
 	if m.subscribeFunc != nil {
 		return m.subscribeFunc(ctx, subject, handler)
 	}
+
 	return func() error { return nil }, nil
 }
 
@@ -44,6 +46,7 @@ func (m *mockBroker) Close() error {
 	if m.closeFunc != nil {
 		return m.closeFunc()
 	}
+
 	return nil
 }
 
@@ -71,20 +74,21 @@ func TestHealthCheck_Check_Success(t *testing.T) {
 
 	// 成功するケース: Subscribeが成功し、パブリッシュされたメッセージに応答する
 	mockBroker := &mockBroker{
-		subscribeFunc: func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, handler func(_ []byte)) (UnsubscribeFunc, error) {
 			// パブリッシュされると同時にハンドラをトリガーするモック
 			go func() {
 				time.Sleep(50 * time.Millisecond) // 少し遅延を入れる
 				handler([]byte("pong"))
 			}()
+
 			return func() error { return nil }, nil
 		},
 	}
 
 	hc := NewHealthCheck(mockBroker)
-	err := hc.Check(context.Background())
+	err := hc.Check(t.Context())
+	require.NoError(t, err)
 
-	assert.NoError(t, err)
 	assert.True(t, mockBroker.publishCalled)
 	assert.Equal(t, "recoto.health.check.v1", mockBroker.publishSubject)
 	assert.Equal(t, []byte("ping"), mockBroker.publishMessage)
@@ -96,16 +100,16 @@ func TestHealthCheck_Check_SubscribeError(t *testing.T) {
 	// Subscribeがエラーを返すケース
 	errSubscribe := assert.AnError
 	mockBroker := &mockBroker{
-		subscribeFunc: func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, _ func(_ []byte)) (UnsubscribeFunc, error) {
 			return nil, errSubscribe
 		},
 	}
 
 	hc := NewHealthCheck(mockBroker)
-	err := hc.Check(context.Background())
+	err := hc.Check(t.Context())
+	require.Error(t, err)
 
-	assert.Error(t, err)
-	assert.ErrorIs(t, err, errSubscribe)
+	require.ErrorIs(t, err, errSubscribe)
 	assert.False(t, mockBroker.publishCalled)
 }
 
@@ -115,18 +119,18 @@ func TestHealthCheck_Check_PublishError(t *testing.T) {
 	// Publishがエラーを返すケース
 	errPublish := assert.AnError
 	mockBroker := &mockBroker{
-		subscribeFunc: func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, _ func(_ []byte)) (UnsubscribeFunc, error) {
 			return func() error { return nil }, nil
 		},
-		publishFunc: func(ctx context.Context, subject string, message []byte) error {
+		publishFunc: func(_ context.Context, _ string, _ []byte) error {
 			return errPublish
 		},
 	}
 
 	hc := NewHealthCheck(mockBroker)
-	err := hc.Check(context.Background())
+	err := hc.Check(t.Context())
+	require.Error(t, err)
 
-	assert.Error(t, err)
 	assert.ErrorIs(t, err, errPublish)
 }
 
@@ -135,21 +139,21 @@ func TestHealthCheck_Check_Timeout(t *testing.T) {
 
 	// タイムアウトが発生するケース
 	mockBroker := &mockBroker{
-		subscribeFunc: func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, _ func(_ []byte)) (UnsubscribeFunc, error) {
 			// ハンドラを呼び出さない
 			return func() error { return nil }, nil
 		},
 	}
 
 	hc := NewHealthCheck(mockBroker)
-	
-	// タイムアウトを短く設定したコンテキストを使用
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
-	defer cancel()
-	
-	err := hc.Check(ctx)
 
+	// タイムアウトを短く設定したコンテキストを使用
+	ctx, cancel := context.WithTimeout(t.Context(), 100*time.Millisecond)
+	defer cancel()
+
+	err := hc.Check(ctx)
 	require.Error(t, err)
+
 	assert.True(t, mockBroker.publishCalled)
 	assert.Contains(t, err.Error(), "health check timeout")
 }
@@ -157,31 +161,32 @@ func TestHealthCheck_Check_Timeout(t *testing.T) {
 func TestHealthCheck_Check_UnsubscribeError(t *testing.T) {
 	t.Parallel()
 
-	// Unsubscribeがエラーを返すケース（ただし健康チェック自体は成功する）
+	// Unsubscribeがエラーを返すケース（ただしヘルスチェック自体は成功する）
 	unsubscribeErr := assert.AnError
 	unsubscribeCalled := false
 	handlerCalled := false
-	
+
 	mockBroker := &mockBroker{
-		subscribeFunc: func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, handler func(_ []byte)) (UnsubscribeFunc, error) {
 			// パブリッシュされると同時にハンドラをトリガーするモック
 			go func() {
 				time.Sleep(50 * time.Millisecond)
 				handlerCalled = true
 				handler([]byte("pong"))
 			}()
+
 			return func() error {
 				unsubscribeCalled = true
+
 				return unsubscribeErr
 			}, nil
 		},
 	}
 
 	hc := NewHealthCheck(mockBroker)
-	err := hc.Check(context.Background())
+	err := hc.Check(t.Context())
+	require.NoError(t, err)
 
-	// 健康チェック自体は成功
-	assert.NoError(t, err)
 	assert.True(t, handlerCalled)
 	assert.True(t, unsubscribeCalled)
 }

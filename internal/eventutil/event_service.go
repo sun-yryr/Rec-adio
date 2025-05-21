@@ -33,6 +33,7 @@ func EncodeEvent[T any](event T) ([]byte, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to marshal event")
 	}
+
 	return data, nil
 }
 
