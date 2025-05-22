@@ -22,8 +22,9 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/u2takey/go-utils v0.3.1 // indirect
+        github.com/pmezard/go-difflib v1.0.0 // indirect
+        github.com/spf13/afero v1.14.0 // indirect
+        github.com/u2takey/go-utils v0.3.1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250428153025-10db94c68c34 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

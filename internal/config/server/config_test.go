@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -8,7 +9,24 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/sun-yryr/recoto/internal/fileutil"
 )
+
+type statErrorFS struct{ fileutil.FileSystem }
+
+func (statErrorFS) Stat(string) (os.FileInfo, error) { return nil, errStat }
+
+type writeErrorFS struct{ fileutil.FileSystem }
+
+func (writeErrorFS) WriteFile(string, []byte, os.FileMode) error { return errWrite }
+
+var (
+	errStat  = errors.New("stat error")
+	errWrite = errors.New("write error")
+)
+
+const testConfigPath = "/config.toml"
 
 func TestNewDefaultConfig(t *testing.T) {
 	t.Parallel()
@@ -21,42 +39,35 @@ func TestNewDefaultConfig(t *testing.T) {
 }
 
 func TestGetDefaultConfigPath(t *testing.T) {
-	t.Parallel()
+	fs := fileutil.NewMemFS()
 
-	path, err := GetDefaultConfigPath()
+	t.Setenv("HOME", "/home/test")
+
+	path, err := GetDefaultConfigPathFS(fs)
 	require.NoError(t, err)
 
-	homeDir, err := os.UserHomeDir()
-	require.NoError(t, err)
-
-	expectedPath := filepath.Join(homeDir, ".config", "recoto", "daemon.toml")
+	expectedPath := filepath.Join("/home/test", ".config", "recoto", "daemon.toml")
 	assert.Equal(t, expectedPath, path)
 }
 
 func TestLoadConfig_FileNotExists(t *testing.T) {
 	t.Parallel()
 
-	tempDir := t.TempDir()
-
-	// 存在しないファイルパスを指定
-	configPath := filepath.Join(tempDir, "config.toml")
-
-	// 設定を読み込む
-	cfg, err := LoadConfig(configPath)
+	fs := fileutil.NewMemFS()
+	cfg, err := LoadConfigFS(fs, testConfigPath)
 	require.NoError(t, err)
 
-	// デフォルト値が設定されていることを確認
 	assert.Equal(t, "info", cfg.Log.Level)
-	assert.FileExists(t, configPath)
+
+	_, statErr := fs.Stat(testConfigPath)
+	assert.NoError(t, statErr)
 }
 
 func TestLoadConfig_FileExists(t *testing.T) {
 	t.Parallel()
 
-	tempDir := t.TempDir()
-
-	// テスト用の設定ファイルを作成
-	configPath := filepath.Join(tempDir, "config.toml")
+	fs := fileutil.NewMemFS()
+	configPath := testConfigPath
 	configContent := `
 [log]
 level = "error"
@@ -68,10 +79,8 @@ port = 9090
 save_dir = "/custom/path"
 `
 
-	require.NoError(t, os.WriteFile(configPath, []byte(configContent), 0o600))
-
-	// 設定を読み込む
-	cfg, err := LoadConfig(configPath)
+	require.NoError(t, fs.WriteFile(configPath, []byte(configContent), 0o600))
+	cfg, err := LoadConfigFS(fs, configPath)
 	require.NoError(t, err)
 
 	assert.Equal(t, "error", cfg.Log.Level)
@@ -88,11 +97,12 @@ func TestLoadConfig_DefaultPath(t *testing.T) {
 	})
 
 	tempDir := t.TempDir()
-	t.Setenv("HOME", tempDir)
+	fs := fileutil.NewMemFS()
 
+	t.Setenv("HOME", tempDir)
 	// デフォルトパスに設定ファイルを作成
 	configDir := filepath.Join(tempDir, ".config", "recoto")
-	require.NoError(t, os.MkdirAll(configDir, 0o755))
+	require.NoError(t, fs.MkdirAll(configDir, 0o755))
 
 	configPath := filepath.Join(configDir, "daemon.toml")
 	configContent := `
@@ -105,10 +115,9 @@ port = 7070
 [recording]
 save_dir = "/test/dir"
 `
-	require.NoError(t, os.WriteFile(configPath, []byte(configContent), 0o600))
+	require.NoError(t, fs.WriteFile(configPath, []byte(configContent), 0o600))
 
-	// 空のパスを指定してデフォルトパスから読み込む
-	cfg, err := LoadConfig("")
+	cfg, err := LoadConfigFS(fs, "")
 	require.NoError(t, err)
 
 	assert.Equal(t, "debug", cfg.Log.Level)
@@ -119,10 +128,8 @@ save_dir = "/test/dir"
 func TestLoadConfig_InvalidTOML(t *testing.T) {
 	t.Parallel()
 
-	tempDir := t.TempDir()
-
-	// 不正なTOML形式の設定ファイルを作成
-	configPath := filepath.Join(tempDir, "config.toml")
+	fs := fileutil.NewMemFS()
+	configPath := testConfigPath
 	invalidContent := `
 [log]
 level = "error"
@@ -131,10 +138,9 @@ level = "error"
 port = "not a number" # 整数であるべき
 `
 
-	require.NoError(t, os.WriteFile(configPath, []byte(invalidContent), 0o600))
+	require.NoError(t, fs.WriteFile(configPath, []byte(invalidContent), 0o600))
 
-	// 設定を読み込む
-	_, err := LoadConfig(configPath)
+	_, err := LoadConfigFS(fs, configPath)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to unmarshal config")
 }
@@ -142,14 +148,8 @@ port = "not a number" # 整数であるべき
 func TestLoadConfig_StatError(t *testing.T) {
 	t.Parallel()
 
-	// ファイルのチェックが失敗するケース
-	// これはOSによって振る舞いが異なるため、全環境で動作するようにはしにくい
-	// 例えば、アクセス権のないディレクトリ内のファイルなど
-	configPath := "/root/.impossible/config.toml" // 通常のユーザーではアクセスできないパス
-
-	// 設定を読み込む試行
-	_, err := LoadConfig(configPath)
-	// エラーが発生することだけ確認
+	fs := statErrorFS{fileutil.NewMemFS()}
+	_, err := LoadConfigFS(fs, testConfigPath)
 	require.Error(t, err)
 }
 
@@ -243,10 +243,8 @@ func TestValidateConfig(t *testing.T) {
 func TestSaveConfig(t *testing.T) {
 	t.Parallel()
 
-	tempDir := t.TempDir()
-
-	// 設定ファイルのパス
-	configPath := filepath.Join(tempDir, "config.toml")
+	fs := fileutil.NewMemFS()
+	configPath := testConfigPath
 
 	// テスト用の設定
 	cfg := &Config{
@@ -261,13 +259,11 @@ func TestSaveConfig(t *testing.T) {
 		},
 	}
 
-	// 設定を保存
-	require.NoError(t, SaveConfig(configPath, cfg))
-	// 設定ファイルが作成されていることを確認
-	require.FileExists(t, configPath)
+	require.NoError(t, SaveConfigFS(fs, configPath, cfg))
+	_, statErr := fs.Stat(configPath)
+	require.NoError(t, statErr)
 
-	// 設定を読み込む
-	loadedCfg, err := LoadConfig(configPath)
+	loadedCfg, err := LoadConfigFS(fs, configPath)
 	require.NoError(t, err)
 
 	// 保存した値が正しく読み込まれていることを確認
@@ -279,8 +275,8 @@ func TestSaveConfig(t *testing.T) {
 func TestSaveConfig_InvalidConfig(t *testing.T) {
 	t.Parallel()
 
-	tempDir := t.TempDir()
-	configPath := filepath.Join(tempDir, "config.toml")
+	fs := fileutil.NewMemFS()
+	configPath := testConfigPath
 
 	// 無効な設定
 	invalidCfg := &Config{
@@ -296,7 +292,7 @@ func TestSaveConfig_InvalidConfig(t *testing.T) {
 	}
 
 	// 無効な設定で保存を試みる
-	err := SaveConfig(configPath, invalidCfg)
+	err := SaveConfigFS(fs, configPath, invalidCfg)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to validate config")
 }
@@ -304,13 +300,11 @@ func TestSaveConfig_InvalidConfig(t *testing.T) {
 func TestSaveConfig_WriteError(t *testing.T) {
 	t.Parallel()
 
-	// 書き込み権限のないパス
-	configPath := "/root/impossible_config.toml"
-
+	mem := fileutil.NewMemFS()
+	ro := writeErrorFS{mem}
 	cfg := NewDefaultConfig()
 
-	// 書き込み権限のないパスに保存を試みる
-	err := SaveConfig(configPath, cfg)
+	err := SaveConfigFS(ro, testConfigPath, cfg)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to write config file")
 }
