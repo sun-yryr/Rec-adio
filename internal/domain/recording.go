@@ -79,7 +79,7 @@ func NewRecording(source *Source, output string, duration time.Duration) (*Recor
 	}
 
 	return &Recording{
-		ID:       RecordingID(uuid.New().String()),
+		ID:       RecordingID(uuid.Must(uuid.NewV7()).String()),
 		Source:   source,
 		Status:   RecordingStatusRequested,
 		Output:   output,

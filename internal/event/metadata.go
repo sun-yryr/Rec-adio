@@ -21,6 +21,6 @@ func NewMetadata(traceID trace.ID) Metadata {
 	return Metadata{
 		TraceID:   traceID,
 		Timestamp: time.Now(),
-		EventID:   uuid.New().String(),
+		EventID:   uuid.Must(uuid.NewV7()).String(),
 	}
 }
