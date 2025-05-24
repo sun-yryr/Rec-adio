@@ -39,7 +39,7 @@ func (s *HealthService) Check(
 	ctx context.Context,
 	_ *pb.CheckRequest,
 ) (*pb.CheckResponse, error) {
-	logger := logger.FromContext(ctx)
+	log := logger.FromContextWithTrace(ctx)
 	results := make([]*pb.CheckResult, 0, len(s.healthCheckers))
 
 	resultCh := make(chan *pb.CheckResult, len(s.healthCheckers))
@@ -56,7 +56,7 @@ func (s *HealthService) Check(
 			if err := checker.Check(ctx); err != nil {
 				result.Ok = false
 				result.Error = err.Error()
-				logger.Error(
+				log.Error(
 					"Health check failed",
 					zap.String("checker", checker.GetName()),
 					zap.Error(err),

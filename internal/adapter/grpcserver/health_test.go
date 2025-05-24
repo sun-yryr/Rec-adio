@@ -44,7 +44,7 @@ type mockBroker struct {
 	subscribed bool
 }
 
-func (m *mockBroker) Publish(_ context.Context, _ string, _ []byte) error {
+func (m *mockBroker) Publish(_ context.Context, _ string, _ interface{}) error {
 	m.published = true
 
 	return nil
@@ -53,7 +53,7 @@ func (m *mockBroker) Publish(_ context.Context, _ string, _ []byte) error {
 func (m *mockBroker) Subscribe(
 	_ context.Context,
 	_ string,
-	_ func(message []byte),
+	_ func(context.Context, []byte),
 ) (broker.UnsubscribeFunc, error) {
 	m.subscribed = true
 

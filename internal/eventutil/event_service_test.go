@@ -16,6 +16,7 @@ import (
 	"go.uber.org/zap/zaptest"
 
 	"github.com/sun-yryr/recoto/internal/broker"
+	"github.com/sun-yryr/recoto/internal/logger"
 )
 
 // testEvent はテスト用のイベント構造体.
@@ -26,15 +27,15 @@ type testEvent struct {
 
 // mockBroker はブローカーのモック実装.
 type mockBroker struct {
-	publishFunc    func(ctx context.Context, subject string, message []byte) error
-	subscribeFunc  func(ctx context.Context, subject string, handler func(message []byte)) (broker.UnsubscribeFunc, error)
+	publishFunc    func(ctx context.Context, subject string, message interface{}) error
+	subscribeFunc  func(ctx context.Context, subject string, handler func(context.Context, []byte)) (broker.UnsubscribeFunc, error)
 	publishCalled  bool
 	publishSubject string
-	publishMessage []byte
+	publishMessage interface{}
 	mu             sync.Mutex
 }
 
-func (m *mockBroker) Publish(ctx context.Context, subject string, message []byte) error {
+func (m *mockBroker) Publish(ctx context.Context, subject string, message interface{}) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	m.publishCalled = true
@@ -51,7 +52,7 @@ func (m *mockBroker) Publish(ctx context.Context, subject string, message []byte
 func (m *mockBroker) Subscribe(
 	ctx context.Context,
 	subject string,
-	handler func(message []byte),
+	handler func(context.Context, []byte),
 ) (broker.UnsubscribeFunc, error) {
 	if m.subscribeFunc != nil {
 		return m.subscribeFunc(ctx, subject, handler)
@@ -79,7 +80,7 @@ func (m *mockBroker) PublishSubject() string {
 	return m.publishSubject
 }
 
-func (m *mockBroker) PublishMessage() []byte {
+func (m *mockBroker) PublishMessage() interface{} {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -92,15 +93,13 @@ func TestNewEventService(t *testing.T) {
 	// テスト用の入力
 	testSubject := "test-subject"
 	mockBroker := &mockBroker{}
-	logger := zaptest.NewLogger(t)
 
 	// テスト対象の関数を実行
-	service := NewEventService[testEvent](mockBroker, logger, testSubject)
+	service := NewEventService[testEvent](mockBroker, testSubject)
 
 	// 結果の検証
 	assert.NotNil(t, service)
 	assert.Equal(t, mockBroker, service.broker)
-	assert.Equal(t, logger, service.logger)
 	assert.Equal(t, testSubject, service.subject)
 }
 
@@ -110,7 +109,7 @@ func TestEventService_Publish(t *testing.T) {
 	testCases := []struct {
 		name          string
 		event         testEvent
-		publishFunc   func(ctx context.Context, subject string, message []byte) error
+		publishFunc   func(ctx context.Context, subject string, message interface{}) error
 		expectedError bool
 	}{
 		{
@@ -128,7 +127,7 @@ func TestEventService_Publish(t *testing.T) {
 				ID:      "2",
 				Message: "will fail",
 			},
-			publishFunc: func(_ context.Context, _ string, _ []byte) error {
+			publishFunc: func(_ context.Context, _ string, _ interface{}) error {
 				return errors.New("failed to publish message")
 			},
 			expectedError: true,
@@ -143,8 +142,7 @@ func TestEventService_Publish(t *testing.T) {
 			mockBroker := &mockBroker{
 				publishFunc: testCase.publishFunc,
 			}
-			logger := zaptest.NewLogger(t)
-			service := NewEventService[testEvent](mockBroker, logger, "test-subject")
+			service := NewEventService[testEvent](mockBroker, "test-subject")
 
 			// テスト対象の関数を実行
 			err := service.Publish(t.Context(), testCase.event)
@@ -156,12 +154,11 @@ func TestEventService_Publish(t *testing.T) {
 				require.NoError(t, err)
 				require.True(t, mockBroker.PublishCalled())
 				assert.Equal(t, "test-subject", mockBroker.PublishSubject())
-				// メッセージの内容を検証
-				var decodedEvent testEvent
-
-				require.NoError(t, json.Unmarshal(mockBroker.PublishMessage(), &decodedEvent))
-				assert.Equal(t, testCase.event.ID, decodedEvent.ID)
-				assert.Equal(t, testCase.event.Message, decodedEvent.Message)
+				// 新しい実装では、イベントオブジェクトが直接渡される
+				publishedEvent, ok := mockBroker.PublishMessage().(testEvent)
+				require.True(t, ok, "published message should be testEvent")
+				assert.Equal(t, testCase.event.ID, publishedEvent.ID)
+				assert.Equal(t, testCase.event.Message, publishedEvent.Message)
 			}
 		})
 	}
@@ -172,7 +169,7 @@ func TestEventService_Subscribe(t *testing.T) {
 
 	testCases := []struct {
 		name           string
-		subscribeFunc  func(ctx context.Context, subject string, handler func(message []byte)) (broker.UnsubscribeFunc, error)
+		subscribeFunc  func(ctx context.Context, subject string, handler func(context.Context, []byte)) (broker.UnsubscribeFunc, error)
 		expectedError  bool
 		messageToSend  []byte
 		expectedID     string
@@ -181,16 +178,16 @@ func TestEventService_Subscribe(t *testing.T) {
 	}{
 		{
 			name: "successful subscribe",
-			subscribeFunc: func(_ context.Context, _ string, handler func(message []byte)) (broker.UnsubscribeFunc, error) {
+			subscribeFunc: func(ctx context.Context, _ string, handler func(context.Context, []byte)) (broker.UnsubscribeFunc, error) {
 				validEvent := testEvent{ID: "1", Message: "test message"}
 				eventJSON, err := json.Marshal(validEvent)
 				if err != nil {
 					return nil, fmt.Errorf("failed to marshal event: %w", err)
 				}
-				go func() {
+				go func(ctx context.Context) {
 					time.Sleep(100 * time.Millisecond) // 少し待って非同期処理
-					handler(eventJSON)
-				}()
+					handler(ctx, eventJSON)
+				}(ctx)
 
 				return func() error { return nil }, nil
 			},
@@ -200,18 +197,18 @@ func TestEventService_Subscribe(t *testing.T) {
 		},
 		{
 			name: "subscribe error",
-			subscribeFunc: func(_ context.Context, _ string, _ func(message []byte)) (broker.UnsubscribeFunc, error) {
+			subscribeFunc: func(_ context.Context, _ string, _ func(context.Context, []byte)) (broker.UnsubscribeFunc, error) {
 				return nil, errors.New("failed to subscribe to subject")
 			},
 			expectedError: true,
 		},
 		{
 			name: "invalid message format",
-			subscribeFunc: func(_ context.Context, _ string, handler func(message []byte)) (broker.UnsubscribeFunc, error) {
-				go func() {
+			subscribeFunc: func(ctx context.Context, _ string, handler func(context.Context, []byte)) (broker.UnsubscribeFunc, error) {
+				go func(ctx context.Context) {
 					time.Sleep(100 * time.Millisecond)
-					handler([]byte("invalid json"))
-				}()
+					handler(ctx, []byte("invalid json"))
+				}(ctx)
 
 				return func() error { return nil }, nil
 			},
@@ -232,7 +229,7 @@ func TestEventService_Subscribe(t *testing.T) {
 			// テスト用のロガー
 			var logBuffer zaptest.Buffer
 
-			logger := zaptest.NewLogger(
+			testLogger := zaptest.NewLogger(
 				t,
 				zaptest.WrapOptions(zap.WrapCore(func(_ zapcore.Core) zapcore.Core {
 					return zapcore.NewCore(
@@ -243,14 +240,15 @@ func TestEventService_Subscribe(t *testing.T) {
 				})),
 			)
 
-			service := NewEventService[testEvent](mockBroker, logger, "test-subject")
+			service := NewEventService[testEvent](mockBroker, "test-subject")
 
 			// イベント受信を検証するためのチャネル
 			eventReceived := make(chan testEvent, 1)
-
+			// テスト用のロガーをコンテキストに追加
+			ctx := logger.WithLogger(t.Context(), testLogger)
 			// テスト対象の関数を実行
 			unsubscribe, err := service.Subscribe(
-				t.Context(),
+				ctx,
 				func(_ context.Context, event *testEvent) {
 					eventReceived <- *event
 				},

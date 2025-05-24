@@ -34,14 +34,20 @@ func (h *HealthCheck) Check(ctx context.Context) error {
 	cctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
+	log := logger.FromContextWithTrace(cctx)
+
 	healthCheckSubject := "recoto.health.check.v1"
 
 	resultCh := make(chan struct{}, 1)
 	defer close(resultCh)
 
-	unsubscribe, err := h.Broker.Subscribe(cctx, healthCheckSubject, func(_ []byte) {
-		resultCh <- struct{}{}
-	})
+	unsubscribe, err := h.Broker.Subscribe(
+		cctx,
+		healthCheckSubject,
+		func(_ context.Context, _ []byte) {
+			resultCh <- struct{}{}
+		},
+	)
 	if err != nil {
 		return errors.Wrap(err, "failed to subscribe health check message")
 	}
@@ -49,13 +55,12 @@ func (h *HealthCheck) Check(ctx context.Context) error {
 	defer func() {
 		if unsubscribe != nil {
 			if err := unsubscribe(); err != nil {
-				logger := logger.FromContext(cctx)
-				logger.Error("failed to unsubscribe health check message", zap.Error(err))
+				log.Error("failed to unsubscribe health check message", zap.Error(err))
 			}
 		}
 	}()
 
-	err = h.Broker.Publish(cctx, healthCheckSubject, []byte("ping"))
+	err = h.Broker.Publish(cctx, healthCheckSubject, "ping")
 	if err != nil {
 		return errors.Wrap(err, "failed to publish health check message")
 	}

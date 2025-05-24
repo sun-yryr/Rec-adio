@@ -3,8 +3,6 @@ package recording
 import (
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/domain"
 	"github.com/sun-yryr/recoto/internal/eventutil"
@@ -49,7 +47,6 @@ func (e *RequestedEvent) ToDomain() *domain.Recording {
 // NewRequestedService は RequestedEvent 用のサービスを生成するヘルパー。
 func NewRequestedService(
 	broker broker.Broker,
-	logger *zap.Logger,
 ) *eventutil.EventService[RequestedEvent] {
-	return eventutil.NewEventService[RequestedEvent](broker, logger, RequestedSubject)
+	return eventutil.NewEventService[RequestedEvent](broker, RequestedSubject)
 }

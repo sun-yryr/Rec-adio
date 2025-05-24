@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zaptest"
 
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/domain"
@@ -69,9 +68,8 @@ func TestNewRequestedService(t *testing.T) {
 	t.Parallel()
 
 	mockBroker := &mockBroker{}
-	logger := zaptest.NewLogger(t)
 
-	service := NewRequestedService(mockBroker, logger)
+	service := NewRequestedService(mockBroker)
 
 	require.NotNil(t, service)
 }
@@ -82,7 +80,7 @@ type mockBroker struct {
 	CloseCalledCount     int
 
 	PublishTopic   string
-	PublishMessage []byte
+	PublishMessage interface{}
 	SubscribeTopic string
 
 	PublishError   error
@@ -90,7 +88,7 @@ type mockBroker struct {
 	CloseError     error
 }
 
-func (m *mockBroker) Publish(_ context.Context, topic string, message []byte) error {
+func (m *mockBroker) Publish(_ context.Context, topic string, message interface{}) error {
 	m.PublishCalledCount++
 	m.PublishTopic = topic
 	m.PublishMessage = message
@@ -101,7 +99,7 @@ func (m *mockBroker) Publish(_ context.Context, topic string, message []byte) er
 func (m *mockBroker) Subscribe(
 	_ context.Context,
 	topic string,
-	_ func(message []byte),
+	_ func(context.Context, []byte),
 ) (broker.UnsubscribeFunc, error) {
 	m.SubscribeCalledCount++
 	m.SubscribeTopic = topic

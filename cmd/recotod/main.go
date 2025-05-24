@@ -80,9 +80,9 @@ func main() {
 	}()
 
 	// イベント
-	recordingRequestedService := recording.NewRequestedService(embBroker, appLogger)
-	recordingStartedService := recording.NewStartedService(embBroker, appLogger)
-	recordingFinishedService := recording.NewFinishedService(embBroker, appLogger)
+	recordingRequestedService := recording.NewRequestedService(embBroker)
+	recordingStartedService := recording.NewStartedService(embBroker)
+	recordingFinishedService := recording.NewFinishedService(embBroker)
 
 	// Initialize recorder
 	urlRecorder := recorder.NewURLRecorder(appLogger)

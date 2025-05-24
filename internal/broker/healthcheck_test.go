@@ -10,15 +10,15 @@ import (
 )
 
 type mockBroker struct {
-	publishFunc    func(ctx context.Context, subject string, message []byte) error
-	subscribeFunc  func(ctx context.Context, subject string, handler func(message []byte)) (UnsubscribeFunc, error)
+	publishFunc    func(ctx context.Context, subject string, message interface{}) error
+	subscribeFunc  func(ctx context.Context, subject string, handler func(context.Context, []byte)) (UnsubscribeFunc, error)
 	closeFunc      func() error
 	publishCalled  bool
 	publishSubject string
-	publishMessage []byte
+	publishMessage interface{}
 }
 
-func (m *mockBroker) Publish(ctx context.Context, subject string, message []byte) error {
+func (m *mockBroker) Publish(ctx context.Context, subject string, message interface{}) error {
 	m.publishCalled = true
 	m.publishSubject = subject
 	m.publishMessage = message
@@ -33,7 +33,7 @@ func (m *mockBroker) Publish(ctx context.Context, subject string, message []byte
 func (m *mockBroker) Subscribe(
 	ctx context.Context,
 	subject string,
-	handler func(message []byte),
+	handler func(context.Context, []byte),
 ) (UnsubscribeFunc, error) {
 	if m.subscribeFunc != nil {
 		return m.subscribeFunc(ctx, subject, handler)
@@ -74,12 +74,12 @@ func TestHealthCheck_Check_Success(t *testing.T) {
 
 	// 成功するケース: Subscribeが成功し、パブリッシュされたメッセージに応答する
 	mockBroker := &mockBroker{
-		subscribeFunc: func(_ context.Context, _ string, handler func(_ []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(ctx context.Context, _ string, handler func(context.Context, []byte)) (UnsubscribeFunc, error) {
 			// パブリッシュされると同時にハンドラをトリガーするモック
-			go func() {
+			go func(ctx context.Context) {
 				time.Sleep(50 * time.Millisecond) // 少し遅延を入れる
-				handler([]byte("pong"))
-			}()
+				handler(ctx, []byte("pong"))
+			}(ctx)
 
 			return func() error { return nil }, nil
 		},
@@ -91,7 +91,7 @@ func TestHealthCheck_Check_Success(t *testing.T) {
 
 	assert.True(t, mockBroker.publishCalled)
 	assert.Equal(t, "recoto.health.check.v1", mockBroker.publishSubject)
-	assert.Equal(t, []byte("ping"), mockBroker.publishMessage)
+	assert.Equal(t, "ping", mockBroker.publishMessage)
 }
 
 func TestHealthCheck_Check_SubscribeError(t *testing.T) {
@@ -100,7 +100,7 @@ func TestHealthCheck_Check_SubscribeError(t *testing.T) {
 	// Subscribeがエラーを返すケース
 	errSubscribe := assert.AnError
 	mockBroker := &mockBroker{
-		subscribeFunc: func(_ context.Context, _ string, _ func(_ []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, _ func(context.Context, []byte)) (UnsubscribeFunc, error) {
 			return nil, errSubscribe
 		},
 	}
@@ -119,10 +119,10 @@ func TestHealthCheck_Check_PublishError(t *testing.T) {
 	// Publishがエラーを返すケース
 	errPublish := assert.AnError
 	mockBroker := &mockBroker{
-		subscribeFunc: func(_ context.Context, _ string, _ func(_ []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, _ func(context.Context, []byte)) (UnsubscribeFunc, error) {
 			return func() error { return nil }, nil
 		},
-		publishFunc: func(_ context.Context, _ string, _ []byte) error {
+		publishFunc: func(_ context.Context, _ string, _ interface{}) error {
 			return errPublish
 		},
 	}
@@ -139,7 +139,7 @@ func TestHealthCheck_Check_Timeout(t *testing.T) {
 
 	// タイムアウトが発生するケース
 	mockBroker := &mockBroker{
-		subscribeFunc: func(_ context.Context, _ string, _ func(_ []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(_ context.Context, _ string, _ func(context.Context, []byte)) (UnsubscribeFunc, error) {
 			// ハンドラを呼び出さない
 			return func() error { return nil }, nil
 		},
@@ -167,13 +167,13 @@ func TestHealthCheck_Check_UnsubscribeError(t *testing.T) {
 	handlerCalled := false
 
 	mockBroker := &mockBroker{
-		subscribeFunc: func(_ context.Context, _ string, handler func(_ []byte)) (UnsubscribeFunc, error) {
+		subscribeFunc: func(ctx context.Context, _ string, handler func(context.Context, []byte)) (UnsubscribeFunc, error) {
 			// パブリッシュされると同時にハンドラをトリガーするモック
-			go func() {
+			go func(ctx context.Context) {
 				time.Sleep(50 * time.Millisecond)
 				handlerCalled = true
-				handler([]byte("pong"))
-			}()
+				handler(ctx, []byte("pong"))
+			}(ctx)
 
 			return func() error {
 				unsubscribeCalled = true

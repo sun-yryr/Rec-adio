@@ -8,11 +8,11 @@ type UnsubscribeFunc func() error
 
 // Broker は、アプリケーションのメッセージブローカーのインターフェースを定義する。
 type Broker interface {
-	Publish(ctx context.Context, subject string, message []byte) error
+	Publish(ctx context.Context, subject string, message interface{}) error
 	Subscribe(
 		ctx context.Context,
 		subject string,
-		handler func(message []byte),
+		handler func(context.Context, []byte),
 	) (UnsubscribeFunc, error)
 	Close() error
 }

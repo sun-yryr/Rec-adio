@@ -6,7 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zaptest"
 )
 
 func TestStartedEvent(t *testing.T) {
@@ -26,9 +25,8 @@ func TestNewStartedService(t *testing.T) {
 	t.Parallel()
 
 	mockBroker := &mockBroker{}
-	logger := zaptest.NewLogger(t)
 
-	service := NewStartedService(mockBroker, logger)
+	service := NewStartedService(mockBroker)
 
 	require.NotNil(t, service)
 }
