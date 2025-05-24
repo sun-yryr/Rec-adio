@@ -15,18 +15,18 @@ import (
 
 type statErrorFS struct{ fileutil.FileSystem }
 
-func (statErrorFS) Stat(string) (os.FileInfo, error) { return nil, errStat }
+func (*statErrorFS) Stat(string) (os.FileInfo, error) { return nil, errStat }
 
 type writeErrorFS struct{ fileutil.FileSystem }
 
-func (writeErrorFS) WriteFile(string, []byte, os.FileMode) error { return errWrite }
+func (*writeErrorFS) WriteFile(string, []byte, os.FileMode) error { return errWrite }
 
 var (
 	errStat  = errors.New("stat error")
 	errWrite = errors.New("write error")
 )
 
-const testConfigPath = "/config.toml"
+const testConfigPath = "/tmp/recoto/config.toml"
 
 func TestNewDefaultConfig(t *testing.T) {
 	t.Parallel()
@@ -39,9 +39,9 @@ func TestNewDefaultConfig(t *testing.T) {
 }
 
 func TestGetDefaultConfigPath(t *testing.T) {
-	fs := fileutil.NewMemFS()
-
 	t.Setenv("HOME", "/home/test")
+
+	fs := fileutil.NewMemFS()
 
 	path, err := GetDefaultConfigPathFS(fs)
 	require.NoError(t, err)
@@ -97,9 +97,9 @@ func TestLoadConfig_DefaultPath(t *testing.T) {
 	})
 
 	tempDir := t.TempDir()
-	fs := fileutil.NewMemFS()
-
 	t.Setenv("HOME", tempDir)
+
+	fs := fileutil.NewMemFS()
 	// デフォルトパスに設定ファイルを作成
 	configDir := filepath.Join(tempDir, ".config", "recoto")
 	require.NoError(t, fs.MkdirAll(configDir, 0o755))
@@ -149,7 +149,7 @@ func TestLoadConfig_StatError(t *testing.T) {
 	t.Parallel()
 
 	fs := statErrorFS{fileutil.NewMemFS()}
-	_, err := LoadConfigFS(fs, testConfigPath)
+	_, err := LoadConfigFS(&fs, testConfigPath)
 	require.Error(t, err)
 }
 
@@ -304,7 +304,7 @@ func TestSaveConfig_WriteError(t *testing.T) {
 	ro := writeErrorFS{mem}
 	cfg := NewDefaultConfig()
 
-	err := SaveConfigFS(ro, testConfigPath, cfg)
+	err := SaveConfigFS(&ro, testConfigPath, cfg)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "failed to write config file")
 }
