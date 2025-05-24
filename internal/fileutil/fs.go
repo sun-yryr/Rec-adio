@@ -13,6 +13,8 @@ type FileSystem interface {
 	ReadFile(name string) ([]byte, error)
 	WriteFile(name string, data []byte, perm os.FileMode) error
 	MkdirAll(path string, perm os.FileMode) error
+	Remove(name string) error
+	Rename(oldpath, newpath string) error
 	UserHomeDir() (string, error)
 }
 
@@ -64,6 +66,22 @@ func (fs *aferoFS) WriteFile(name string, data []byte, perm os.FileMode) error {
 func (fs *aferoFS) MkdirAll(path string, perm os.FileMode) error {
 	if err := fs.Fs.MkdirAll(path, perm); err != nil {
 		return errors.Wrap(err, "mkdir failed")
+	}
+
+	return nil
+}
+
+func (fs *aferoFS) Remove(name string) error {
+	if err := fs.Fs.Remove(name); err != nil {
+		return errors.Wrap(err, "remove file failed")
+	}
+
+	return nil
+}
+
+func (fs *aferoFS) Rename(oldpath, newpath string) error {
+	if err := fs.Fs.Rename(oldpath, newpath); err != nil {
+		return errors.Wrap(err, "rename file failed")
 	}
 
 	return nil
