@@ -9,6 +9,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.11.2
 	github.com/nats-io/nats.go v1.41.2
 	github.com/pelletier/go-toml/v2 v2.2.4
+	github.com/spf13/afero v1.14.0
 	github.com/stretchr/testify v1.10.0
 	github.com/u2takey/ffmpeg-go v0.5.0
 	go.uber.org/zap v1.27.0
