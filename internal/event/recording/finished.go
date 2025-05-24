@@ -4,8 +4,6 @@ package recording
 import (
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/eventutil"
 )
@@ -24,7 +22,6 @@ type FinishedEvent struct {
 // NewFinishedService は FinishedEvent 用のサービスを生成するヘルパー。
 func NewFinishedService(
 	broker broker.Broker,
-	logger *zap.Logger,
 ) *eventutil.EventService[FinishedEvent] {
-	return eventutil.NewEventService[FinishedEvent](broker, logger, FinishedSubject)
+	return eventutil.NewEventService[FinishedEvent](broker, FinishedSubject)
 }

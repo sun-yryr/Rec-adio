@@ -59,16 +59,16 @@ var (
 type mockBroker struct {
 	publishCalled    bool
 	publishSubject   string
-	publishMsg       []byte
+	publishMsg       interface{}
 	publishErr       error
 	subscribeSubject string
-	subscribeHandler func([]byte)
+	subscribeHandler func(context.Context, []byte)
 	subscribeErr     error
 	unsubscribeErr   error
 	closeErr         error
 }
 
-func (b *mockBroker) Publish(_ context.Context, subject string, msg []byte) error {
+func (b *mockBroker) Publish(_ context.Context, subject string, msg interface{}) error {
 	b.publishCalled = true
 	b.publishSubject = subject
 	b.publishMsg = msg
@@ -79,7 +79,7 @@ func (b *mockBroker) Publish(_ context.Context, subject string, msg []byte) erro
 func (b *mockBroker) Subscribe(
 	_ context.Context,
 	subject string,
-	handler func([]byte),
+	handler func(context.Context, []byte),
 ) (broker.UnsubscribeFunc, error) {
 	b.subscribeSubject = subject
 	b.subscribeHandler = handler
@@ -99,17 +99,14 @@ func setupTestRecordingManager(t *testing.T) (*RecordingManager, *mockBroker) {
 
 	requestedService := eventutil.NewEventService[recording.RequestedEvent](
 		mockBroker,
-		logger,
 		"recording.requested",
 	)
 	startedService := eventutil.NewEventService[recording.StartedEvent](
 		mockBroker,
-		logger,
 		"recording.started",
 	)
 	finishedService := eventutil.NewEventService[recording.FinishedEvent](
 		mockBroker,
-		logger,
 		"recording.finished",
 	)
 
@@ -176,7 +173,7 @@ func TestRecordingManager_Start(t *testing.T) {
 	manager, broker := setupTestRecordingManager(t)
 
 	// ハンドラがnilにならないよう、デフォルト値を設定
-	broker.subscribeHandler = func([]byte) {}
+	broker.subscribeHandler = func(context.Context, []byte) {}
 
 	// マネージャーの起動
 	err := manager.Start(t.Context())
@@ -194,17 +191,14 @@ func TestRecordingManager_Start(t *testing.T) {
 
 	requestedService := eventutil.NewEventService[recording.RequestedEvent](
 		errorBroker,
-		logger,
 		"recording.requested",
 	)
 	startedService := eventutil.NewEventService[recording.StartedEvent](
 		errorBroker,
-		logger,
 		"recording.started",
 	)
 	finishedService := eventutil.NewEventService[recording.FinishedEvent](
 		errorBroker,
-		logger,
 		"recording.finished",
 	)
 

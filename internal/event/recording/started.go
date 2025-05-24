@@ -3,8 +3,6 @@ package recording
 import (
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/sun-yryr/recoto/internal/broker"
 	"github.com/sun-yryr/recoto/internal/eventutil"
 )
@@ -21,7 +19,6 @@ type StartedEvent struct {
 // NewStartedService は StartedEvent 用のサービスを生成するヘルパー。
 func NewStartedService(
 	broker broker.Broker,
-	logger *zap.Logger,
 ) *eventutil.EventService[StartedEvent] {
-	return eventutil.NewEventService[StartedEvent](broker, logger, StartedSubject)
+	return eventutil.NewEventService[StartedEvent](broker, StartedSubject)
 }

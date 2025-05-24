@@ -9,22 +9,21 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/sun-yryr/recoto/internal/broker"
+	"github.com/sun-yryr/recoto/internal/logger"
 )
 
 // EventService はイベントを発行・購読する関数を提供するジェネリックなサービス。
 type EventService[T any] struct {
 	broker  broker.Broker
-	logger  *zap.Logger
 	subject string
 }
 
 // NewEventService は新しい EventService を作成する。
 func NewEventService[T any](
 	broker broker.Broker,
-	logger *zap.Logger,
 	subject string,
 ) *EventService[T] {
-	return &EventService[T]{broker: broker, logger: logger, subject: subject}
+	return &EventService[T]{broker: broker, subject: subject}
 }
 
 // EncodeEvent はイベントをJSON形式にエンコードする（テスト用）。
@@ -37,29 +36,29 @@ func EncodeEvent[T any](event T) ([]byte, error) {
 	return data, nil
 }
 
-// Publish はイベントを発行する。
+// Publish は TraceID 付きでイベントを発行する。
 func (s *EventService[T]) Publish(ctx context.Context, event T) error {
-	message, err := json.Marshal(event)
-	if err != nil {
-		return errors.Wrapf(err, "failed to marshal %s event", s.subject)
-	}
+	// context からロガーを取得して TraceID で拡張
+	log := logger.FromContextWithTrace(ctx)
+	log.Debug("publishing event", zap.String("subject", s.subject))
 
-	if err := s.broker.Publish(ctx, s.subject, message); err != nil {
+	if err := s.broker.Publish(ctx, s.subject, event); err != nil {
 		return errors.Wrapf(err, "failed to publish %s event", s.subject)
 	}
 
 	return nil
 }
 
-// Subscribe はイベントを購読する。
+// Subscribe は TraceID 対応でイベントを購読する。
 func (s *EventService[T]) Subscribe(
 	ctx context.Context,
 	handler func(context.Context, *T),
 ) (broker.UnsubscribeFunc, error) {
-	subscribeHandler := func(msg []byte) {
+	subscribeHandler := func(msgCtx context.Context, msg []byte) {
 		var event T
 		if err := json.Unmarshal(msg, &event); err != nil {
-			s.logger.Error(
+			log := logger.FromContextWithTrace(msgCtx)
+			log.Error(
 				"failed to unmarshal message",
 				zap.Error(err),
 				zap.String("subject", s.subject),
@@ -68,7 +67,8 @@ func (s *EventService[T]) Subscribe(
 			return
 		}
 
-		handler(ctx, &event)
+		// TraceID 付きの context でハンドラーを実行
+		handler(msgCtx, &event)
 	}
 
 	unsubscribe, err := s.broker.Subscribe(ctx, s.subject, subscribeHandler)
