@@ -29,6 +29,18 @@ jobs:
         with:
           fetch-depth: 1
 
+      - uses: bufbuild/buf-action@v1
+        with:
+          setup_only: true
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - uses: golangci/golangci-lint-action@v8
+        with:
+          args: --help
+
       - name: Run Claude Code
         id: claude
         uses: anthropics/claude-code-action@beta
