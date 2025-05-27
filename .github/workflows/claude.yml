@@ -46,3 +46,4 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          allowed_tools: Bash(golangci-lint run:*),Bash(golangci-lint fmt:*),Bash(go test:*),Bash(go mod tidy),Bash(go build:*),Bash(go get:*),Bash(buf generate:*),Bash(buf lint:*),Bash(buf breaking:*)
