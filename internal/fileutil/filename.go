@@ -15,13 +15,13 @@ var (
 	invalidCharsPattern = regexp.MustCompile(`[\\/:*?"<>|\s]`)
 	// 連続するアンダースコアを1つにまとめる。
 	multipleUnderscoresPattern = regexp.MustCompile(`_+`)
-	// Windows予約語のリスト
+	// Windows予約語のリスト。
 	windowsReservedNames = []string{
 		"CON", "PRN", "AUX", "NUL",
 		"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
 		"LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
 	}
-	// 特殊なディレクトリ名
+	// 特殊なディレクトリ名。
 	specialNames = []string{".", ".."}
 )
 
@@ -40,10 +40,14 @@ func SanitizeFilename(filename string) string {
 	}
 
 	// Windows予約語と特殊名のチェック
-	allReservedNames := append(windowsReservedNames, specialNames...)
+	allReservedNames := make([]string, 0, len(windowsReservedNames)+len(specialNames))
+	allReservedNames = append(allReservedNames, windowsReservedNames...)
+	allReservedNames = append(allReservedNames, specialNames...)
+
 	for _, reserved := range allReservedNames {
 		if strings.EqualFold(sanitized, reserved) {
 			sanitized = "recording"
+
 			break
 		}
 	}
