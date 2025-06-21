@@ -8,6 +8,9 @@ import (
 	"log"
 	"net"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -127,7 +130,49 @@ func main() {
 
 	appLogger.Info("Server is listening on port", zap.Int("port", cfg.Server.Port))
 
-	if err := srv.Serve(lis); err != nil {
+	// シグナルハンドリングのためのチャネルを作成
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	// 別のゴルーチンでサーバーを起動
+	serverErrCh := make(chan error, 1)
+	go func() {
+		if err := srv.Serve(lis); err != nil {
+			serverErrCh <- err
+		}
+	}()
+
+	// シグナルまたはサーバーエラーを待機
+	select {
+	case sig := <-sigCh:
+		appLogger.Info("received signal", zap.String("signal", sig.String()))
+	case err := <-serverErrCh:
 		appLogger.Fatal("failed to serve", zap.Error(err))
+	}
+
+	// グレースフルシャットダウンの実行
+	graceTimeout := 30 * time.Second
+	appLogger.Info("shutting down server", zap.Duration("timeout", graceTimeout))
+
+	// キャンセル用のコンテキストを作成（RecordingManagerのコンテキストをキャンセル）
+	cancel()
+
+	// サーバーのグレースフルシャットダウン
+	shutdownDone := make(chan struct{})
+	go func() {
+		srv.GracefulStop()
+		close(shutdownDone)
+	}()
+
+	// タイムアウト付きでシャットダウンを待機
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), graceTimeout)
+	defer shutdownCancel()
+
+	select {
+	case <-shutdownDone:
+		appLogger.Info("server shutdown completed")
+	case <-shutdownCtx.Done():
+		appLogger.Warn("server shutdown timed out, forcing stop")
+		srv.Stop()
 	}
 }
