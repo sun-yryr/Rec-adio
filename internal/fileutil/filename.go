@@ -16,12 +16,14 @@ var (
 	// 連続するアンダースコアを1つにまとめる。
 	multipleUnderscoresPattern = regexp.MustCompile(`_+`)
 	// Windows予約語のリスト。
+	//nolint:gochecknoglobals // パフォーマンス上の理由
 	windowsReservedNames = []string{
 		"CON", "PRN", "AUX", "NUL",
 		"COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
 		"LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9",
 	}
 	// 特殊なディレクトリ名。
+	//nolint:gochecknoglobals // パフォーマンス上の理由
 	specialNames = []string{".", ".."}
 )
 
