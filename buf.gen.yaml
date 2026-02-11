@@ -1,13 +1,8 @@
 version: v2
 managed:
   enabled: true
-  override:
-    - file_option: go_package_prefix
-      value: github.com/sun-yryr/recoto/pkg/api
 plugins:
-  - remote: buf.build/protocolbuffers/go
-    out: pkg/api
-    opt: paths=source_relative
-  - remote: buf.build/grpc/go
-    out: pkg/api
-    opt: paths=source_relative
+  - remote: buf.build/grpc/swift-protobuf
+    out: Sources/App/Generated
+  - remote: buf.build/apple/swift
+    out: Sources/App/Generated

@@ -3,25 +3,61 @@ syntax = "proto3";
 package recoto.recording.v1;
 
 import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1";
 
 // 録音に関するRPCメソッドを提供する。
 service RecordingService {
-  // 指定されたURLで即時録音を開始する。
-  rpc StartFromURL(StartFromURLRequest) returns (StartFromURLResponse) {}
+  // 単発の録音ジョブを作成する。
+  rpc CreateJob(CreateJobRequest) returns (CreateJobResponse) {}
 }
 
-message StartFromURLRequest {
+message CreateJobRequest {
   // 録音するコンテンツのURL。m3u8などffmpegで取得可能なURLの必要がある。
   string url = 1;
   // 録音するコンテンツのタイトル。保存する際のファイル名になる。
   string title = 2;
   // 録音するコンテンツの長さ。
   google.protobuf.Duration duration = 3;
+  // 録音を開始する時刻（UTC）。
+  google.protobuf.Timestamp scheduled_at = 4;
+  // タイムゾーン（IANA Time Zone Database形式。例: Asia/Tokyo）。
+  string timezone = 5;
 }
 
-message StartFromURLResponse {
-  // 録音ID。
-  string recording_id = 1;
+message CreateJobResponse {
+  // 作成されたジョブ。
+  Job job = 1;
+}
+
+message Job {
+  // ジョブID。
+  string job_id = 1;
+  // 録音元の種別。
+  SourceType source_type = 2;
+  // 録音元の値。source_type=URL の場合はURL文字列。
+  string source_value = 3;
+  // 録音するコンテンツのタイトル。
+  string title = 4;
+  // 録音するコンテンツの長さ。
+  google.protobuf.Duration duration = 5;
+  // 録音を開始する時刻（UTC）。
+  google.protobuf.Timestamp scheduled_at = 6;
+  // タイムゾーン（IANA Time Zone Database形式。例: Asia/Tokyo）。
+  string timezone = 7;
+  // ジョブの状態。
+  JobState state = 8;
+}
+
+enum SourceType {
+  SOURCE_TYPE_UNSPECIFIED = 0;
+  SOURCE_TYPE_URL = 1;
+}
+
+enum JobState {
+  JOB_STATE_UNSPECIFIED = 0;
+  JOB_STATE_ACTIVE = 1;
+  JOB_STATE_PAUSED = 2;
+  JOB_STATE_DELETED = 3;
 }

@@ -1,0 +1,3 @@
+[tools]
+buf = "latest"
+grpcurl = "latest"
