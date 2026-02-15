@@ -1,3 +1,11 @@
 [tools]
 buf = "latest"
 grpcurl = "latest"
+
+[tasks.generate]
+description = "generate grpc stubs & file descriptor set"
+run = [
+  "rm -rf Sources/App/Generated Sources/App/Resources/Reflection/recoto.pb",
+  "buf generate",
+  "buf build -o Sources/App/Resources/Reflection/recoto.pb --as-file-descriptor-set",
+]

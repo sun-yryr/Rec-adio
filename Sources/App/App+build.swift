@@ -2,6 +2,7 @@ import Configuration
 import Foundation
 import GRDB
 import Hummingbird
+import JSONLogger
 import Logging
 
 // Request context used by application
@@ -39,6 +40,7 @@ func buildAppCore(reader: ConfigReader) throws -> AppCore {
 }
 
 private func makeLogger(reader: ConfigReader) -> Logger {
+  LoggingSystem.bootstrap(JSONLogger.init, metadataProvider: nil)
   var logger = Logger(label: "Recoto")
   logger.logLevel = reader.string(forKey: "log.level", as: Logger.Level.self, default: .info)
   return logger

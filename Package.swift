@@ -21,6 +21,8 @@ let package = Package(
     .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.33.3"),
     .package(url: "https://github.com/grpc/grpc-swift-extras.git", from: "2.1.1"),
     .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.9.1"),
+    .package(url: "https://github.com/mhayes853/swift-uuidv7", from: "0.4.0"),
+    .package(url: "https://github.com/xcode-actions/json-logger", from: "1.0.0"),
   ],
   targets: [
     .executableTarget(
@@ -36,10 +38,12 @@ let package = Package(
         .product(name: "GRPCReflectionService", package: "grpc-swift-extras"),
         .product(name: "ServiceLifecycle", package: "swift-service-lifecycle"),
         .product(name: "UnixSignals", package: "swift-service-lifecycle"),
+        .product(name: "UUIDV7", package: "swift-uuidv7"),
+        .product(name: "JSONLogger", package: "json-logger"),
       ],
       path: "Sources/App",
       resources: [
-        .copy("Resources/Reflection/recoto.pb"),
+        .copy("Resources/Reflection/recoto.pb")
       ]
     ),
     .testTarget(

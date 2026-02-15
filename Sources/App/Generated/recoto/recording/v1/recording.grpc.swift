@@ -32,9 +32,22 @@ internal enum Recoto_Recording_V1_RecordingService: Sendable {
                 method: "CreateJob"
             )
         }
+        /// Namespace for "ListJobs" metadata.
+        internal enum ListJobs: Sendable {
+            /// Request type for "ListJobs".
+            internal typealias Input = Recoto_Recording_V1_ListJobsRequest
+            /// Response type for "ListJobs".
+            internal typealias Output = Recoto_Recording_V1_ListJobsResponse
+            /// Descriptor for "ListJobs".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "ListJobs"
+            )
+        }
         /// Descriptors for all methods in the "recoto.recording.v1.RecordingService" service.
         internal static let descriptors: [GRPCCore.MethodDescriptor] = [
-            CreateJob.descriptor
+            CreateJob.descriptor,
+            ListJobs.descriptor
         ]
     }
 }
@@ -81,6 +94,24 @@ extension Recoto_Recording_V1_RecordingService {
             request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_CreateJobRequest>,
             context: GRPCCore.ServerContext
         ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_CreateJobResponse>
+
+        /// Handle the "ListJobs" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブの一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_ListJobsRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_ListJobsResponse` messages.
+        func listJobs(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ListJobsRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ListJobsResponse>
     }
 
     /// Service protocol for the "recoto.recording.v1.RecordingService" service.
@@ -112,6 +143,24 @@ extension Recoto_Recording_V1_RecordingService {
             request: GRPCCore.ServerRequest<Recoto_Recording_V1_CreateJobRequest>,
             context: GRPCCore.ServerContext
         ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_CreateJobResponse>
+
+        /// Handle the "ListJobs" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブの一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ListJobsRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_ListJobsResponse` message.
+        func listJobs(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_ListJobsRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ListJobsResponse>
     }
 
     /// Simple service protocol for the "recoto.recording.v1.RecordingService" service.
@@ -141,6 +190,24 @@ extension Recoto_Recording_V1_RecordingService {
             request: Recoto_Recording_V1_CreateJobRequest,
             context: GRPCCore.ServerContext
         ) async throws -> Recoto_Recording_V1_CreateJobResponse
+
+        /// Handle the "ListJobs" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブの一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_ListJobsRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_ListJobsResponse` to respond with.
+        func listJobs(
+            request: Recoto_Recording_V1_ListJobsRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_ListJobsResponse
     }
 }
 
@@ -154,6 +221,17 @@ extension Recoto_Recording_V1_RecordingService.StreamingServiceProtocol {
             serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_CreateJobResponse>(),
             handler: { request, context in
                 try await self.createJob(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.ListJobs.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ListJobsRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ListJobsResponse>(),
+            handler: { request, context in
+                try await self.listJobs(
                     request: request,
                     context: context
                 )
@@ -175,6 +253,17 @@ extension Recoto_Recording_V1_RecordingService.ServiceProtocol {
         )
         return GRPCCore.StreamingServerResponse(single: response)
     }
+
+    internal func listJobs(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ListJobsRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ListJobsResponse> {
+        let response = try await self.listJobs(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
 }
 
 // Default implementation of methods from 'ServiceProtocol'.
@@ -186,6 +275,19 @@ extension Recoto_Recording_V1_RecordingService.SimpleServiceProtocol {
     ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_CreateJobResponse> {
         return GRPCCore.ServerResponse<Recoto_Recording_V1_CreateJobResponse>(
             message: try await self.createJob(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func listJobs(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_ListJobsRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ListJobsResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_ListJobsResponse>(
+            message: try await self.listJobs(
                 request: request.message,
                 context: context
             ),
@@ -228,6 +330,29 @@ extension Recoto_Recording_V1_RecordingService {
             deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_CreateJobResponse>,
             options: GRPCCore.CallOptions,
             onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_CreateJobResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "ListJobs" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブの一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ListJobsRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_ListJobsRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_ListJobsResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func listJobs<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_ListJobsRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_ListJobsRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ListJobsResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListJobsResponse>) async throws -> Result
         ) async throws -> Result where Result: Sendable
     }
 
@@ -284,6 +409,40 @@ extension Recoto_Recording_V1_RecordingService {
                 onResponse: handleResponse
             )
         }
+
+        /// Call the "ListJobs" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブの一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ListJobsRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_ListJobsRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_ListJobsResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func listJobs<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_ListJobsRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_ListJobsRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ListJobsResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListJobsResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.ListJobs.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
     }
 }
 
@@ -314,6 +473,35 @@ extension Recoto_Recording_V1_RecordingService.ClientProtocol {
             request: request,
             serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_CreateJobRequest>(),
             deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_CreateJobResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "ListJobs" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブの一覧を取得する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_ListJobsRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func listJobs<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_ListJobsRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListJobsResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.listJobs(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ListJobsRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ListJobsResponse>(),
             options: options,
             onResponse: handleResponse
         )
@@ -350,6 +538,39 @@ extension Recoto_Recording_V1_RecordingService.ClientProtocol {
             metadata: metadata
         )
         return try await self.createJob(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "ListJobs" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブの一覧を取得する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func listJobs<Result>(
+        _ message: Recoto_Recording_V1_ListJobsRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListJobsResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_ListJobsRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.listJobs(
             request: request,
             options: options,
             onResponse: handleResponse

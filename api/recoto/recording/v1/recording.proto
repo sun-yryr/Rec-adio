@@ -11,6 +11,8 @@ option go_package = "github.com/sun-yryr/recoto/pkg/api/recoto/recording/v1";
 service RecordingService {
   // 単発の録音ジョブを作成する。
   rpc CreateJob(CreateJobRequest) returns (CreateJobResponse) {}
+  // ジョブの一覧を取得する。
+  rpc ListJobs(ListJobsRequest) returns (ListJobsResponse) {}
 }
 
 message CreateJobRequest {
@@ -29,6 +31,20 @@ message CreateJobRequest {
 message CreateJobResponse {
   // 作成されたジョブ。
   Job job = 1;
+}
+
+message ListJobsRequest {
+  // 1ページあたりの最大件数。
+  int32 page_size = 1;
+  // ページトークン。
+  string page_token = 2;
+}
+
+message ListJobsResponse {
+  // ジョブの一覧。
+  repeated Job jobs = 1;
+  // 次ページのトークン。空の場合は最終ページ。
+  string next_page_token = 2;
 }
 
 message Job {
