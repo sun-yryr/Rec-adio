@@ -1,0 +1,14 @@
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - Sources/App/Generated
+
+disabled_rules:
+  # SwiftFormatと被る
+  - opening_brace
+
+# SwiftFormatと被る
+trailing_comma:
+  mandatory_comma: true

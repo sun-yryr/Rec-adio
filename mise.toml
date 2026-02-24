@@ -1,6 +1,44 @@
 [tools]
 buf = "latest"
 grpcurl = "latest"
+swiftformat = { version = "0.59.1", no_app = "true", rename_exe = "swiftformat" }
+swiftlint = "0.63.2"
+
+[env]
+TOOLCHAIN_DIR = "{{ exec(command='bash -lc \"swiftly use --print-location | xargs\"', cache_key='swiftly_tc', cache_duration='1h') | trim }}"
+
+[tasks.build]
+description = "build application"
+depends = ["generate"]
+run = "swift build"
+
+[tasks.check]
+description = "check formatting and lint"
+depends = ["check:*"]
+
+[tasks."check:lint"]
+description = "check with SwiftLint"
+hide = true
+run = "swiftlint lint"
+
+[tasks."check:format"]
+description = "check with SwiftFormat"
+hide = true
+run = "swiftformat --lint ."
+
+[tasks.fix]
+description = "auto-fix formatting and lint"
+run = [{ task = "fix:format" }, { task = "fix:lint" }, { tasks = ["check:*"] }]
+
+[tasks."fix:lint"]
+description = "auto-fix with SwiftLint"
+hide = true
+run = "swiftlint lint --fix"
+
+[tasks."fix:format"]
+description = "auto-fix with SwiftFormat"
+hide = true
+run = "swiftformat ."
 
 [tasks.generate]
 description = "generate grpc stubs & file descriptor set"
@@ -8,4 +46,9 @@ run = [
   "rm -rf Sources/App/Generated Sources/App/Resources/Reflection/recoto.pb",
   "buf generate",
   "buf build -o Sources/App/Resources/Reflection/recoto.pb --as-file-descriptor-set",
+]
+sources = ["api/**/*.proto", "buf.gen.yaml", "buf.yaml"]
+outputs = [
+  "Sources/App/Generated/**/*.swift",
+  "Sources/App/Resources/Reflection/recoto.pb",
 ]
