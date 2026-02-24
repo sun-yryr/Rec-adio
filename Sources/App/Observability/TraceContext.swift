@@ -74,7 +74,10 @@ struct TraceContext: Sendable, Equatable {
             bytes.append(Self.hexAlphabet[Int(value & 0x0F)])
         }
 
-        return String(decoding: bytes, as: UTF8.self)
+        guard let hex = String(bytes: bytes, encoding: .utf8) else {
+            preconditionFailure("randomHex produced non-UTF8 bytes")
+        }
+        return hex
     }
 
     private static func isHex(_ value: String, length: Int) -> Bool {
