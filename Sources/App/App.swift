@@ -1,4 +1,5 @@
 import Configuration
+import Dependencies
 import Hummingbird
 import Logging
 
@@ -18,6 +19,10 @@ struct App {
                 "grpc.reflection": "true",
             ]),
         ])
-        try await runGRPCDaemon(reader: reader)
+        try await withDependencies { deps in
+            deps.uuid = UUIDGenerator.v7
+        } operation: {
+            try await runGRPCDaemon(reader: reader)
+        }
     }
 }

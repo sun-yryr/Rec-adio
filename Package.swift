@@ -22,8 +22,12 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.33.3"),
         .package(url: "https://github.com/grpc/grpc-swift-extras.git", from: "2.1.1"),
         .package(url: "https://github.com/swift-server/swift-service-lifecycle.git", from: "2.9.1"),
-        .package(url: "https://github.com/mhayes853/swift-uuidv7", from: "0.4.0"),
+        .package(
+            url: "https://github.com/mhayes853/swift-uuidv7", from: "0.4.0",
+            traits: ["SwiftUUIDV7Dependencies"]
+        ),
         .package(url: "https://github.com/xcode-actions/json-logger", from: "1.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-dependencies", from: "1.0.0"),
     ],
     targets: [
         .executableTarget(
@@ -41,6 +45,7 @@ let package = Package(
                 .product(name: "UnixSignals", package: "swift-service-lifecycle"),
                 .product(name: "UUIDV7", package: "swift-uuidv7"),
                 .product(name: "JSONLogger", package: "json-logger"),
+                .product(name: "Dependencies", package: "swift-dependencies"),
             ],
             path: "Sources/App",
             resources: [

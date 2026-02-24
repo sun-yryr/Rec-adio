@@ -13,7 +13,8 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         self.logger = logger
     }
 
-    func createJob(request: Recoto_Recording_V1_CreateJobRequest, context _: ServerContext) async throws
+    func createJob(request: Recoto_Recording_V1_CreateJobRequest, context _: ServerContext)
+        async throws
         -> Recoto_Recording_V1_CreateJobResponse
     {
         let logger = self.logger.rpc()
@@ -30,7 +31,7 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         try await persistJob(job, logger: logger)
 
         var response = Recoto_Recording_V1_CreateJobResponse()
-        response.job = convertGrpcJob(job: job)
+        response.job = job.toGrpcJob()
 
         logger.info(
             "recording.create_job.finished",
@@ -38,14 +39,6 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         )
 
         return response
-    }
-
-    private func makeJob(from request: Recoto_Recording_V1_CreateJobRequest) -> Job {
-        Job(
-            jobId: UUIDV7().uuidString, sourceType: "url", sourceValue: request.url, title: request.title,
-            durationSec: request.duration.seconds, scheduledAt: request.scheduledAt.date,
-            timezone: request.timezone, state: .active
-        )
     }
 
     private func persistJob(_ job: Job, logger: Logger) async throws {
@@ -84,7 +77,8 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         }
     }
 
-    func listJobs(request _: Recoto_Recording_V1_ListJobsRequest, context _: ServerContext) async throws
+    func listJobs(request _: Recoto_Recording_V1_ListJobsRequest, context _: ServerContext)
+        async throws
         -> Recoto_Recording_V1_ListJobsResponse
     {
         let logger = self.logger.rpc()
@@ -93,7 +87,7 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
             let jobs = try await jobRepo.findAll()
 
             var response = Recoto_Recording_V1_ListJobsResponse()
-            response.jobs = jobs.map(convertGrpcJob)
+            response.jobs = jobs.map { job in job.toGrpcJob() }
 
             return response
         } catch {
