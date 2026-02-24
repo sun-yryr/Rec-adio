@@ -1,18 +1,17 @@
+@testable import App
 import Configuration
 import Hummingbird
 import HummingbirdTesting
 import Logging
 import Testing
 
-@testable import App
-
 private let reader = ConfigReader(providers: [
     InMemoryProvider(values: [
         "http.host": "127.0.0.1",
         "http.port": "0",
         "log.level": "trace",
-        "db.path": ":memory:"
-    ])
+        "db.path": ":memory:",
+    ]),
 ])
 
 @Suite
