@@ -26,12 +26,29 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
             ]
         )
 
-        let job = Job(
+        let job = makeJob(from: request)
+        try await persistJob(job, logger: logger)
+
+        var response = Recoto_Recording_V1_CreateJobResponse()
+        response.job = convertGrpcJob(job: job)
+
+        logger.info(
+            "recording.create_job.finished",
+            metadata: ["job_id": .string(job.jobId)]
+        )
+
+        return response
+    }
+
+    private func makeJob(from request: Recoto_Recording_V1_CreateJobRequest) -> Job {
+        Job(
             jobId: UUIDV7().uuidString, sourceType: "url", sourceValue: request.url, title: request.title,
             durationSec: request.duration.seconds, scheduledAt: request.scheduledAt.date,
             timezone: request.timezone, state: .active
         )
+    }
 
+    private func persistJob(_ job: Job, logger: Logger) async throws {
         do {
             try await jobRepo.create(job)
         } catch let error as RPCError {
@@ -65,16 +82,6 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
                 cause: error
             )
         }
-
-        var response = Recoto_Recording_V1_CreateJobResponse()
-        response.job = convertGrpcJob(job: job)
-
-        logger.info(
-            "recording.create_job.finished",
-            metadata: ["job_id": .string(job.jobId)]
-        )
-
-        return response
     }
 
     func listJobs(request _: Recoto_Recording_V1_ListJobsRequest, context _: ServerContext) async throws
