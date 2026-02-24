@@ -14,8 +14,8 @@ actor GRDBDatabaseHealthChecker: DatabaseHealthChecking {
     }
 
     func check() async throws {
-        try await dbQueue.read { db in
-            _ = try Row.fetchOne(db, sql: "SELECT 1")
+        try await dbQueue.read { database in
+            _ = try Row.fetchOne(database, sql: "SELECT 1")
         }
     }
 }

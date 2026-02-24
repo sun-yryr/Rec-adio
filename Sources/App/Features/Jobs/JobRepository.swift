@@ -16,28 +16,28 @@ actor GRDBJobRepository: JobRepository {
     }
 
     func create(_ job: Job) async throws {
-        try await dbQueue.write { db in
-            try job.insert(db)
+        try await dbQueue.write { database in
+            try job.insert(database)
         }
     }
 
     func find(jobId: String) async throws -> Job? {
-        try await dbQueue.read { db in
-            try Job.fetchOne(db, key: jobId)
+        try await dbQueue.read { database in
+            try Job.fetchOne(database, key: jobId)
         }
     }
 
     func findAll() async throws -> [Job] {
-        try await dbQueue.read { db in
+        try await dbQueue.read { database in
             try Job
                 .order(Job.Columns.scheduledAt)
-                .fetchAll(db)
+                .fetchAll(database)
         }
     }
 
     func delete(jobId: String) async throws -> Bool {
-        try await dbQueue.write { db in
-            try Job.deleteOne(db, key: jobId)
+        try await dbQueue.write { database in
+            try Job.deleteOne(database, key: jobId)
         }
     }
 }
