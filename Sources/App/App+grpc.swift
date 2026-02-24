@@ -74,9 +74,11 @@ private func buildGRPCServer(
     dbQueue: DatabaseQueue,
     logger: Logger
 ) throws -> GRPCServer<HTTP2ServerTransport.Posix> {
+    let jobRepository = GRDBJobRepository(dbQueue: dbQueue)
+    let jobService = JobService(jobRepo: jobRepository)
     var services: [any RegistrableRPCService] = [
         HealthService(dbQueue: dbQueue, logger: logger),
-        RecordingService(jobRepo: GRDBJobRepository(dbQueue: dbQueue), logger: logger),
+        RecordingService(jobService: jobService, logger: logger),
     ]
 
     if config.reflectionEnabled {

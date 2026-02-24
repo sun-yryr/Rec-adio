@@ -44,10 +44,114 @@ internal enum Recoto_Recording_V1_RecordingService: Sendable {
                 method: "ListJobs"
             )
         }
+        /// Namespace for "UpdateJob" metadata.
+        internal enum UpdateJob: Sendable {
+            /// Request type for "UpdateJob".
+            internal typealias Input = Recoto_Recording_V1_UpdateJobRequest
+            /// Response type for "UpdateJob".
+            internal typealias Output = Recoto_Recording_V1_UpdateJobResponse
+            /// Descriptor for "UpdateJob".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "UpdateJob"
+            )
+        }
+        /// Namespace for "PauseJob" metadata.
+        internal enum PauseJob: Sendable {
+            /// Request type for "PauseJob".
+            internal typealias Input = Recoto_Recording_V1_PauseJobRequest
+            /// Response type for "PauseJob".
+            internal typealias Output = Recoto_Recording_V1_PauseJobResponse
+            /// Descriptor for "PauseJob".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "PauseJob"
+            )
+        }
+        /// Namespace for "ResumeJob" metadata.
+        internal enum ResumeJob: Sendable {
+            /// Request type for "ResumeJob".
+            internal typealias Input = Recoto_Recording_V1_ResumeJobRequest
+            /// Response type for "ResumeJob".
+            internal typealias Output = Recoto_Recording_V1_ResumeJobResponse
+            /// Descriptor for "ResumeJob".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "ResumeJob"
+            )
+        }
+        /// Namespace for "DeleteJob" metadata.
+        internal enum DeleteJob: Sendable {
+            /// Request type for "DeleteJob".
+            internal typealias Input = Recoto_Recording_V1_DeleteJobRequest
+            /// Response type for "DeleteJob".
+            internal typealias Output = Recoto_Recording_V1_DeleteJobResponse
+            /// Descriptor for "DeleteJob".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "DeleteJob"
+            )
+        }
+        /// Namespace for "GetJob" metadata.
+        internal enum GetJob: Sendable {
+            /// Request type for "GetJob".
+            internal typealias Input = Recoto_Recording_V1_GetJobRequest
+            /// Response type for "GetJob".
+            internal typealias Output = Recoto_Recording_V1_GetJobResponse
+            /// Descriptor for "GetJob".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "GetJob"
+            )
+        }
+        /// Namespace for "CancelRun" metadata.
+        internal enum CancelRun: Sendable {
+            /// Request type for "CancelRun".
+            internal typealias Input = Recoto_Recording_V1_CancelRunRequest
+            /// Response type for "CancelRun".
+            internal typealias Output = Recoto_Recording_V1_CancelRunResponse
+            /// Descriptor for "CancelRun".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "CancelRun"
+            )
+        }
+        /// Namespace for "GetRun" metadata.
+        internal enum GetRun: Sendable {
+            /// Request type for "GetRun".
+            internal typealias Input = Recoto_Recording_V1_GetRunRequest
+            /// Response type for "GetRun".
+            internal typealias Output = Recoto_Recording_V1_GetRunResponse
+            /// Descriptor for "GetRun".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "GetRun"
+            )
+        }
+        /// Namespace for "ListRuns" metadata.
+        internal enum ListRuns: Sendable {
+            /// Request type for "ListRuns".
+            internal typealias Input = Recoto_Recording_V1_ListRunsRequest
+            /// Response type for "ListRuns".
+            internal typealias Output = Recoto_Recording_V1_ListRunsResponse
+            /// Descriptor for "ListRuns".
+            internal static let descriptor = GRPCCore.MethodDescriptor(
+                service: GRPCCore.ServiceDescriptor(fullyQualifiedService: "recoto.recording.v1.RecordingService"),
+                method: "ListRuns"
+            )
+        }
         /// Descriptors for all methods in the "recoto.recording.v1.RecordingService" service.
         internal static let descriptors: [GRPCCore.MethodDescriptor] = [
             CreateJob.descriptor,
-            ListJobs.descriptor
+            ListJobs.descriptor,
+            UpdateJob.descriptor,
+            PauseJob.descriptor,
+            ResumeJob.descriptor,
+            DeleteJob.descriptor,
+            GetJob.descriptor,
+            CancelRun.descriptor,
+            GetRun.descriptor,
+            ListRuns.descriptor
         ]
     }
 }
@@ -112,6 +216,150 @@ extension Recoto_Recording_V1_RecordingService {
             request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ListJobsRequest>,
             context: GRPCCore.ServerContext
         ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ListJobsResponse>
+
+        /// Handle the "UpdateJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_UpdateJobRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_UpdateJobResponse` messages.
+        func updateJob(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_UpdateJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_UpdateJobResponse>
+
+        /// Handle the "PauseJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを一時停止する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_PauseJobRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_PauseJobResponse` messages.
+        func pauseJob(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_PauseJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_PauseJobResponse>
+
+        /// Handle the "ResumeJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 一時停止したジョブを再開する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_ResumeJobRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_ResumeJobResponse` messages.
+        func resumeJob(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ResumeJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ResumeJobResponse>
+
+        /// Handle the "DeleteJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを削除する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_DeleteJobRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_DeleteJobResponse` messages.
+        func deleteJob(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_DeleteJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_DeleteJobResponse>
+
+        /// Handle the "GetJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_GetJobRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_GetJobResponse` messages.
+        func getJob(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_GetJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_GetJobResponse>
+
+        /// Handle the "CancelRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行中または待機中の実行をキャンセルする。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_CancelRunRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_CancelRunResponse` messages.
+        func cancelRun(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_CancelRunRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_CancelRunResponse>
+
+        /// Handle the "GetRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_GetRunRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_GetRunResponse` messages.
+        func getRun(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_GetRunRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_GetRunResponse>
+
+        /// Handle the "ListRuns" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行の一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A streaming request of `Recoto_Recording_V1_ListRunsRequest` messages.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A streaming response of `Recoto_Recording_V1_ListRunsResponse` messages.
+        func listRuns(
+            request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ListRunsRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ListRunsResponse>
     }
 
     /// Service protocol for the "recoto.recording.v1.RecordingService" service.
@@ -161,6 +409,150 @@ extension Recoto_Recording_V1_RecordingService {
             request: GRPCCore.ServerRequest<Recoto_Recording_V1_ListJobsRequest>,
             context: GRPCCore.ServerContext
         ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ListJobsResponse>
+
+        /// Handle the "UpdateJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_UpdateJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_UpdateJobResponse` message.
+        func updateJob(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_UpdateJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_UpdateJobResponse>
+
+        /// Handle the "PauseJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを一時停止する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_PauseJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_PauseJobResponse` message.
+        func pauseJob(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_PauseJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_PauseJobResponse>
+
+        /// Handle the "ResumeJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 一時停止したジョブを再開する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ResumeJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_ResumeJobResponse` message.
+        func resumeJob(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_ResumeJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ResumeJobResponse>
+
+        /// Handle the "DeleteJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを削除する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_DeleteJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_DeleteJobResponse` message.
+        func deleteJob(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_DeleteJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_DeleteJobResponse>
+
+        /// Handle the "GetJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_GetJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_GetJobResponse` message.
+        func getJob(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_GetJobRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_GetJobResponse>
+
+        /// Handle the "CancelRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行中または待機中の実行をキャンセルする。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_CancelRunRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_CancelRunResponse` message.
+        func cancelRun(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_CancelRunRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_CancelRunResponse>
+
+        /// Handle the "GetRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_GetRunRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_GetRunResponse` message.
+        func getRun(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_GetRunRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_GetRunResponse>
+
+        /// Handle the "ListRuns" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行の一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ListRunsRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A response containing a single `Recoto_Recording_V1_ListRunsResponse` message.
+        func listRuns(
+            request: GRPCCore.ServerRequest<Recoto_Recording_V1_ListRunsRequest>,
+            context: GRPCCore.ServerContext
+        ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ListRunsResponse>
     }
 
     /// Simple service protocol for the "recoto.recording.v1.RecordingService" service.
@@ -208,6 +600,150 @@ extension Recoto_Recording_V1_RecordingService {
             request: Recoto_Recording_V1_ListJobsRequest,
             context: GRPCCore.ServerContext
         ) async throws -> Recoto_Recording_V1_ListJobsResponse
+
+        /// Handle the "UpdateJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_UpdateJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_UpdateJobResponse` to respond with.
+        func updateJob(
+            request: Recoto_Recording_V1_UpdateJobRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_UpdateJobResponse
+
+        /// Handle the "PauseJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを一時停止する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_PauseJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_PauseJobResponse` to respond with.
+        func pauseJob(
+            request: Recoto_Recording_V1_PauseJobRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_PauseJobResponse
+
+        /// Handle the "ResumeJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 一時停止したジョブを再開する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_ResumeJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_ResumeJobResponse` to respond with.
+        func resumeJob(
+            request: Recoto_Recording_V1_ResumeJobRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_ResumeJobResponse
+
+        /// Handle the "DeleteJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを削除する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_DeleteJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_DeleteJobResponse` to respond with.
+        func deleteJob(
+            request: Recoto_Recording_V1_DeleteJobRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_DeleteJobResponse
+
+        /// Handle the "GetJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_GetJobRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_GetJobResponse` to respond with.
+        func getJob(
+            request: Recoto_Recording_V1_GetJobRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_GetJobResponse
+
+        /// Handle the "CancelRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行中または待機中の実行をキャンセルする。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_CancelRunRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_CancelRunResponse` to respond with.
+        func cancelRun(
+            request: Recoto_Recording_V1_CancelRunRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_CancelRunResponse
+
+        /// Handle the "GetRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_GetRunRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_GetRunResponse` to respond with.
+        func getRun(
+            request: Recoto_Recording_V1_GetRunRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_GetRunResponse
+
+        /// Handle the "ListRuns" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行の一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A `Recoto_Recording_V1_ListRunsRequest` message.
+        ///   - context: Context providing information about the RPC.
+        /// - Throws: Any error which occurred during the processing of the request. Thrown errors
+        ///     of type `RPCError` are mapped to appropriate statuses. All other errors are converted
+        ///     to an internal error.
+        /// - Returns: A `Recoto_Recording_V1_ListRunsResponse` to respond with.
+        func listRuns(
+            request: Recoto_Recording_V1_ListRunsRequest,
+            context: GRPCCore.ServerContext
+        ) async throws -> Recoto_Recording_V1_ListRunsResponse
     }
 }
 
@@ -232,6 +768,94 @@ extension Recoto_Recording_V1_RecordingService.StreamingServiceProtocol {
             serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ListJobsResponse>(),
             handler: { request, context in
                 try await self.listJobs(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.UpdateJob.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_UpdateJobRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_UpdateJobResponse>(),
+            handler: { request, context in
+                try await self.updateJob(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.PauseJob.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_PauseJobRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_PauseJobResponse>(),
+            handler: { request, context in
+                try await self.pauseJob(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.ResumeJob.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ResumeJobRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ResumeJobResponse>(),
+            handler: { request, context in
+                try await self.resumeJob(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.DeleteJob.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_DeleteJobRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_DeleteJobResponse>(),
+            handler: { request, context in
+                try await self.deleteJob(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.GetJob.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_GetJobRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_GetJobResponse>(),
+            handler: { request, context in
+                try await self.getJob(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.CancelRun.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_CancelRunRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_CancelRunResponse>(),
+            handler: { request, context in
+                try await self.cancelRun(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.GetRun.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_GetRunRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_GetRunResponse>(),
+            handler: { request, context in
+                try await self.getRun(
+                    request: request,
+                    context: context
+                )
+            }
+        )
+        router.registerHandler(
+            forMethod: Recoto_Recording_V1_RecordingService.Method.ListRuns.descriptor,
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ListRunsRequest>(),
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ListRunsResponse>(),
+            handler: { request, context in
+                try await self.listRuns(
                     request: request,
                     context: context
                 )
@@ -264,6 +888,94 @@ extension Recoto_Recording_V1_RecordingService.ServiceProtocol {
         )
         return GRPCCore.StreamingServerResponse(single: response)
     }
+
+    internal func updateJob(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_UpdateJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_UpdateJobResponse> {
+        let response = try await self.updateJob(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func pauseJob(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_PauseJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_PauseJobResponse> {
+        let response = try await self.pauseJob(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func resumeJob(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ResumeJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ResumeJobResponse> {
+        let response = try await self.resumeJob(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func deleteJob(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_DeleteJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_DeleteJobResponse> {
+        let response = try await self.deleteJob(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func getJob(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_GetJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_GetJobResponse> {
+        let response = try await self.getJob(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func cancelRun(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_CancelRunRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_CancelRunResponse> {
+        let response = try await self.cancelRun(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func getRun(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_GetRunRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_GetRunResponse> {
+        let response = try await self.getRun(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
+
+    internal func listRuns(
+        request: GRPCCore.StreamingServerRequest<Recoto_Recording_V1_ListRunsRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.StreamingServerResponse<Recoto_Recording_V1_ListRunsResponse> {
+        let response = try await self.listRuns(
+            request: GRPCCore.ServerRequest(stream: request),
+            context: context
+        )
+        return GRPCCore.StreamingServerResponse(single: response)
+    }
 }
 
 // Default implementation of methods from 'ServiceProtocol'.
@@ -288,6 +1000,110 @@ extension Recoto_Recording_V1_RecordingService.SimpleServiceProtocol {
     ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ListJobsResponse> {
         return GRPCCore.ServerResponse<Recoto_Recording_V1_ListJobsResponse>(
             message: try await self.listJobs(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func updateJob(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_UpdateJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_UpdateJobResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_UpdateJobResponse>(
+            message: try await self.updateJob(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func pauseJob(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_PauseJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_PauseJobResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_PauseJobResponse>(
+            message: try await self.pauseJob(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func resumeJob(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_ResumeJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ResumeJobResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_ResumeJobResponse>(
+            message: try await self.resumeJob(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func deleteJob(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_DeleteJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_DeleteJobResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_DeleteJobResponse>(
+            message: try await self.deleteJob(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func getJob(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_GetJobRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_GetJobResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_GetJobResponse>(
+            message: try await self.getJob(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func cancelRun(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_CancelRunRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_CancelRunResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_CancelRunResponse>(
+            message: try await self.cancelRun(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func getRun(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_GetRunRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_GetRunResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_GetRunResponse>(
+            message: try await self.getRun(
+                request: request.message,
+                context: context
+            ),
+            metadata: [:]
+        )
+    }
+
+    internal func listRuns(
+        request: GRPCCore.ServerRequest<Recoto_Recording_V1_ListRunsRequest>,
+        context: GRPCCore.ServerContext
+    ) async throws -> GRPCCore.ServerResponse<Recoto_Recording_V1_ListRunsResponse> {
+        return GRPCCore.ServerResponse<Recoto_Recording_V1_ListRunsResponse>(
+            message: try await self.listRuns(
                 request: request.message,
                 context: context
             ),
@@ -353,6 +1169,190 @@ extension Recoto_Recording_V1_RecordingService {
             deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ListJobsResponse>,
             options: GRPCCore.CallOptions,
             onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListJobsResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "UpdateJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_UpdateJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_UpdateJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_UpdateJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func updateJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_UpdateJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_UpdateJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_UpdateJobResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_UpdateJobResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "PauseJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを一時停止する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_PauseJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_PauseJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_PauseJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func pauseJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_PauseJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_PauseJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_PauseJobResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_PauseJobResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "ResumeJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 一時停止したジョブを再開する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ResumeJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_ResumeJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_ResumeJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func resumeJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_ResumeJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_ResumeJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ResumeJobResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ResumeJobResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "DeleteJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを削除する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_DeleteJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_DeleteJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_DeleteJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func deleteJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_DeleteJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_DeleteJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_DeleteJobResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_DeleteJobResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "GetJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_GetJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_GetJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_GetJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func getJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_GetJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_GetJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_GetJobResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetJobResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "CancelRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行中または待機中の実行をキャンセルする。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_CancelRunRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_CancelRunRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_CancelRunResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func cancelRun<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_CancelRunRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_CancelRunRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_CancelRunResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_CancelRunResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "GetRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_GetRunRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_GetRunRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_GetRunResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func getRun<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_GetRunRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_GetRunRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_GetRunResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetRunResponse>) async throws -> Result
+        ) async throws -> Result where Result: Sendable
+
+        /// Call the "ListRuns" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行の一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ListRunsRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_ListRunsRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_ListRunsResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        func listRuns<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_ListRunsRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_ListRunsRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ListRunsResponse>,
+            options: GRPCCore.CallOptions,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListRunsResponse>) async throws -> Result
         ) async throws -> Result where Result: Sendable
     }
 
@@ -443,6 +1443,278 @@ extension Recoto_Recording_V1_RecordingService {
                 onResponse: handleResponse
             )
         }
+
+        /// Call the "UpdateJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_UpdateJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_UpdateJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_UpdateJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func updateJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_UpdateJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_UpdateJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_UpdateJobResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_UpdateJobResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.UpdateJob.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "PauseJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを一時停止する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_PauseJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_PauseJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_PauseJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func pauseJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_PauseJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_PauseJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_PauseJobResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_PauseJobResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.PauseJob.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "ResumeJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 一時停止したジョブを再開する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ResumeJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_ResumeJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_ResumeJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func resumeJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_ResumeJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_ResumeJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ResumeJobResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ResumeJobResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.ResumeJob.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "DeleteJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを削除する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_DeleteJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_DeleteJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_DeleteJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func deleteJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_DeleteJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_DeleteJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_DeleteJobResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_DeleteJobResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.DeleteJob.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "GetJob" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > ジョブを取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_GetJobRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_GetJobRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_GetJobResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func getJob<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_GetJobRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_GetJobRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_GetJobResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetJobResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.GetJob.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "CancelRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行中または待機中の実行をキャンセルする。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_CancelRunRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_CancelRunRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_CancelRunResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func cancelRun<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_CancelRunRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_CancelRunRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_CancelRunResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_CancelRunResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.CancelRun.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "GetRun" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_GetRunRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_GetRunRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_GetRunResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func getRun<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_GetRunRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_GetRunRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_GetRunResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetRunResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.GetRun.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
+
+        /// Call the "ListRuns" method.
+        ///
+        /// > Source IDL Documentation:
+        /// >
+        /// > 実行の一覧を取得する。
+        ///
+        /// - Parameters:
+        ///   - request: A request containing a single `Recoto_Recording_V1_ListRunsRequest` message.
+        ///   - serializer: A serializer for `Recoto_Recording_V1_ListRunsRequest` messages.
+        ///   - deserializer: A deserializer for `Recoto_Recording_V1_ListRunsResponse` messages.
+        ///   - options: Options to apply to this RPC.
+        ///   - handleResponse: A closure which handles the response, the result of which is
+        ///       returned to the caller. Returning from the closure will cancel the RPC if it
+        ///       hasn't already finished.
+        /// - Returns: The result of `handleResponse`.
+        internal func listRuns<Result>(
+            request: GRPCCore.ClientRequest<Recoto_Recording_V1_ListRunsRequest>,
+            serializer: some GRPCCore.MessageSerializer<Recoto_Recording_V1_ListRunsRequest>,
+            deserializer: some GRPCCore.MessageDeserializer<Recoto_Recording_V1_ListRunsResponse>,
+            options: GRPCCore.CallOptions = .defaults,
+            onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListRunsResponse>) async throws -> Result = { response in
+                try response.message
+            }
+        ) async throws -> Result where Result: Sendable {
+            try await self.client.unary(
+                request: request,
+                descriptor: Recoto_Recording_V1_RecordingService.Method.ListRuns.descriptor,
+                serializer: serializer,
+                deserializer: deserializer,
+                options: options,
+                onResponse: handleResponse
+            )
+        }
     }
 }
 
@@ -502,6 +1774,238 @@ extension Recoto_Recording_V1_RecordingService.ClientProtocol {
             request: request,
             serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ListJobsRequest>(),
             deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ListJobsResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "UpdateJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_UpdateJobRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func updateJob<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_UpdateJobRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_UpdateJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.updateJob(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_UpdateJobRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_UpdateJobResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "PauseJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブを一時停止する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_PauseJobRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func pauseJob<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_PauseJobRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_PauseJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.pauseJob(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_PauseJobRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_PauseJobResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "ResumeJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 一時停止したジョブを再開する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_ResumeJobRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func resumeJob<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_ResumeJobRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ResumeJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.resumeJob(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ResumeJobRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ResumeJobResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "DeleteJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブを削除する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_DeleteJobRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func deleteJob<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_DeleteJobRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_DeleteJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.deleteJob(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_DeleteJobRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_DeleteJobResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "GetJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブを取得する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_GetJobRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func getJob<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_GetJobRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.getJob(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_GetJobRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_GetJobResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "CancelRun" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 実行中または待機中の実行をキャンセルする。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_CancelRunRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func cancelRun<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_CancelRunRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_CancelRunResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.cancelRun(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_CancelRunRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_CancelRunResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "GetRun" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 実行を取得する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_GetRunRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func getRun<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_GetRunRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetRunResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.getRun(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_GetRunRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_GetRunResponse>(),
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "ListRuns" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 実行の一覧を取得する。
+    ///
+    /// - Parameters:
+    ///   - request: A request containing a single `Recoto_Recording_V1_ListRunsRequest` message.
+    ///   - options: Options to apply to this RPC.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func listRuns<Result>(
+        request: GRPCCore.ClientRequest<Recoto_Recording_V1_ListRunsRequest>,
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListRunsResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        try await self.listRuns(
+            request: request,
+            serializer: GRPCProtobuf.ProtobufSerializer<Recoto_Recording_V1_ListRunsRequest>(),
+            deserializer: GRPCProtobuf.ProtobufDeserializer<Recoto_Recording_V1_ListRunsResponse>(),
             options: options,
             onResponse: handleResponse
         )
@@ -571,6 +2075,270 @@ extension Recoto_Recording_V1_RecordingService.ClientProtocol {
             metadata: metadata
         )
         return try await self.listJobs(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "UpdateJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func updateJob<Result>(
+        _ message: Recoto_Recording_V1_UpdateJobRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_UpdateJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_UpdateJobRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.updateJob(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "PauseJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブを一時停止する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func pauseJob<Result>(
+        _ message: Recoto_Recording_V1_PauseJobRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_PauseJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_PauseJobRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.pauseJob(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "ResumeJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 一時停止したジョブを再開する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func resumeJob<Result>(
+        _ message: Recoto_Recording_V1_ResumeJobRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ResumeJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_ResumeJobRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.resumeJob(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "DeleteJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブを削除する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func deleteJob<Result>(
+        _ message: Recoto_Recording_V1_DeleteJobRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_DeleteJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_DeleteJobRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.deleteJob(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "GetJob" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > ジョブを取得する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func getJob<Result>(
+        _ message: Recoto_Recording_V1_GetJobRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetJobResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_GetJobRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.getJob(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "CancelRun" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 実行中または待機中の実行をキャンセルする。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func cancelRun<Result>(
+        _ message: Recoto_Recording_V1_CancelRunRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_CancelRunResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_CancelRunRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.cancelRun(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "GetRun" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 実行を取得する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func getRun<Result>(
+        _ message: Recoto_Recording_V1_GetRunRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_GetRunResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_GetRunRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.getRun(
+            request: request,
+            options: options,
+            onResponse: handleResponse
+        )
+    }
+
+    /// Call the "ListRuns" method.
+    ///
+    /// > Source IDL Documentation:
+    /// >
+    /// > 実行の一覧を取得する。
+    ///
+    /// - Parameters:
+    ///   - message: request message to send.
+    ///   - metadata: Additional metadata to send, defaults to empty.
+    ///   - options: Options to apply to this RPC, defaults to `.defaults`.
+    ///   - handleResponse: A closure which handles the response, the result of which is
+    ///       returned to the caller. Returning from the closure will cancel the RPC if it
+    ///       hasn't already finished.
+    /// - Returns: The result of `handleResponse`.
+    internal func listRuns<Result>(
+        _ message: Recoto_Recording_V1_ListRunsRequest,
+        metadata: GRPCCore.Metadata = [:],
+        options: GRPCCore.CallOptions = .defaults,
+        onResponse handleResponse: @Sendable @escaping (GRPCCore.ClientResponse<Recoto_Recording_V1_ListRunsResponse>) async throws -> Result = { response in
+            try response.message
+        }
+    ) async throws -> Result where Result: Sendable {
+        let request = GRPCCore.ClientRequest<Recoto_Recording_V1_ListRunsRequest>(
+            message: message,
+            metadata: metadata
+        )
+        return try await self.listRuns(
             request: request,
             options: options,
             onResponse: handleResponse

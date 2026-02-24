@@ -1,16 +1,21 @@
 import Foundation
-import GRDB
 import GRPCCore
 import Logging
-import UUIDV7
 
 struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProtocol {
     private let logger: Logger
-    private let jobRepo: any JobRepository
+    private let jobService: any JobServicing
+
+    init(
+        jobService: any JobServicing,
+        logger: Logger = Logger(label: "Recoto.RecordingService")
+    ) {
+        self.jobService = jobService
+        self.logger = logger
+    }
 
     init(jobRepo: any JobRepository, logger: Logger = Logger(label: "Recoto.RecordingService")) {
-        self.jobRepo = jobRepo
-        self.logger = logger
+        self.init(jobService: JobService(jobRepo: jobRepo), logger: logger)
     }
 
     func createJob(request: Recoto_Recording_V1_CreateJobRequest, context _: ServerContext)
@@ -28,7 +33,7 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         )
 
         let job = makeJob(from: request)
-        try await persistJob(job, logger: logger)
+        try await create(job, logger: logger)
 
         var response = Recoto_Recording_V1_CreateJobResponse()
         response.job = job.toGrpcJob()
@@ -41,39 +46,40 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         return response
     }
 
-    private func persistJob(_ job: Job, logger: Logger) async throws {
+    private func create(_ job: Job, logger: Logger) async throws {
         do {
-            try await jobRepo.create(job)
-        } catch let error as RPCError {
-            throw error
-        } catch let error as DatabaseError where error.resultCode == .SQLITE_CONSTRAINT {
-            logger.error(
-                "recording.create_job.failed",
-                metadata: [
-                    "job_id": .string(job.jobId),
-                    "grpc_status": .string("alreadyExists"),
-                    "reason": .string(error.message ?? "constraint violation"),
-                ]
-            )
-            throw RPCError(
-                code: .alreadyExists,
-                message: "recording job already exists",
-                cause: error
-            )
-        } catch {
-            logger.error(
-                "recording.create_job.failed",
-                metadata: [
-                    "job_id": .string(job.jobId),
-                    "grpc_status": .string("internalError"),
-                    "reason": .string(String(describing: error)),
-                ]
-            )
-            throw RPCError(
-                code: .internalError,
-                message: "failed to create recording job",
-                cause: error
-            )
+            try await jobService.create(job)
+        } catch let error as JobServiceError {
+            switch error {
+            case let .duplicateJob(reason):
+                logger.error(
+                    "recording.create_job.failed",
+                    metadata: [
+                        "job_id": .string(job.jobId),
+                        "grpc_status": .string("alreadyExists"),
+                        "reason": .string(reason),
+                    ]
+                )
+                throw RPCError(
+                    code: .alreadyExists,
+                    message: "recording job already exists",
+                    cause: error
+                )
+            case let .createFailed(reason), let .listFailed(reason):
+                logger.error(
+                    "recording.create_job.failed",
+                    metadata: [
+                        "job_id": .string(job.jobId),
+                        "grpc_status": .string("internalError"),
+                        "reason": .string(reason),
+                    ]
+                )
+                throw RPCError(
+                    code: .internalError,
+                    message: "failed to create recording job",
+                    cause: error
+                )
+            }
         }
     }
 
@@ -84,22 +90,97 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         let logger = self.logger.rpc()
 
         do {
-            let jobs = try await jobRepo.findAll()
+            let jobs = try await jobService.list()
 
             var response = Recoto_Recording_V1_ListJobsResponse()
             response.jobs = jobs.map { job in job.toGrpcJob() }
 
             return response
+        } catch let error as JobServiceError {
+            logger.error(
+                "recording.list_jobs.failed",
+                metadata: [
+                    "grpc_status": .string("internalError"),
+                    "reason": .string(error.reason),
+                ]
+            )
+            throw RPCError(
+                code: .internalError, message: "failed to list jobs", cause: error
+            )
         } catch {
             logger.error(
-                "failed list jobs",
+                "recording.list_jobs.failed",
                 metadata: [
-                    "error": .string(String(describing: error)),
+                    "grpc_status": .string("internalError"),
+                    "reason": .string(String(describing: error)),
                 ]
             )
             throw RPCError(
                 code: .internalError, message: "failed to list jobs", cause: error
             )
         }
+    }
+
+    func updateJob(request _: Recoto_Recording_V1_UpdateJobRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_UpdateJobResponse
+    {
+        try unimplementedRPC("updateJob")
+    }
+
+    func pauseJob(request _: Recoto_Recording_V1_PauseJobRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_PauseJobResponse
+    {
+        try unimplementedRPC("pauseJob")
+    }
+
+    func resumeJob(request _: Recoto_Recording_V1_ResumeJobRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_ResumeJobResponse
+    {
+        try unimplementedRPC("resumeJob")
+    }
+
+    func deleteJob(request _: Recoto_Recording_V1_DeleteJobRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_DeleteJobResponse
+    {
+        try unimplementedRPC("deleteJob")
+    }
+
+    func getJob(request _: Recoto_Recording_V1_GetJobRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_GetJobResponse
+    {
+        try unimplementedRPC("getJob")
+    }
+
+    func cancelRun(request _: Recoto_Recording_V1_CancelRunRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_CancelRunResponse
+    {
+        try unimplementedRPC("cancelRun")
+    }
+
+    func getRun(request _: Recoto_Recording_V1_GetRunRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_GetRunResponse
+    {
+        try unimplementedRPC("getRun")
+    }
+
+    func listRuns(request _: Recoto_Recording_V1_ListRunsRequest, context _: ServerContext)
+        async throws
+        -> Recoto_Recording_V1_ListRunsResponse
+    {
+        try unimplementedRPC("listRuns")
+    }
+
+    private func unimplementedRPC<Response>(_ method: String) throws -> Response {
+        throw RPCError(
+            code: .unimplemented,
+            message: "\(method) is not implemented yet"
+        )
     }
 }

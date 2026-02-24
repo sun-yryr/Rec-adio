@@ -2,6 +2,7 @@ import Configuration
 import Dependencies
 import Hummingbird
 import Logging
+import UUIDV7
 
 @main
 struct App {

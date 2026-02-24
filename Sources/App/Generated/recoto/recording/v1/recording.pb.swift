@@ -96,6 +96,56 @@ enum Recoto_Recording_V1_JobState: SwiftProtobuf.Enum, Swift.CaseIterable {
 
 }
 
+enum Recoto_Recording_V1_RunState: SwiftProtobuf.Enum, Swift.CaseIterable {
+  typealias RawValue = Int
+  case unspecified // = 0
+  case queued // = 1
+  case running // = 2
+  case succeeded // = 3
+  case failed // = 4
+  case canceled // = 5
+  case UNRECOGNIZED(Int)
+
+  init() {
+    self = .unspecified
+  }
+
+  init?(rawValue: Int) {
+    switch rawValue {
+    case 0: self = .unspecified
+    case 1: self = .queued
+    case 2: self = .running
+    case 3: self = .succeeded
+    case 4: self = .failed
+    case 5: self = .canceled
+    default: self = .UNRECOGNIZED(rawValue)
+    }
+  }
+
+  var rawValue: Int {
+    switch self {
+    case .unspecified: return 0
+    case .queued: return 1
+    case .running: return 2
+    case .succeeded: return 3
+    case .failed: return 4
+    case .canceled: return 5
+    case .UNRECOGNIZED(let i): return i
+    }
+  }
+
+  // The compiler won't synthesize support with the UNRECOGNIZED case.
+  static let allCases: [Recoto_Recording_V1_RunState] = [
+    .unspecified,
+    .queued,
+    .running,
+    .succeeded,
+    .failed,
+    .canceled,
+  ]
+
+}
+
 struct Recoto_Recording_V1_CreateJobRequest: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -192,6 +242,281 @@ struct Recoto_Recording_V1_ListJobsResponse: Sendable {
   init() {}
 }
 
+struct Recoto_Recording_V1_UpdateJobRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// source_type/source_value/state は更新不可。
+  /// 更新対象のジョブID。
+  var jobID: String = String()
+
+  /// 録音するコンテンツのタイトル。指定した場合のみ更新する。
+  var title: String {
+    get {_title ?? String()}
+    set {_title = newValue}
+  }
+  /// Returns true if `title` has been explicitly set.
+  var hasTitle: Bool {self._title != nil}
+  /// Clears the value of `title`. Subsequent reads from it will return its default value.
+  mutating func clearTitle() {self._title = nil}
+
+  /// 録音するコンテンツの長さ。指定した場合のみ更新する。
+  var duration: SwiftProtobuf.Google_Protobuf_Duration {
+    get {_duration ?? SwiftProtobuf.Google_Protobuf_Duration()}
+    set {_duration = newValue}
+  }
+  /// Returns true if `duration` has been explicitly set.
+  var hasDuration: Bool {self._duration != nil}
+  /// Clears the value of `duration`. Subsequent reads from it will return its default value.
+  mutating func clearDuration() {self._duration = nil}
+
+  /// 録音を開始する時刻（UTC）。指定した場合のみ更新する。
+  var scheduledAt: SwiftProtobuf.Google_Protobuf_Timestamp {
+    get {_scheduledAt ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
+    set {_scheduledAt = newValue}
+  }
+  /// Returns true if `scheduledAt` has been explicitly set.
+  var hasScheduledAt: Bool {self._scheduledAt != nil}
+  /// Clears the value of `scheduledAt`. Subsequent reads from it will return its default value.
+  mutating func clearScheduledAt() {self._scheduledAt = nil}
+
+  /// タイムゾーン（IANA Time Zone Database形式）。指定した場合のみ更新する。
+  var timezone: String {
+    get {_timezone ?? String()}
+    set {_timezone = newValue}
+  }
+  /// Returns true if `timezone` has been explicitly set.
+  var hasTimezone: Bool {self._timezone != nil}
+  /// Clears the value of `timezone`. Subsequent reads from it will return its default value.
+  mutating func clearTimezone() {self._timezone = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _title: String? = nil
+  fileprivate var _duration: SwiftProtobuf.Google_Protobuf_Duration? = nil
+  fileprivate var _scheduledAt: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
+  fileprivate var _timezone: String? = nil
+}
+
+struct Recoto_Recording_V1_UpdateJobResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 更新後のジョブ。
+  var job: Recoto_Recording_V1_Job {
+    get {_job ?? Recoto_Recording_V1_Job()}
+    set {_job = newValue}
+  }
+  /// Returns true if `job` has been explicitly set.
+  var hasJob: Bool {self._job != nil}
+  /// Clears the value of `job`. Subsequent reads from it will return its default value.
+  mutating func clearJob() {self._job = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _job: Recoto_Recording_V1_Job? = nil
+}
+
+struct Recoto_Recording_V1_PauseJobRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// ジョブID。
+  var jobID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_PauseJobResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_ResumeJobRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// ジョブID。
+  var jobID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_ResumeJobResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_DeleteJobRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// ジョブID。
+  var jobID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_DeleteJobResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_GetJobRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// ジョブID。
+  var jobID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_GetJobResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 取得したジョブ。
+  var job: Recoto_Recording_V1_Job {
+    get {_job ?? Recoto_Recording_V1_Job()}
+    set {_job = newValue}
+  }
+  /// Returns true if `job` has been explicitly set.
+  var hasJob: Bool {self._job != nil}
+  /// Clears the value of `job`. Subsequent reads from it will return its default value.
+  mutating func clearJob() {self._job = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _job: Recoto_Recording_V1_Job? = nil
+}
+
+struct Recoto_Recording_V1_CancelRunRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 実行ID。
+  var runID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_CancelRunResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_GetRunRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 実行ID。
+  var runID: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_GetRunResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 取得した実行。
+  var run: Recoto_Recording_V1_Run {
+    get {_run ?? Recoto_Recording_V1_Run()}
+    set {_run = newValue}
+  }
+  /// Returns true if `run` has been explicitly set.
+  var hasRun: Bool {self._run != nil}
+  /// Clears the value of `run`. Subsequent reads from it will return its default value.
+  mutating func clearRun() {self._run = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _run: Recoto_Recording_V1_Run? = nil
+}
+
+struct Recoto_Recording_V1_ListRunsRequest: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 1ページあたりの最大件数。
+  var pageSize: Int32 = 0
+
+  /// ページトークン。
+  var pageToken: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
+struct Recoto_Recording_V1_ListRunsResponse: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 実行の一覧。
+  var runs: [Recoto_Recording_V1_Run] = []
+
+  /// 次ページのトークン。空の場合は最終ページ。
+  var nextPageToken: String = String()
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+}
+
 struct Recoto_Recording_V1_Job: Sendable {
   // SwiftProtobuf.Message conformance is added in an extension below. See the
   // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
@@ -243,6 +568,81 @@ struct Recoto_Recording_V1_Job: Sendable {
   fileprivate var _scheduledAt: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
 }
 
+struct Recoto_Recording_V1_Run: Sendable {
+  // SwiftProtobuf.Message conformance is added in an extension below. See the
+  // `Message` and `Message+*Additions` files in the SwiftProtobuf library for
+  // methods supported on all messages.
+
+  /// 実行ID。
+  var runID: String = String()
+
+  /// 実行元ジョブID。
+  var jobID: String = String()
+
+  /// 録音開始予定時刻（UTC）。
+  var plannedAt: SwiftProtobuf.Google_Protobuf_Timestamp {
+    get {_plannedAt ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
+    set {_plannedAt = newValue}
+  }
+  /// Returns true if `plannedAt` has been explicitly set.
+  var hasPlannedAt: Bool {self._plannedAt != nil}
+  /// Clears the value of `plannedAt`. Subsequent reads from it will return its default value.
+  mutating func clearPlannedAt() {self._plannedAt = nil}
+
+  /// 実際の録音開始時刻（UTC）。
+  var startedAt: SwiftProtobuf.Google_Protobuf_Timestamp {
+    get {_startedAt ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
+    set {_startedAt = newValue}
+  }
+  /// Returns true if `startedAt` has been explicitly set.
+  var hasStartedAt: Bool {self._startedAt != nil}
+  /// Clears the value of `startedAt`. Subsequent reads from it will return its default value.
+  mutating func clearStartedAt() {self._startedAt = nil}
+
+  /// 録音終了時刻（UTC）。
+  var finishedAt: SwiftProtobuf.Google_Protobuf_Timestamp {
+    get {_finishedAt ?? SwiftProtobuf.Google_Protobuf_Timestamp()}
+    set {_finishedAt = newValue}
+  }
+  /// Returns true if `finishedAt` has been explicitly set.
+  var hasFinishedAt: Bool {self._finishedAt != nil}
+  /// Clears the value of `finishedAt`. Subsequent reads from it will return its default value.
+  mutating func clearFinishedAt() {self._finishedAt = nil}
+
+  /// 実行状態。
+  var state: Recoto_Recording_V1_RunState = .unspecified
+
+  /// 保存先ファイルパス。成功時に設定される。
+  var outputPath: String {
+    get {_outputPath ?? String()}
+    set {_outputPath = newValue}
+  }
+  /// Returns true if `outputPath` has been explicitly set.
+  var hasOutputPath: Bool {self._outputPath != nil}
+  /// Clears the value of `outputPath`. Subsequent reads from it will return its default value.
+  mutating func clearOutputPath() {self._outputPath = nil}
+
+  /// 失敗理由。失敗時に設定される。
+  var errorMessage: String {
+    get {_errorMessage ?? String()}
+    set {_errorMessage = newValue}
+  }
+  /// Returns true if `errorMessage` has been explicitly set.
+  var hasErrorMessage: Bool {self._errorMessage != nil}
+  /// Clears the value of `errorMessage`. Subsequent reads from it will return its default value.
+  mutating func clearErrorMessage() {self._errorMessage = nil}
+
+  var unknownFields = SwiftProtobuf.UnknownStorage()
+
+  init() {}
+
+  fileprivate var _plannedAt: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
+  fileprivate var _startedAt: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
+  fileprivate var _finishedAt: SwiftProtobuf.Google_Protobuf_Timestamp? = nil
+  fileprivate var _outputPath: String? = nil
+  fileprivate var _errorMessage: String? = nil
+}
+
 // MARK: - Code below here is support for the SwiftProtobuf runtime.
 
 fileprivate let _protobuf_package = "recoto.recording.v1"
@@ -253,6 +653,10 @@ extension Recoto_Recording_V1_SourceType: SwiftProtobuf._ProtoNameProviding {
 
 extension Recoto_Recording_V1_JobState: SwiftProtobuf._ProtoNameProviding {
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0JOB_STATE_UNSPECIFIED\0\u{1}JOB_STATE_ACTIVE\0\u{1}JOB_STATE_PAUSED\0\u{1}JOB_STATE_DELETED\0")
+}
+
+extension Recoto_Recording_V1_RunState: SwiftProtobuf._ProtoNameProviding {
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{2}\0RUN_STATE_UNSPECIFIED\0\u{1}RUN_STATE_QUEUED\0\u{1}RUN_STATE_RUNNING\0\u{1}RUN_STATE_SUCCEEDED\0\u{1}RUN_STATE_FAILED\0\u{1}RUN_STATE_CANCELED\0")
 }
 
 extension Recoto_Recording_V1_CreateJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
@@ -413,6 +817,488 @@ extension Recoto_Recording_V1_ListJobsResponse: SwiftProtobuf.Message, SwiftProt
   }
 }
 
+extension Recoto_Recording_V1_UpdateJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".UpdateJobRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{4}\u{2}job_id\0\u{1}title\0\u{1}duration\0\u{3}scheduled_at\0\u{1}timezone\0\u{b}job\0\u{c}\u{1}\u{1}")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 2: try { try decoder.decodeSingularStringField(value: &self.jobID) }()
+      case 3: try { try decoder.decodeSingularStringField(value: &self._title) }()
+      case 4: try { try decoder.decodeSingularMessageField(value: &self._duration) }()
+      case 5: try { try decoder.decodeSingularMessageField(value: &self._scheduledAt) }()
+      case 6: try { try decoder.decodeSingularStringField(value: &self._timezone) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.jobID.isEmpty {
+      try visitor.visitSingularStringField(value: self.jobID, fieldNumber: 2)
+    }
+    try { if let v = self._title {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._duration {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    } }()
+    try { if let v = self._scheduledAt {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+    } }()
+    try { if let v = self._timezone {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 6)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_UpdateJobRequest, rhs: Recoto_Recording_V1_UpdateJobRequest) -> Bool {
+    if lhs.jobID != rhs.jobID {return false}
+    if lhs._title != rhs._title {return false}
+    if lhs._duration != rhs._duration {return false}
+    if lhs._scheduledAt != rhs._scheduledAt {return false}
+    if lhs._timezone != rhs._timezone {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_UpdateJobResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".UpdateJobResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}job\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._job) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._job {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_UpdateJobResponse, rhs: Recoto_Recording_V1_UpdateJobResponse) -> Bool {
+    if lhs._job != rhs._job {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_PauseJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".PauseJobRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.jobID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.jobID.isEmpty {
+      try visitor.visitSingularStringField(value: self.jobID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_PauseJobRequest, rhs: Recoto_Recording_V1_PauseJobRequest) -> Bool {
+    if lhs.jobID != rhs.jobID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_PauseJobResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".PauseJobResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_PauseJobResponse, rhs: Recoto_Recording_V1_PauseJobResponse) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_ResumeJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ResumeJobRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.jobID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.jobID.isEmpty {
+      try visitor.visitSingularStringField(value: self.jobID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_ResumeJobRequest, rhs: Recoto_Recording_V1_ResumeJobRequest) -> Bool {
+    if lhs.jobID != rhs.jobID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_ResumeJobResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ResumeJobResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_ResumeJobResponse, rhs: Recoto_Recording_V1_ResumeJobResponse) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_DeleteJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".DeleteJobRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.jobID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.jobID.isEmpty {
+      try visitor.visitSingularStringField(value: self.jobID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_DeleteJobRequest, rhs: Recoto_Recording_V1_DeleteJobRequest) -> Bool {
+    if lhs.jobID != rhs.jobID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_DeleteJobResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".DeleteJobResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_DeleteJobResponse, rhs: Recoto_Recording_V1_DeleteJobResponse) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_GetJobRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".GetJobRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.jobID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.jobID.isEmpty {
+      try visitor.visitSingularStringField(value: self.jobID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_GetJobRequest, rhs: Recoto_Recording_V1_GetJobRequest) -> Bool {
+    if lhs.jobID != rhs.jobID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_GetJobResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".GetJobResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}job\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._job) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._job {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_GetJobResponse, rhs: Recoto_Recording_V1_GetJobResponse) -> Bool {
+    if lhs._job != rhs._job {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_CancelRunRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".CancelRunRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}run_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.runID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.runID.isEmpty {
+      try visitor.visitSingularStringField(value: self.runID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_CancelRunRequest, rhs: Recoto_Recording_V1_CancelRunRequest) -> Bool {
+    if lhs.runID != rhs.runID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_CancelRunResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".CancelRunResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap()
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    // Load everything into unknown fields
+    while try decoder.nextFieldNumber() != nil {}
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_CancelRunResponse, rhs: Recoto_Recording_V1_CancelRunResponse) -> Bool {
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_GetRunRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".GetRunRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}run_id\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.runID) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.runID.isEmpty {
+      try visitor.visitSingularStringField(value: self.runID, fieldNumber: 1)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_GetRunRequest, rhs: Recoto_Recording_V1_GetRunRequest) -> Bool {
+    if lhs.runID != rhs.runID {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_GetRunResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".GetRunResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}run\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularMessageField(value: &self._run) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    try { if let v = self._run {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 1)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_GetRunResponse, rhs: Recoto_Recording_V1_GetRunResponse) -> Bool {
+    if lhs._run != rhs._run {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_ListRunsRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ListRunsRequest"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}page_size\0\u{3}page_token\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularInt32Field(value: &self.pageSize) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.pageToken) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if self.pageSize != 0 {
+      try visitor.visitSingularInt32Field(value: self.pageSize, fieldNumber: 1)
+    }
+    if !self.pageToken.isEmpty {
+      try visitor.visitSingularStringField(value: self.pageToken, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_ListRunsRequest, rhs: Recoto_Recording_V1_ListRunsRequest) -> Bool {
+    if lhs.pageSize != rhs.pageSize {return false}
+    if lhs.pageToken != rhs.pageToken {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_ListRunsResponse: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".ListRunsResponse"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}runs\0\u{3}next_page_token\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeRepeatedMessageField(value: &self.runs) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.nextPageToken) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    if !self.runs.isEmpty {
+      try visitor.visitRepeatedMessageField(value: self.runs, fieldNumber: 1)
+    }
+    if !self.nextPageToken.isEmpty {
+      try visitor.visitSingularStringField(value: self.nextPageToken, fieldNumber: 2)
+    }
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_ListRunsResponse, rhs: Recoto_Recording_V1_ListRunsResponse) -> Bool {
+    if lhs.runs != rhs.runs {return false}
+    if lhs.nextPageToken != rhs.nextPageToken {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
 extension Recoto_Recording_V1_Job: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Job"
   static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}job_id\0\u{3}source_type\0\u{3}source_value\0\u{1}title\0\u{1}duration\0\u{3}scheduled_at\0\u{1}timezone\0\u{1}state\0")
@@ -477,6 +1363,75 @@ extension Recoto_Recording_V1_Job: SwiftProtobuf.Message, SwiftProtobuf._Message
     if lhs._scheduledAt != rhs._scheduledAt {return false}
     if lhs.timezone != rhs.timezone {return false}
     if lhs.state != rhs.state {return false}
+    if lhs.unknownFields != rhs.unknownFields {return false}
+    return true
+  }
+}
+
+extension Recoto_Recording_V1_Run: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
+  static let protoMessageName: String = _protobuf_package + ".Run"
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}run_id\0\u{3}job_id\0\u{3}planned_at\0\u{3}started_at\0\u{3}finished_at\0\u{1}state\0\u{3}output_path\0\u{3}error_message\0")
+
+  mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
+    while let fieldNumber = try decoder.nextFieldNumber() {
+      // The use of inline closures is to circumvent an issue where the compiler
+      // allocates stack space for every case branch when no optimizations are
+      // enabled. https://github.com/apple/swift-protobuf/issues/1034
+      switch fieldNumber {
+      case 1: try { try decoder.decodeSingularStringField(value: &self.runID) }()
+      case 2: try { try decoder.decodeSingularStringField(value: &self.jobID) }()
+      case 3: try { try decoder.decodeSingularMessageField(value: &self._plannedAt) }()
+      case 4: try { try decoder.decodeSingularMessageField(value: &self._startedAt) }()
+      case 5: try { try decoder.decodeSingularMessageField(value: &self._finishedAt) }()
+      case 6: try { try decoder.decodeSingularEnumField(value: &self.state) }()
+      case 7: try { try decoder.decodeSingularStringField(value: &self._outputPath) }()
+      case 8: try { try decoder.decodeSingularStringField(value: &self._errorMessage) }()
+      default: break
+      }
+    }
+  }
+
+  func traverse<V: SwiftProtobuf.Visitor>(visitor: inout V) throws {
+    // The use of inline closures is to circumvent an issue where the compiler
+    // allocates stack space for every if/case branch local when no optimizations
+    // are enabled. https://github.com/apple/swift-protobuf/issues/1034 and
+    // https://github.com/apple/swift-protobuf/issues/1182
+    if !self.runID.isEmpty {
+      try visitor.visitSingularStringField(value: self.runID, fieldNumber: 1)
+    }
+    if !self.jobID.isEmpty {
+      try visitor.visitSingularStringField(value: self.jobID, fieldNumber: 2)
+    }
+    try { if let v = self._plannedAt {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 3)
+    } }()
+    try { if let v = self._startedAt {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
+    } }()
+    try { if let v = self._finishedAt {
+      try visitor.visitSingularMessageField(value: v, fieldNumber: 5)
+    } }()
+    if self.state != .unspecified {
+      try visitor.visitSingularEnumField(value: self.state, fieldNumber: 6)
+    }
+    try { if let v = self._outputPath {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 7)
+    } }()
+    try { if let v = self._errorMessage {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 8)
+    } }()
+    try unknownFields.traverse(visitor: &visitor)
+  }
+
+  static func ==(lhs: Recoto_Recording_V1_Run, rhs: Recoto_Recording_V1_Run) -> Bool {
+    if lhs.runID != rhs.runID {return false}
+    if lhs.jobID != rhs.jobID {return false}
+    if lhs._plannedAt != rhs._plannedAt {return false}
+    if lhs._startedAt != rhs._startedAt {return false}
+    if lhs._finishedAt != rhs._finishedAt {return false}
+    if lhs.state != rhs.state {return false}
+    if lhs._outputPath != rhs._outputPath {return false}
+    if lhs._errorMessage != rhs._errorMessage {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

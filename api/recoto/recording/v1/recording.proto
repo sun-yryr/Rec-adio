@@ -13,6 +13,23 @@ service RecordingService {
   rpc CreateJob(CreateJobRequest) returns (CreateJobResponse) {}
   // ジョブの一覧を取得する。
   rpc ListJobs(ListJobsRequest) returns (ListJobsResponse) {}
+  // 既存のジョブを更新する（title/duration/scheduled_at/timezoneのみ更新可能）。
+  rpc UpdateJob(UpdateJobRequest) returns (UpdateJobResponse) {}
+  // ジョブを一時停止する。
+  rpc PauseJob(PauseJobRequest) returns (PauseJobResponse) {}
+  // 一時停止したジョブを再開する。
+  rpc ResumeJob(ResumeJobRequest) returns (ResumeJobResponse) {}
+  // ジョブを削除する。
+  rpc DeleteJob(DeleteJobRequest) returns (DeleteJobResponse) {}
+  // ジョブを取得する。
+  rpc GetJob(GetJobRequest) returns (GetJobResponse) {}
+
+  // 実行中または待機中の実行をキャンセルする。
+  rpc CancelRun(CancelRunRequest) returns (CancelRunResponse) {}
+  // 実行を取得する。
+  rpc GetRun(GetRunRequest) returns (GetRunResponse) {}
+  // 実行の一覧を取得する。
+  rpc ListRuns(ListRunsRequest) returns (ListRunsResponse) {}
 }
 
 message CreateJobRequest {
@@ -47,6 +64,90 @@ message ListJobsResponse {
   string next_page_token = 2;
 }
 
+message UpdateJobRequest {
+  reserved 1;
+  reserved "job";
+
+  // source_type/source_value/state は更新不可。
+  // 更新対象のジョブID。
+  string job_id = 2;
+  // 録音するコンテンツのタイトル。指定した場合のみ更新する。
+  optional string title = 3;
+  // 録音するコンテンツの長さ。指定した場合のみ更新する。
+  google.protobuf.Duration duration = 4;
+  // 録音を開始する時刻（UTC）。指定した場合のみ更新する。
+  google.protobuf.Timestamp scheduled_at = 5;
+  // タイムゾーン（IANA Time Zone Database形式）。指定した場合のみ更新する。
+  optional string timezone = 6;
+}
+
+message UpdateJobResponse {
+  // 更新後のジョブ。
+  Job job = 1;
+}
+
+message PauseJobRequest {
+  // ジョブID。
+  string job_id = 1;
+}
+
+message PauseJobResponse {}
+
+message ResumeJobRequest {
+  // ジョブID。
+  string job_id = 1;
+}
+
+message ResumeJobResponse {}
+
+message DeleteJobRequest {
+  // ジョブID。
+  string job_id = 1;
+}
+
+message DeleteJobResponse {}
+
+message GetJobRequest {
+  // ジョブID。
+  string job_id = 1;
+}
+
+message GetJobResponse {
+  // 取得したジョブ。
+  Job job = 1;
+}
+
+message CancelRunRequest {
+  // 実行ID。
+  string run_id = 1;
+}
+
+message CancelRunResponse {}
+
+message GetRunRequest {
+  // 実行ID。
+  string run_id = 1;
+}
+
+message GetRunResponse {
+  // 取得した実行。
+  Run run = 1;
+}
+
+message ListRunsRequest {
+  // 1ページあたりの最大件数。
+  int32 page_size = 1;
+  // ページトークン。
+  string page_token = 2;
+}
+
+message ListRunsResponse {
+  // 実行の一覧。
+  repeated Run runs = 1;
+  // 次ページのトークン。空の場合は最終ページ。
+  string next_page_token = 2;
+}
+
 message Job {
   // ジョブID。
   string job_id = 1;
@@ -76,4 +177,32 @@ enum JobState {
   JOB_STATE_ACTIVE = 1;
   JOB_STATE_PAUSED = 2;
   JOB_STATE_DELETED = 3;
+}
+
+message Run {
+  // 実行ID。
+  string run_id = 1;
+  // 実行元ジョブID。
+  string job_id = 2;
+  // 録音開始予定時刻（UTC）。
+  google.protobuf.Timestamp planned_at = 3;
+  // 実際の録音開始時刻（UTC）。
+  google.protobuf.Timestamp started_at = 4;
+  // 録音終了時刻（UTC）。
+  google.protobuf.Timestamp finished_at = 5;
+  // 実行状態。
+  RunState state = 6;
+  // 保存先ファイルパス。成功時に設定される。
+  optional string output_path = 7;
+  // 失敗理由。失敗時に設定される。
+  optional string error_message = 8;
+}
+
+enum RunState {
+  RUN_STATE_UNSPECIFIED = 0;
+  RUN_STATE_QUEUED = 1;
+  RUN_STATE_RUNNING = 2;
+  RUN_STATE_SUCCEEDED = 3;
+  RUN_STATE_FAILED = 4;
+  RUN_STATE_CANCELED = 5;
 }
