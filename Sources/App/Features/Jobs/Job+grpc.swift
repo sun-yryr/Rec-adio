@@ -1,14 +1,16 @@
 import Dependencies
+import Foundation
 import SwiftProtobuf
 
 func makeJob(from request: Recoto_Recording_V1_CreateJobRequest) -> Job {
     @Dependency(\.uuid) var uuid
+    @Dependency(\.date.now) var now
 
     return Job(
         jobId: uuid().uuidString, sourceType: "url", sourceValue: request.url,
         title: request.title,
         durationSec: request.duration.seconds, scheduledAt: request.scheduledAt.date,
-        timezone: request.timezone, state: .active
+        timezone: request.timezone, state: .active, createdAt: now, updatedAt: now
     )
 }
 

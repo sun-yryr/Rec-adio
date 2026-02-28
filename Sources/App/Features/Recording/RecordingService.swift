@@ -4,18 +4,18 @@ import Logging
 
 struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProtocol {
     private let logger: Logger
-    private let jobService: any JobServicing
+    private let jobUseCase: any JobUseCase
 
     init(
-        jobService: any JobServicing,
+        jobUseCase: any JobUseCase,
         logger: Logger = Logger(label: "Recoto.RecordingService")
     ) {
-        self.jobService = jobService
+        self.jobUseCase = jobUseCase
         self.logger = logger
     }
 
     init(jobRepo: any JobRepository, logger: Logger = Logger(label: "Recoto.RecordingService")) {
-        self.init(jobService: JobService(jobRepo: jobRepo), logger: logger)
+        self.init(jobUseCase: DefaultJobUseCase(jobRepository: jobRepo), logger: logger)
     }
 
     func createJob(request: Recoto_Recording_V1_CreateJobRequest, context _: ServerContext)
@@ -48,8 +48,8 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
 
     private func create(_ job: Job, logger: Logger) async throws {
         do {
-            try await jobService.create(job)
-        } catch let error as JobServiceError {
+            try await jobUseCase.create(job)
+        } catch let error as JobUseCaseError {
             switch error {
             case let .duplicateJob(reason):
                 logger.error(
@@ -65,13 +65,13 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
                     message: "recording job already exists",
                     cause: error
                 )
-            case let .createFailed(reason), let .listFailed(reason):
+            default:
                 logger.error(
                     "recording.create_job.failed",
                     metadata: [
                         "job_id": .string(job.jobId),
                         "grpc_status": .string("internalError"),
-                        "reason": .string(reason),
+                        "reason": .string(error.reason),
                     ]
                 )
                 throw RPCError(
@@ -90,13 +90,13 @@ struct RecordingService: Recoto_Recording_V1_RecordingService.SimpleServiceProto
         let logger = self.logger.rpc()
 
         do {
-            let jobs = try await jobService.list()
+            let jobs = try await jobUseCase.list()
 
             var response = Recoto_Recording_V1_ListJobsResponse()
             response.jobs = jobs.map { job in job.toGrpcJob() }
 
             return response
-        } catch let error as JobServiceError {
+        } catch let error as JobUseCaseError {
             logger.error(
                 "recording.list_jobs.failed",
                 metadata: [

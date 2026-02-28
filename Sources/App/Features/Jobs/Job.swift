@@ -9,6 +9,32 @@ struct Job: Codable {
     let scheduledAt: Date
     let timezone: String
     let state: JobState
+    let createdAt: Date
+    let updatedAt: Date
+
+    init(
+        jobId: String,
+        sourceType: String,
+        sourceValue: String,
+        title: String,
+        durationSec: Int64,
+        scheduledAt: Date,
+        timezone: String,
+        state: JobState,
+        createdAt: Date = Date(),
+        updatedAt: Date = Date()
+    ) {
+        self.jobId = jobId
+        self.sourceType = sourceType
+        self.sourceValue = sourceValue
+        self.title = title
+        self.durationSec = durationSec
+        self.scheduledAt = scheduledAt
+        self.timezone = timezone
+        self.state = state
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
 }
 
 enum JobState: String, Codable {

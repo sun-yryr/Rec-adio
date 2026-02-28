@@ -4,6 +4,8 @@ extension Job: Identifiable, TableRecord, FetchableRecord, PersistableRecord {
     static let databaseTableName = "jobs"
     static let databaseColumnEncodingStrategy = DatabaseColumnEncodingStrategy.convertToSnakeCase
     static let databaseColumnDecodingStrategy = DatabaseColumnDecodingStrategy.convertFromSnakeCase
+    static let databaseDateEncodingStrategy = DatabaseDateEncodingStrategy.iso8601
+    static let databaseDateDecodingStrategy = DatabaseDateDecodingStrategy.iso8601
 
     var id: String {
         jobId
@@ -18,5 +20,7 @@ extension Job: Identifiable, TableRecord, FetchableRecord, PersistableRecord {
         static let scheduledAt = Column("scheduled_at")
         static let timezone = Column("timezone")
         static let state = Column("state")
+        static let createdAt = Column("created_at")
+        static let updatedAt = Column("updated_at")
     }
 }

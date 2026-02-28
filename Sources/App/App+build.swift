@@ -56,7 +56,14 @@ func makeDatabaseQueue(reader: ConfigReader) throws -> DatabaseQueue {
             )
         }
     }
-    return try DatabaseQueue(path: dbPath)
+    var configuration = Configuration()
+    configuration.prepareDatabase { database in
+        try database.execute(sql: "PRAGMA journal_mode=WAL;")
+        try database.execute(sql: "PRAGMA synchronous=NORMAL;")
+        try database.execute(sql: "PRAGMA foreign_keys=ON;")
+        try database.execute(sql: "PRAGMA busy_timeout=5000;")
+    }
+    return try DatabaseQueue(path: dbPath, configuration: configuration)
 }
 
 /// Build router

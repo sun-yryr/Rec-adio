@@ -24,6 +24,7 @@ struct RecordingServiceTests {
 
         let response = try await withDependencies {
             $0.uuid = .constant(fixedUUID)
+            $0.date = .constant(Date(timeIntervalSince1970: 1_700_000_000))
         } operation: {
             try await service.createJob(
                 request: request,
@@ -68,6 +69,7 @@ struct RecordingServiceTests {
         do {
             _ = try await withDependencies {
                 $0.uuid = .constant(fixedUUID)
+                $0.date = .constant(Date(timeIntervalSince1970: 1_700_000_000))
             } operation: {
                 try await service.createJob(
                     request: makeCreateJobRequest(),
@@ -78,8 +80,8 @@ struct RecordingServiceTests {
         } catch let error as RPCError {
             #expect(error.code == .internalError)
             #expect(error.message == "failed to create recording job")
-            #expect(error.cause is JobServiceError)
-            let cause = error.cause as? JobServiceError
+            #expect(error.cause is JobUseCaseError)
+            let cause = error.cause as? JobUseCaseError
             switch cause {
             case let .createFailed(reason):
                 #expect(reason.contains(expected.message))
@@ -100,6 +102,7 @@ struct RecordingServiceTests {
         do {
             _ = try await withDependencies {
                 $0.uuid = .constant(fixedUUID)
+                $0.date = .constant(Date(timeIntervalSince1970: 1_700_000_000))
             } operation: {
                 try await service.createJob(
                     request: makeCreateJobRequest(),
@@ -110,8 +113,8 @@ struct RecordingServiceTests {
         } catch let error as RPCError {
             #expect(error.code == .alreadyExists)
             #expect(error.message == "recording job already exists")
-            #expect(error.cause is JobServiceError)
-            let cause = error.cause as? JobServiceError
+            #expect(error.cause is JobUseCaseError)
+            let cause = error.cause as? JobUseCaseError
             switch cause {
             case let .duplicateJob(reason):
                 #expect(reason.contains("UNIQUE constraint failed"))
@@ -132,6 +135,7 @@ struct RecordingServiceTests {
         do {
             _ = try await withDependencies {
                 $0.uuid = .constant(fixedUUID)
+                $0.date = .constant(Date(timeIntervalSince1970: 1_700_000_000))
             } operation: {
                 try await service.createJob(
                     request: makeCreateJobRequest(),
@@ -142,8 +146,8 @@ struct RecordingServiceTests {
         } catch let error as RPCError {
             #expect(error.code == .internalError)
             #expect(error.message == "failed to create recording job")
-            #expect(error.cause is JobServiceError)
-            let cause = error.cause as? JobServiceError
+            #expect(error.cause is JobUseCaseError)
+            let cause = error.cause as? JobUseCaseError
             switch cause {
             case let .createFailed(reason):
                 #expect(reason.contains("unexpected"))
@@ -209,8 +213,8 @@ struct RecordingServiceTests {
         } catch let error as RPCError {
             #expect(error.code == .internalError)
             #expect(error.message == "failed to list jobs")
-            #expect(error.cause is JobServiceError)
-            let cause = error.cause as? JobServiceError
+            #expect(error.cause is JobUseCaseError)
+            let cause = error.cause as? JobUseCaseError
             switch cause {
             case let .listFailed(reason):
                 #expect(reason.contains("unexpected"))
