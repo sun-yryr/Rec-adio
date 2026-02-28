@@ -6,7 +6,7 @@ import SwiftProtobuf
 import Testing
 
 @Suite
-struct RecordingServiceTests {
+struct RecordingGRPCServiceTests {
     @Test
     func createJobPersistsMappedJobAndReturnsMappedResponse() async throws {
         let fixedUUID = try #require(UUID(uuidString: "0AF76519-16CD-43DD-8448-EB211C80319C"))
