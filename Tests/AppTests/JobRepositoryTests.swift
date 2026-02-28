@@ -74,6 +74,46 @@ struct JobRepositoryTests {
 
         #expect(!deleted)
     }
+
+    @Test
+    func updateReturnsTrueAndPersistsChanges() async throws {
+        let repository = try makeTestRepository()
+        let original = makeJob(jobId: "job-1")
+        try await repository.create(original)
+
+        let updatedJob = Job(
+            jobId: original.jobId,
+            sourceType: "url",
+            sourceValue: "https://example.com/updated",
+            title: "Updated Title",
+            durationSec: 120,
+            scheduledAt: Date(timeIntervalSince1970: 1_700_123_456),
+            timezone: "UTC",
+            state: .paused
+        )
+
+        let updated = try await repository.update(updatedJob)
+        let found = try await repository.find(jobId: original.jobId)
+
+        #expect(updated)
+        #expect(found?.jobId == updatedJob.jobId)
+        #expect(found?.sourceType == updatedJob.sourceType)
+        #expect(found?.sourceValue == updatedJob.sourceValue)
+        #expect(found?.title == updatedJob.title)
+        #expect(found?.durationSec == updatedJob.durationSec)
+        #expect(found?.scheduledAt == updatedJob.scheduledAt)
+        #expect(found?.timezone == updatedJob.timezone)
+        #expect(found?.state == updatedJob.state)
+    }
+
+    @Test
+    func updateReturnsFalseForUnknownJob() async throws {
+        let repository = try makeTestRepository()
+
+        let updated = try await repository.update(makeJob(jobId: "missing"))
+
+        #expect(!updated)
+    }
 }
 
 private func makeTestRepository() throws -> GRDBJobRepository {

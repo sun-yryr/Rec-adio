@@ -156,6 +156,14 @@ private actor JobRepositoryDouble: JobRepository {
         }
     }
 
+    func update(_ job: Job) async throws -> Bool {
+        guard let index = createdJobs.firstIndex(where: { $0.jobId == job.jobId }) else {
+            return false
+        }
+        createdJobs[index] = job
+        return true
+    }
+
     func delete(jobId _: String) async throws -> Bool {
         false
     }
