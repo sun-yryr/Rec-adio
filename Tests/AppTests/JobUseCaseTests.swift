@@ -1,6 +1,5 @@
 @testable import App
 import Foundation
-import GRDB
 import Testing
 
 @Suite
@@ -85,23 +84,21 @@ struct JobUseCaseTests {
         let initial = makeJob(jobId: "job-1")
         let repository = JobRepositoryDouble(initialJobs: [initial])
         let useCase = DefaultJobUseCase(jobRepository: repository)
-        let updated = Job(
-            jobId: initial.jobId,
-            sourceType: initial.sourceType,
-            sourceValue: initial.sourceValue,
+        let updatable = Job.Updatable(
             title: "Updated title",
             durationSec: 120,
             scheduledAt: Date(timeIntervalSince1970: 1_700_000_123),
-            timezone: "UTC",
-            state: .paused
+            timezone: "UTC"
         )
 
-        let result = try await useCase.update(updated)
+        let result = try await useCase.update(jobId: initial.jobId, updatable: updatable)
         let stored = try await repository.find(jobId: initial.jobId)
 
-        #expect(result.jobId == updated.jobId)
+        #expect(result.jobId == initial.jobId)
         #expect(result.title == "Updated title")
-        #expect(stored?.state == .paused)
+        #expect(result.durationSec == 120)
+        #expect(result.timezone == "UTC")
+        #expect(stored?.state == .active)
     }
 
     @Test
@@ -110,7 +107,15 @@ struct JobUseCaseTests {
         let useCase = DefaultJobUseCase(jobRepository: repository)
 
         do {
-            _ = try await useCase.update(makeJob(jobId: "missing"))
+            _ = try await useCase.update(
+                jobId: "missing",
+                updatable: Job.Updatable(
+                    title: "Updated title",
+                    durationSec: nil,
+                    scheduledAt: nil,
+                    timezone: nil
+                )
+            )
             Issue.record("Expected update to throw")
         } catch let error as JobUseCaseError {
             switch error {
@@ -211,9 +216,8 @@ private actor JobRepositoryDouble: JobRepository {
         case .succeed:
             jobs[job.jobId] = job
         case .throwConstraintViolation:
-            throw DatabaseError(
-                resultCode: .SQLITE_CONSTRAINT,
-                message: "UNIQUE constraint failed: jobs.job_id"
+            throw JobRepositoryError.duplicateJob(
+                reason: "UNIQUE constraint failed: jobs.job_id"
             )
         case .throwUnexpectedError:
             throw JobUseCaseTestError.unexpected
@@ -228,13 +232,69 @@ private actor JobRepositoryDouble: JobRepository {
         jobs.values.sorted { $0.scheduledAt < $1.scheduledAt }
     }
 
-    func update(_ job: Job) async throws -> Bool {
+    func update(jobId: String, updatable: Job.Updatable) async throws -> Bool {
         switch updateBehavior {
         case .useStorage:
-            guard jobs[job.jobId] != nil else {
+            guard var current = jobs[jobId] else {
                 return false
             }
-            jobs[job.jobId] = job
+            if let title = updatable.title {
+                current = Job(
+                    jobId: current.jobId,
+                    sourceType: current.sourceType,
+                    sourceValue: current.sourceValue,
+                    title: title,
+                    durationSec: current.durationSec,
+                    scheduledAt: current.scheduledAt,
+                    timezone: current.timezone,
+                    state: current.state,
+                    createdAt: current.createdAt,
+                    updatedAt: current.updatedAt
+                )
+            }
+            if let durationSec = updatable.durationSec {
+                current = Job(
+                    jobId: current.jobId,
+                    sourceType: current.sourceType,
+                    sourceValue: current.sourceValue,
+                    title: current.title,
+                    durationSec: durationSec,
+                    scheduledAt: current.scheduledAt,
+                    timezone: current.timezone,
+                    state: current.state,
+                    createdAt: current.createdAt,
+                    updatedAt: current.updatedAt
+                )
+            }
+            if let scheduledAt = updatable.scheduledAt {
+                current = Job(
+                    jobId: current.jobId,
+                    sourceType: current.sourceType,
+                    sourceValue: current.sourceValue,
+                    title: current.title,
+                    durationSec: current.durationSec,
+                    scheduledAt: scheduledAt,
+                    timezone: current.timezone,
+                    state: current.state,
+                    createdAt: current.createdAt,
+                    updatedAt: current.updatedAt
+                )
+            }
+            if let timezone = updatable.timezone {
+                current = Job(
+                    jobId: current.jobId,
+                    sourceType: current.sourceType,
+                    sourceValue: current.sourceValue,
+                    title: current.title,
+                    durationSec: current.durationSec,
+                    scheduledAt: current.scheduledAt,
+                    timezone: timezone,
+                    state: current.state,
+                    createdAt: current.createdAt,
+                    updatedAt: current.updatedAt
+                )
+            }
+            jobs[jobId] = current
             return true
         case .returnFalse:
             return false

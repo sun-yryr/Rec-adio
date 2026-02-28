@@ -1,6 +1,5 @@
 @testable import App
 import Foundation
-import GRDB
 import Testing
 
 @Suite
@@ -215,9 +214,8 @@ private actor RunRepositoryDouble: RunRepository {
         case .succeed:
             runs[run.runId] = run
         case .throwConstraintViolation:
-            throw DatabaseError(
-                resultCode: .SQLITE_CONSTRAINT,
-                message: "UNIQUE constraint failed: runs.run_id"
+            throw RunRepositoryError.duplicateRun(
+                reason: "UNIQUE constraint failed: runs.run_id"
             )
         case .throwUnexpectedError:
             throw RunUseCaseTestError.unexpected

@@ -42,3 +42,16 @@ enum JobState: String, Codable {
     case paused
     case deleted
 }
+
+extension Job {
+    struct Updatable: Sendable {
+        let title: String?
+        let durationSec: Int64?
+        let scheduledAt: Date?
+        let timezone: String?
+
+        var isEmpty: Bool {
+            title == nil && durationSec == nil && scheduledAt == nil && timezone == nil
+        }
+    }
+}

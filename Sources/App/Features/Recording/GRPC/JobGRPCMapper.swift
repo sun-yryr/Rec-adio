@@ -14,10 +14,19 @@ func makeJob(from request: Recoto_Recording_V1_CreateJobRequest) -> Job {
     )
 }
 
+func makeUpdatable(from request: Recoto_Recording_V1_UpdateJobRequest) -> Job.Updatable {
+    Job.Updatable(
+        title: request.hasTitle ? request.title : nil,
+        durationSec: request.hasDuration ? request.duration.seconds : nil,
+        scheduledAt: request.hasScheduledAt ? request.scheduledAt.date : nil,
+        timezone: request.hasTimezone ? request.timezone : nil
+    )
+}
+
 extension Job {
     func toGrpcJob() -> Recoto_Recording_V1_Job {
         var grpcJob = Recoto_Recording_V1_Job()
-        grpcJob.jobID = id
+        grpcJob.jobID = jobId
         grpcJob.duration = Google_Protobuf_Duration(seconds: durationSec, nanos: 0)
         grpcJob.title = title
         grpcJob.sourceType = {

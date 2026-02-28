@@ -117,6 +117,17 @@ private func makeTestRepository() throws -> GRDBRunRepository {
     let dbQueue = try DatabaseQueue(path: ":memory:")
     let migrator = makeDatabaseMigrator()
     try migrator.migrate(dbQueue)
+    try dbQueue.write { database in
+        try database.execute(
+            sql: """
+            INSERT INTO jobs (
+              job_id, source_type, source_value, title, duration_sec, scheduled_at, timezone, state, created_at, updated_at
+            ) VALUES (
+              'job-1', 'url', 'https://example.com/job-1', 'Seed Job', 60, '2024-01-01T00:00:00Z', 'UTC', 'active', '2024-01-01T00:00:00Z', '2024-01-01T00:00:00Z'
+            );
+            """
+        )
+    }
     return GRDBRunRepository(dbQueue: dbQueue)
 }
 

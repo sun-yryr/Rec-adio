@@ -78,7 +78,7 @@ private func buildGRPCServer(
     let jobUseCase = DefaultJobUseCase(jobRepository: jobRepository)
     var services: [any RegistrableRPCService] = [
         HealthService(dbQueue: dbQueue, logger: logger),
-        RecordingService(jobUseCase: jobUseCase, logger: logger),
+        RecordingGRPCService(jobUseCase: jobUseCase, logger: logger),
     ]
 
     if config.reflectionEnabled {

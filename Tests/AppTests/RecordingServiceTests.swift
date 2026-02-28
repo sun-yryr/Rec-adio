@@ -1,7 +1,6 @@
 @testable import App
 import Dependencies
 import Foundation
-import GRDB
 import GRPCCore
 import SwiftProtobuf
 import Testing
@@ -20,7 +19,7 @@ struct RecordingServiceTests {
             timezone: "Asia/Tokyo"
         )
         let repository = JobRepositoryStub()
-        let service = RecordingService(jobRepo: repository)
+        let service = RecordingGRPCService(jobRepo: repository)
 
         let response = try await withDependencies {
             $0.uuid = .constant(fixedUUID)
@@ -63,7 +62,7 @@ struct RecordingServiceTests {
     func createJobTranslatesRepositoryRPCErrorToInternalError() async throws {
         let expected = RPCError(code: .invalidArgument, message: "invalid create request")
         let repository = JobRepositoryStub(createBehavior: .throwRPCError(expected))
-        let service = RecordingService(jobRepo: repository)
+        let service = RecordingGRPCService(jobRepo: repository)
         let fixedUUID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
 
         do {
@@ -96,7 +95,7 @@ struct RecordingServiceTests {
     @Test
     func createJobTranslatesConstraintViolationToAlreadyExists() async throws {
         let repository = JobRepositoryStub(createBehavior: .throwConstraintViolation)
-        let service = RecordingService(jobRepo: repository)
+        let service = RecordingGRPCService(jobRepo: repository)
         let fixedUUID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000002"))
 
         do {
@@ -129,7 +128,7 @@ struct RecordingServiceTests {
     @Test
     func createJobTranslatesUnexpectedErrorToInternalError() async throws {
         let repository = JobRepositoryStub(createBehavior: .throwUnexpectedError)
-        let service = RecordingService(jobRepo: repository)
+        let service = RecordingGRPCService(jobRepo: repository)
         let fixedUUID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000003"))
 
         do {
@@ -180,7 +179,7 @@ struct RecordingServiceTests {
             scheduledAt: Date(timeIntervalSince1970: 1_700_000_120)
         )
         let repository = JobRepositoryStub(findAllBehavior: .succeed([job1, job2, job3]))
-        let service = RecordingService(jobRepo: repository)
+        let service = RecordingGRPCService(jobRepo: repository)
 
         let response = try await service.listJobs(
             request: Recoto_Recording_V1_ListJobsRequest(),
@@ -202,7 +201,7 @@ struct RecordingServiceTests {
     @Test
     func listJobsTranslatesUnexpectedErrorToInternalError() async {
         let repository = JobRepositoryStub(findAllBehavior: .throwUnexpectedError)
-        let service = RecordingService(jobRepo: repository)
+        let service = RecordingGRPCService(jobRepo: repository)
 
         do {
             _ = try await service.listJobs(
@@ -224,6 +223,32 @@ struct RecordingServiceTests {
         } catch {
             Issue.record("Expected RPCError but got: \(error)")
         }
+    }
+
+    @Test
+    func updateJobMapsPresentFieldsAndReturnsUpdatedJob() async throws {
+        let original = makeJob(
+            jobId: "job-1",
+            sourceType: "url",
+            state: .active,
+            scheduledAt: Date(timeIntervalSince1970: 1_700_000_000)
+        )
+        let repository = JobRepositoryStub(findAllBehavior: .succeed([]), initialJobs: [original])
+        let service = RecordingGRPCService(jobRepo: repository)
+        var request = Recoto_Recording_V1_UpdateJobRequest()
+        request.jobID = original.jobId
+        request.title = "Updated"
+        request.timezone = "UTC"
+
+        let response = try await service.updateJob(
+            request: request,
+            context: makeRecordingServerContext(method: "UpdateJob")
+        )
+
+        #expect(response.job.jobID == original.jobId)
+        #expect(response.job.title == "Updated")
+        #expect(response.job.timezone == "UTC")
+        #expect(response.job.duration.seconds == original.durationSec)
     }
 }
 
@@ -288,26 +313,29 @@ private actor JobRepositoryStub: JobRepository {
 
     private let createBehavior: CreateBehavior
     private let findAllBehavior: FindAllBehavior
+    private var jobsById: [String: Job]
     private var createdJobs: [Job] = []
 
     init(
         createBehavior: CreateBehavior = .succeed,
-        findAllBehavior: FindAllBehavior = .succeed([])
+        findAllBehavior: FindAllBehavior = .succeed([]),
+        initialJobs: [Job] = []
     ) {
         self.createBehavior = createBehavior
         self.findAllBehavior = findAllBehavior
+        self.jobsById = Dictionary(uniqueKeysWithValues: initialJobs.map { ($0.jobId, $0) })
     }
 
     func create(_ job: Job) async throws {
         switch createBehavior {
         case .succeed:
             createdJobs.append(job)
+            jobsById[job.jobId] = job
         case let .throwRPCError(error):
             throw error
         case .throwConstraintViolation:
-            throw DatabaseError(
-                resultCode: .SQLITE_CONSTRAINT,
-                message: "UNIQUE constraint failed: jobs.job_id"
+            throw JobRepositoryError.duplicateJob(
+                reason: "UNIQUE constraint failed: jobs.job_id"
             )
         case .throwUnexpectedError:
             throw RecordingRepositoryTestError.unexpected
@@ -315,7 +343,7 @@ private actor JobRepositoryStub: JobRepository {
     }
 
     func find(jobId: String) async throws -> Job? {
-        createdJobs.first(where: { $0.jobId == jobId })
+        jobsById[jobId] ?? createdJobs.first(where: { $0.jobId == jobId })
     }
 
     func findAll() async throws -> [Job] {
@@ -327,11 +355,67 @@ private actor JobRepositoryStub: JobRepository {
         }
     }
 
-    func update(_ job: Job) async throws -> Bool {
-        guard let index = createdJobs.firstIndex(where: { $0.jobId == job.jobId }) else {
+    func update(jobId: String, updatable: Job.Updatable) async throws -> Bool {
+        guard var current = jobsById[jobId] else {
             return false
         }
-        createdJobs[index] = job
+        if let title = updatable.title {
+            current = Job(
+                jobId: current.jobId,
+                sourceType: current.sourceType,
+                sourceValue: current.sourceValue,
+                title: title,
+                durationSec: current.durationSec,
+                scheduledAt: current.scheduledAt,
+                timezone: current.timezone,
+                state: current.state,
+                createdAt: current.createdAt,
+                updatedAt: current.updatedAt
+            )
+        }
+        if let durationSec = updatable.durationSec {
+            current = Job(
+                jobId: current.jobId,
+                sourceType: current.sourceType,
+                sourceValue: current.sourceValue,
+                title: current.title,
+                durationSec: durationSec,
+                scheduledAt: current.scheduledAt,
+                timezone: current.timezone,
+                state: current.state,
+                createdAt: current.createdAt,
+                updatedAt: current.updatedAt
+            )
+        }
+        if let scheduledAt = updatable.scheduledAt {
+            current = Job(
+                jobId: current.jobId,
+                sourceType: current.sourceType,
+                sourceValue: current.sourceValue,
+                title: current.title,
+                durationSec: current.durationSec,
+                scheduledAt: scheduledAt,
+                timezone: current.timezone,
+                state: current.state,
+                createdAt: current.createdAt,
+                updatedAt: current.updatedAt
+            )
+        }
+        if let timezone = updatable.timezone {
+            current = Job(
+                jobId: current.jobId,
+                sourceType: current.sourceType,
+                sourceValue: current.sourceValue,
+                title: current.title,
+                durationSec: current.durationSec,
+                scheduledAt: current.scheduledAt,
+                timezone: timezone,
+                state: current.state,
+                createdAt: current.createdAt,
+                updatedAt: current.updatedAt
+            )
+        }
+        jobsById[jobId] = current
         return true
     }
 

@@ -1,15 +1,5 @@
 import GRDB
 
-protocol RunRepository: Sendable {
-    func create(_ run: Run) async throws
-    func find(runId: String) async throws -> Run?
-    func findAll() async throws -> [Run]
-    @discardableResult
-    func update(_ run: Run) async throws -> Bool
-    @discardableResult
-    func delete(runId: String) async throws -> Bool
-}
-
 actor GRDBRunRepository: RunRepository {
     private let dbQueue: DatabaseQueue
 
@@ -18,8 +8,15 @@ actor GRDBRunRepository: RunRepository {
     }
 
     func create(_ run: Run) async throws {
-        try await dbQueue.write { database in
-            try run.insert(database)
+        do {
+            try await dbQueue.write { database in
+                try run.insert(database)
+            }
+        } catch let error as DatabaseError where error.resultCode == .SQLITE_CONSTRAINT {
+            if let message = error.message, message.contains("UNIQUE constraint failed") {
+                throw RunRepositoryError.duplicateRun(reason: message)
+            }
+            throw error
         }
     }
 

@@ -1,5 +1,3 @@
-import GRDB
-
 protocol RunUseCase: Sendable {
     func create(_ run: Run) async throws
     func get(runId: String) async throws -> Run
@@ -47,10 +45,11 @@ struct DefaultRunUseCase: RunUseCase {
     func create(_ run: Run) async throws {
         do {
             try await runRepository.create(run)
-        } catch let error as DatabaseError where error.resultCode == .SQLITE_CONSTRAINT {
-            throw RunUseCaseError.duplicateRun(
-                reason: error.message ?? "constraint violation"
-            )
+        } catch let error as RunRepositoryError {
+            switch error {
+            case let .duplicateRun(reason):
+                throw RunUseCaseError.duplicateRun(reason: reason)
+            }
         } catch {
             throw RunUseCaseError.createFailed(reason: String(describing: error))
         }

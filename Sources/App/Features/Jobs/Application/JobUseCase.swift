@@ -1,10 +1,8 @@
-import GRDB
-
 protocol JobUseCase: Sendable {
     func create(_ job: Job) async throws
     func get(jobId: String) async throws -> Job
     func list() async throws -> [Job]
-    func update(_ job: Job) async throws -> Job
+    func update(jobId: String, updatable: Job.Updatable) async throws -> Job
     func delete(jobId: String) async throws
 }
 
@@ -47,10 +45,11 @@ struct DefaultJobUseCase: JobUseCase {
     func create(_ job: Job) async throws {
         do {
             try await jobRepository.create(job)
-        } catch let error as DatabaseError where error.resultCode == .SQLITE_CONSTRAINT {
-            throw JobUseCaseError.duplicateJob(
-                reason: error.message ?? "constraint violation"
-            )
+        } catch let error as JobRepositoryError {
+            switch error {
+            case let .duplicateJob(reason):
+                throw JobUseCaseError.duplicateJob(reason: reason)
+            }
         } catch {
             throw JobUseCaseError.createFailed(reason: String(describing: error))
         }
@@ -77,11 +76,14 @@ struct DefaultJobUseCase: JobUseCase {
         }
     }
 
-    func update(_ job: Job) async throws -> Job {
+    func update(jobId: String, updatable: Job.Updatable) async throws -> Job {
         do {
-            let updated = try await jobRepository.update(job)
+            let updated = try await jobRepository.update(jobId: jobId, updatable: updatable)
             guard updated else {
-                throw JobUseCaseError.jobNotFound(jobId: job.jobId)
+                throw JobUseCaseError.jobNotFound(jobId: jobId)
+            }
+            guard let job = try await jobRepository.find(jobId: jobId) else {
+                throw JobUseCaseError.jobNotFound(jobId: jobId)
             }
             return job
         } catch let error as JobUseCaseError {

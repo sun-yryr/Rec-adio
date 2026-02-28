@@ -81,36 +81,40 @@ struct JobRepositoryTests {
         let original = makeJob(jobId: "job-1")
         try await repository.create(original)
 
-        let updatedJob = Job(
-            jobId: original.jobId,
-            sourceType: "url",
-            sourceValue: "https://example.com/updated",
+        let updatable = Job.Updatable(
             title: "Updated Title",
             durationSec: 120,
             scheduledAt: Date(timeIntervalSince1970: 1_700_123_456),
-            timezone: "UTC",
-            state: .paused
+            timezone: "UTC"
         )
 
-        let updated = try await repository.update(updatedJob)
+        let updated = try await repository.update(jobId: original.jobId, updatable: updatable)
         let found = try await repository.find(jobId: original.jobId)
 
         #expect(updated)
-        #expect(found?.jobId == updatedJob.jobId)
-        #expect(found?.sourceType == updatedJob.sourceType)
-        #expect(found?.sourceValue == updatedJob.sourceValue)
-        #expect(found?.title == updatedJob.title)
-        #expect(found?.durationSec == updatedJob.durationSec)
-        #expect(found?.scheduledAt == updatedJob.scheduledAt)
-        #expect(found?.timezone == updatedJob.timezone)
-        #expect(found?.state == updatedJob.state)
+        #expect(found?.jobId == original.jobId)
+        #expect(found?.sourceType == original.sourceType)
+        #expect(found?.sourceValue == original.sourceValue)
+        #expect(found?.title == "Updated Title")
+        #expect(found?.durationSec == 120)
+        #expect(found?.scheduledAt == Date(timeIntervalSince1970: 1_700_123_456))
+        #expect(found?.timezone == "UTC")
+        #expect(found?.state == original.state)
     }
 
     @Test
     func updateReturnsFalseForUnknownJob() async throws {
         let repository = try makeTestRepository()
 
-        let updated = try await repository.update(makeJob(jobId: "missing"))
+        let updated = try await repository.update(
+            jobId: "missing",
+            updatable: Job.Updatable(
+                title: "Updated Title",
+                durationSec: nil,
+                scheduledAt: nil,
+                timezone: nil
+            )
+        )
 
         #expect(!updated)
     }
